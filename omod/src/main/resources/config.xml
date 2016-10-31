@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <module configVersion="1.2">
-
 	<!-- Module Properties -->
 	<id>${project.parent.artifactId}</id>
 	<name>${project.parent.name}</name>
@@ -14,15 +13,12 @@
 	<updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
 	<require_version>${openMRSVersion}</require_version>
 	<!-- / Module Properties -->
-
 	
 	<!-- Required Modules -->
-	<require_modules>
-																											
+	<require_modules>																							
 		<require_module version="0.9.7">
 			org.openmrs.module.reporting
-		</require_module>
-			
+		</require_module>	
 	</require_modules>
 	<!-- / Required Modules -->
 	
@@ -37,10 +33,8 @@
 	</extension>
 	
 	<!-- Maps hibernate file's, if present -->
-	<mappingFiles>
-				
+	<mappingFiles>	
 		DHISReporting.hbm.xml
-				
 	</mappingFiles>
 
 	<!-- Internationalization -->
@@ -59,5 +53,90 @@
 	</messages>
 	<!-- /Internationalization -->
 
+	<globalProperty>
+		<property>dhisreporting.bloodSmearConceptId</property>
+		<defaultValue>1476</defaultValue>
+		<description>BLOOD SMEAR concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.microFilariaConceptId</property>
+		<defaultValue>7232</defaultValue>
+		<description>MICRO-FILARIA concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.trypanosomaConceptId</property>
+		<defaultValue>7230</defaultValue>
+		<description>TRYPANOSOMA concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.giardiaConceptId</property>
+		<defaultValue>7234</defaultValue>
+		<description>GIARDIA concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.ascariasisConceptId</property>
+		<defaultValue>9581</defaultValue>
+		<description>ASCARIASIS concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.anklyostiasisConceptId</property>
+		<defaultValue>9582</defaultValue>
+		<description>ANKLYOSTOMIASIS concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.taeniaConceptId</property>
+		<defaultValue>9580</defaultValue>
+		<description>TAENIA concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.otherParasitesConceptId</property>
+		<defaultValue>8012</defaultValue>
+		<description>OTHER PARASITES concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.pregnancyTestConceptId</property>
+		<defaultValue>2473</defaultValue>
+		<description>PREGNANCY TEST concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.hemoglobinConceptId</property>
+		<defaultValue>21</defaultValue>
+		<description>HEMOGLOBIN concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.rprConceptId</property>
+		<defaultValue>1478</defaultValue>
+		<description>RPR / RAPID PLASMA REAGENT concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.fullBloodCountConceptId</property>
+		<defaultValue>7836</defaultValue>
+		<description>FULL BLOOD COUNT concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.creatinineConceptId</property>
+		<defaultValue>790</defaultValue>
+		<description>CREATININE concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.amylasseConceptId</property>
+		<defaultValue>3054</defaultValue>
+		<description>SERUM AMYLASE/AMYLASE concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.cd4CountConceptId</property>
+		<defaultValue>5497</defaultValue>
+		<description>CD4 COUNT/CD4 concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.widalConceptId</property>
+		<defaultValue>7661</defaultValue>
+		<description>WIDAL concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.derebrospinalFluidConceptId</property>
+		<defaultValue>1594</defaultValue>
+		<description>CEREBROSPINAL FLUID concept id</description>
+	</globalProperty>
 </module>
 

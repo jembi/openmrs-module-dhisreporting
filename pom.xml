@@ -38,33 +38,14 @@
 	</properties>
 
 	<dependencyManagement>
-		<dependencies>
-		
-			<!--
-			Libraries to add as dependencies with compile or runtime scope:
-			Find matching dependencies in the maven central repository.
-			<dependency>
-				<groupId>org.other.library</groupId>
-				<artifactId>library-name</artifactId>
-				<version>library.version</version>
-				<scope>compile</scope>
-			</dependency>
-			-->
-			
-						
+		<dependencies>	
 			<!-- Begin OpenMRS modules -->
 			
-						
 			<dependency>
-			
-				<groupId>org.openmrs.module</groupId>
-												
-				<artifactId>reporting-api</artifactId>
-																								
-				<version>0.9.7</version>
-												
+				<groupId>org.openmrs.module</groupId>						
+				<artifactId>reporting-api</artifactId>																		
+				<version>0.9.7</version>						
 				<scope>provided</scope>
-				
 			</dependency>
 						
 			<!-- End OpenMRS modules -->
