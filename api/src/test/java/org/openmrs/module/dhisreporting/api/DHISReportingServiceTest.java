@@ -43,7 +43,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 	public void test_periodIndicatorCreationByThisModule() {
 		Concept concept = Context.getConceptService().getConcept(5089);
 		Location location = Context.getLocationService().getLocation(1);
-		Date startDate = DateUtil.getDateTime(2010, 1, 1);
+		Date startDate = DateUtil.getDateTime(2008, 1, 1);
 		Date endDate = DateUtil.getDateTime(2016, 11, 1);
 		Cohort cohort = Context.getService(DHISReportingService.class).evaluateDHISObsCountCohortQuery(concept,
 				location, startDate, endDate);
@@ -52,6 +52,8 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		ReportData reportData = Context.getService(DHISReportingService.class).evaluateNewDHISPeriodReport("test", null,
 				startDate, endDate, location, Collections.singletonList(cohortIndicator));
 
-		//Assert.assertTrue(cohort.size() > 0);
+		Assert.assertTrue(cohort.size() > 0);
+		Assert.assertNotNull(cohortIndicator);
+		Assert.assertNotNull(reportData);
 	}
 }
