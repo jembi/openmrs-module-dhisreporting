@@ -13,11 +13,20 @@
  */
 package org.openmrs.module.dhisreporting.api;
 
+import java.util.Date;
+import java.util.List;
+
+import org.openmrs.Cohort;
+import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.reporting.indicator.CohortIndicator;
+import org.openmrs.module.reporting.report.ReportData;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * This service exposes module's core functionality. It is a Spring managed bean which is configured in moduleApplicationContext.xml.
+ * This service exposes module's core functionality. It is a Spring managed bean
+ * which is configured in moduleApplicationContext.xml.
  * <p>
  * It can be accessed only via Context:<br>
  * <code>
@@ -28,9 +37,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public interface DHISReportingService extends OpenmrsService {
-     
-	/*
-	 * Add service methods here
-	 * 
-	 */
+
+	Cohort evaluateDHISObsCountCohortQuery(Concept concept, Location location, Date startDate, Date endDate);
+
+	CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription, Cohort obsCohort);
+
+	ReportData evaluateNewDHISPeriodReport(String reportName, String reportDrescription, Date startDate, Date endDate,
+			Location location, List<CohortIndicator> indicators);
 }
