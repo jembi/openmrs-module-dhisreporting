@@ -24,9 +24,12 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DateUtil;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
-import org.openmrs.module.reporting.report.ReportData;
+import org.openmrs.module.reporting.report.Report;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 /**
@@ -45,15 +48,22 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Location location = Context.getLocationService().getLocation(1);
 		Date startDate = DateUtil.getDateTime(2008, 1, 1);
 		Date endDate = DateUtil.getDateTime(2016, 11, 1);
-		Cohort cohort = Context.getService(DHISReportingService.class).evaluateDHISObsCountCohortQuery(concept,
-				location, startDate, endDate);
+		CodedObsCohortDefinition cohort = Context.getService(DHISReportingService.class)
+				.evaluateDHISObsCountCohortQuery("test", concept, location, startDate, endDate);
 		CohortIndicator cohortIndicator = Context.getService(DHISReportingService.class)
 				.saveNewDHISCohortIndicator("test", null, cohort);
-		ReportData reportData = Context.getService(DHISReportingService.class).evaluateNewDHISPeriodReport("test", null,
+		Report report = Context.getService(DHISReportingService.class).evaluateNewDHISPeriodReport("test", null,
 				startDate, endDate, location, Collections.singletonList(cohortIndicator));
+		try {
+			Cohort c = Context.getService(CohortDefinitionService.class).evaluate(cohort, null);
 
-		Assert.assertTrue(cohort.size() > 0);
+			Assert.assertTrue(c.size() > 0);
+		} catch (EvaluationException e) {
+			e.printStackTrace();
+		}
 		Assert.assertNotNull(cohortIndicator);
-		Assert.assertNotNull(reportData);
+		Assert.assertNotNull(report);
+		Assert.assertNotNull(report.getReportData());
+		Assert.assertEquals(1, report.getReportData().getDataSets().size());
 	}
 }
