@@ -39,10 +39,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface DHISReportingService extends OpenmrsService {
 
-	CodedObsCohortDefinition evaluateDHISObsCountCohortQuery(String name, Concept concept, Location location, Date startDate, Date endDate);
+	CodedObsCohortDefinition createDHISObsCountCohortQuery(String name, Concept concept, Location location, Date startDate, Date endDate);
 
 	CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription, CodedObsCohortDefinition obsCohort);
 
-	Report evaluateNewDHISPeriodReport(String reportName, String reportDrescription, Date startDate, Date endDate,
+	Report createNewDHISPeriodReport(String reportName, String reportDrescription, Date startDate, Date endDate,
 			Location location, List<CohortIndicator> indicators);
+
+	Report createCohortQueriesIndicatorsAndLabReport(Location location, Date startDate, Date endDate);
 }

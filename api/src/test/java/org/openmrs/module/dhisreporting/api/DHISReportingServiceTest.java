@@ -49,10 +49,10 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Date startDate = DateUtil.getDateTime(2008, 1, 1);
 		Date endDate = DateUtil.getDateTime(2016, 11, 1);
 		CodedObsCohortDefinition cohort = Context.getService(DHISReportingService.class)
-				.evaluateDHISObsCountCohortQuery("test", concept, location, startDate, endDate);
+				.createDHISObsCountCohortQuery("test", concept, location, startDate, endDate);
 		CohortIndicator cohortIndicator = Context.getService(DHISReportingService.class)
 				.saveNewDHISCohortIndicator("test", null, cohort);
-		Report report = Context.getService(DHISReportingService.class).evaluateNewDHISPeriodReport("test", null,
+		Report report = Context.getService(DHISReportingService.class).createNewDHISPeriodReport("test", null,
 				startDate, endDate, location, Collections.singletonList(cohortIndicator));
 		try {
 			Cohort c = Context.getService(CohortDefinitionService.class).evaluate(cohort, null);
