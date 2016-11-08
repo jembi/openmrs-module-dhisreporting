@@ -15,7 +15,8 @@
 	<!-- / Module Properties -->
 	
 	<!-- Required Modules -->
-	<require_modules>																							
+	<require_modules>																					
+		<require_module version="${dhisconnectorVersion}">org.openmrs.module.dhisconnector</require_module>		
 		<require_module version="${reportingVersion}">org.openmrs.module.reporting</require_module>
 	</require_modules>
 	<!-- / Required Modules -->
@@ -135,6 +136,16 @@
 		<property>dhisreporting.derebrospinalFluidConceptId</property>
 		<defaultValue>1594</defaultValue>
 		<description>CEREBROSPINAL FLUID concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.defaultLocationId</property>
+		<defaultValue>1</defaultValue>
+		<description>Default location id from OpenMRS that matches the next configuration of orgunit</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.configuredDHISOrgUnitFosIdMatchingDefaultLocation</property>
+		<defaultValue>JEMBI</defaultValue>
+		<description>Configured organization unit code (the real id is mapped in the dhis-mappings.properties file) or fos id in Rwanda that matches the configured default location id</description>
 	</globalProperty>
 </module>
 

@@ -39,6 +39,7 @@
 		<serializationVersion>0.2.7</serializationVersion>
 		<htmlwidgetsVersion>1.6.4</htmlwidgetsVersion>
 		<calculationVersion>1.1</calculationVersion>
+		<dhisconnectorVersion>0.1.4-SNAPSHOT</dhisconnectorVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -68,6 +69,12 @@
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>calculation-api</artifactId>
 				<version>${calculationVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>dhisconnector-api</artifactId>
+				<version>${dhisconnectorVersion}</version>
 				<scope>provided</scope>
 			</dependency>
 

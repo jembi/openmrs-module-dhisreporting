@@ -16,20 +16,17 @@ package org.openmrs.module.dhisreporting.api;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
-import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
-import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
-import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
-import org.openmrs.module.reporting.report.Report;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 /**
@@ -45,15 +42,13 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void test_periodIndicatorCreationByThisModule() {
 		Concept concept = Context.getConceptService().getConcept(5089);
-		Location location = Context.getLocationService().getLocation(1);
-		Date startDate = DateUtil.getDateTime(2008, 1, 1);
-		Date endDate = DateUtil.getDateTime(2016, 11, 1);
 		CodedObsCohortDefinition cohort = Context.getService(DHISReportingService.class)
-				.createDHISObsCountCohortQuery("test", concept, location, startDate, endDate);
+				.createDHISObsCountCohortQuery("test", concept);
 		CohortIndicator cohortIndicator = Context.getService(DHISReportingService.class)
 				.saveNewDHISCohortIndicator("test", null, cohort);
-		Report report = Context.getService(DHISReportingService.class).createNewDHISPeriodReport("test", null,
-				startDate, endDate, location, Collections.singletonList(cohortIndicator));
+		ReportDefinition report = Context.getService(DHISReportingService.class)
+				.createNewDHISPeriodReportAndItsDHISConnectorMapping("test", null,
+						Collections.singletonList(cohortIndicator), null, "", "");
 		try {
 			Cohort c = Context.getService(CohortDefinitionService.class).evaluate(cohort, null);
 
@@ -63,7 +58,5 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		}
 		Assert.assertNotNull(cohortIndicator);
 		Assert.assertNotNull(report);
-		Assert.assertNotNull(report.getReportData());
-		Assert.assertEquals(1, report.getReportData().getDataSets().size());
 	}
 }

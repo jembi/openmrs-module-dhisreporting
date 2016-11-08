@@ -32,6 +32,11 @@
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>htmlwidgets-omod</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>dhisconnector-api</artifactId>
+		</dependency>
 				
 		<!-- End OpenMRS modules -->
 		

@@ -13,9 +13,19 @@
  */
 package org.openmrs.module.dhisreporting.web.controller;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
+import org.openmrs.module.dhisreporting.api.DHISReportingService;
+import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,12 +35,29 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * The main controller.
  */
 @Controller
-public class  DHISReportingManageController {
-	
+public class DHISReportingManageController {
+
 	protected final Log log = LogFactory.getLog(getClass());
-	
+
 	@RequestMapping(value = "/module/dhisreporting/manage", method = RequestMethod.GET)
 	public void manage(ModelMap model) {
 		model.addAttribute("user", Context.getAuthenticatedUser());
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/manage", method = RequestMethod.POST)
+	public void postManage(ModelMap model, HttpServletRequest request) {
+		DHISImportSummary feedback = Context.getService(DHISReportingService.class)
+				.runAndSendReportDataForTheCurrentMonth();
+
+		try {
+			request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
+					new ObjectMapper().writeValueAsString(feedback));
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

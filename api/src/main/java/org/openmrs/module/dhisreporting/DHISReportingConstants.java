@@ -1,6 +1,21 @@
 package org.openmrs.module.dhisreporting;
 
-public class DHISReportingGPConstants {
+import java.io.File;
+
+import org.openmrs.util.OpenmrsUtil;
+
+public class DHISReportingConstants {
+
+	private static final String DHISREPORTING_DIRECTORY_NAME = "DHISReporting";
+
+	public static final File DHISREPORTING_DIRECTORY = OpenmrsUtil
+			.getDirectoryInApplicationDataDirectory(DHISREPORTING_DIRECTORY_NAME);
+
+	public static final String DHISREPORTING_MAPPING_FILENAME = "dhis-mappings.properties";
+
+	public static final File DHISREPORTING_FINAL_MAPPINGFILE = new File(
+			DHISREPORTING_DIRECTORY.getAbsolutePath() + File.separator + DHISREPORTING_MAPPING_FILENAME);
+
 	public static String BLOODSMEAR_CONCEPTID = "dhisreporting.bloodSmearConceptId";
 
 	public static String MICROFILARIA_CONCEPTID = "dhisreporting.microFilariaConceptId";
@@ -32,4 +47,10 @@ public class DHISReportingGPConstants {
 	public static String WIDAL_CONCEPTID = "dhisreporting.widalConceptId";
 
 	public static String DEREBROSPINALFLUID_CONCEPTID = "dhisreporting.derebrospinalFluidConceptId";
+
+	public static String LAB_REPORT_UUID = "c06091be-a4c0-11e6-80f5-76304dec7eb7";
+
+	public static String DEFAULT_LOCATION_ID = "dhisreporting.defaultLocationId";
+
+	public static String CONFIGURED_ORGUNIT_CODE = "dhisreporting.configuredDHISOrgUnitFosIdMatchingDefaultLocation";
 }

@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
- 
+
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <!--
-        See http://www.liquibase.org/manual/home#available_database_refactorings
-        for a list of supported elements and attributes
-    -->
-    
+	<!-- See http://www.liquibase.org/manual/home#available_database_refactorings 
+		for a list of supported elements and attributes -->
+
+	<changeSet id="2016Nov08-1349" author="k-joseph">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM
+				scheduler_task_config WHERE schedulable_class =
+				'org.openmrs.module.dhisreporting.scheduler.RunReportsAndPushToDHISTask';
+			</sqlCheck>
+		</preConditions>
+		<comment>Runs period indicator reports and pushes data into DHIS every after 30 days at mid-day</comment>
+		<insert tableName="scheduler_task_config">
+			<column name="name" value="Run DHIS and Push monthly reports" />
+			<column name="schedulable_class"
+				value="org.openmrs.module.dhisreporting.scheduler.RunReportsAndPushToDHISTask" />
+			<column name="description"
+				value="Scheduled task for cleaning/deleting locally stored logs and dhis data" />
+			<column name="start_time" value="2016-11-30 12:00:00" />
+			<column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+			<column name="repeat_interval" value="2592000" />
+			<column name="start_on_startup" value="1" />
+			<column name="started" value="1" />
+			<column name="created_by" value="1" />
+			<column name="date_created" value="2016-11-08 13:49:45" />
+			<column name="uuid" value="ef0f5e2e-a5a0-11e6-80f5-76304dec7eb7" />
+		</insert>
+	</changeSet>
 </databaseChangeLog>

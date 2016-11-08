@@ -16,13 +16,14 @@ package org.openmrs.module.dhisreporting.api;
 import java.util.Date;
 import java.util.List;
 
-import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.report.Report;
+import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -39,12 +40,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface DHISReportingService extends OpenmrsService {
 
-	CodedObsCohortDefinition createDHISObsCountCohortQuery(String name, Concept concept, Location location, Date startDate, Date endDate);
+	CodedObsCohortDefinition createDHISObsCountCohortQuery(String name, Concept concept);
 
-	CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription, CodedObsCohortDefinition obsCohort);
+	CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription,
+			CodedObsCohortDefinition obsCohort);
 
-	Report createNewDHISPeriodReport(String reportName, String reportDrescription, Date startDate, Date endDate,
-			Location location, List<CohortIndicator> indicators);
+	PeriodIndicatorReportDefinition createNewDHISPeriodReportAndItsDHISConnectorMapping(String reportName,
+			String reportDrescription, List<CohortIndicator> indicators, String uuid, String dataSetCode,
+			String dataSetPeriod);
 
-	Report createCohortQueriesIndicatorsAndLabReport(Location location, Date startDate, Date endDate);
+	void createCohortQueriesIndicatorsAndLabReport();
+
+	void transferDHISMappingsToDataDirectory();
+
+	Report runPeriodIndicatorReport(PeriodIndicatorReportDefinition reportDef, Date startDate, Date endDate,
+			Location location);
+
+	DHISImportSummary sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId);
+
+	String getValueFromMappings(String code);
+
+	DHISImportSummary runAndSendReportDataForTheCurrentMonth();
 }
