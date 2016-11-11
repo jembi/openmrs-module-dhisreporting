@@ -159,11 +159,13 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			for (CohortIndicator ind : indicators) {
 				String code = ind.getName().replaceAll(" ", "").replaceAll("-", "");
 				DHISMappingElement map = new DHISMappingElement();
+				CodedObsCohortDefinition c = (CodedObsCohortDefinition) ind.getCohortDefinition().getParameterizable();
+				String mappedCode = Integer.toString(c.getQuestion().getConceptId());
 
 				map.setIndicator(code);
-				map.setDataElement(getValueFromMappings(code));
+				map.setDataElement(getValueFromMappings(mappedCode));
 				mappings.add(map);
-				report.addIndicator(code, ind.getName(), ind);
+				report.addIndicator(mappedCode, ind.getName(), ind);
 			}
 		}
 		mapping.setName(reportName);
@@ -213,7 +215,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		CohortIndicator pregnantTest = saveNewDHISCohortIndicator("PREGNANCY TEST", "Auto generated PREGNANCY TEST",
 				createDHISObsCountCohortQuery("PREGNANCY TEST", OpenMRSReportConcepts.PREGNANCYTEST));
 		CohortIndicator hemoglobin = saveNewDHISCohortIndicator("HEMOGLOBIN", "Auto generated HEMOGLOBIN",
-				createDHISObsCountCohortQuery("HEMOGLOBIN", OpenMRSReportConcepts.HEMOGLOBIN));
+				createDHISObsCountCohortQuery("HEMOGLOBIN", OpenMRSReportConcepts.RPR));
+		CohortIndicator rpr = saveNewDHISCohortIndicator("RAPID PLASMA REAGENT", "Auto generated RPR",
+				createDHISObsCountCohortQuery("RAPID PLASMA REAGENT", OpenMRSReportConcepts.RPR));
 		CohortIndicator fullBloodCount = saveNewDHISCohortIndicator("FULL BLOOD COUNT",
 				"Auto generated FULL BLOOD COUNT",
 				createDHISObsCountCohortQuery("FULL BLOOD COUNT", OpenMRSReportConcepts.FULLBLOODCOUNT));
@@ -240,6 +244,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		indicators.add(otherParasites);
 		indicators.add(pregnantTest);
 		indicators.add(hemoglobin);
+		indicators.add(rpr);
 		indicators.add(fullBloodCount);
 		indicators.add(creatine);
 		indicators.add(amylasse);
@@ -262,7 +267,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 		try {
 			try {
-				FileUtils.copyFile(mappingsFile, DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+				if (!DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE.exists())
+					FileUtils.copyFile(mappingsFile, DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -356,8 +362,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 		startDate.set(Calendar.DAY_OF_MONTH, 1);
 		if (defaultLocation != null && labReportDef != null) {
-			Report labReport = Context.getService(DHISReportingService.class).runPeriodIndicatorReport(labReportDef,
-					startDate.getTime(), endDate, defaultLocation);
+			Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
 			String dataSetId = getValueFromMappings("HMIS_LAB_REQUEST");
 			String orgUnitId = getValueFromMappings(Context.getAdministrationService()
 					.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_CODE));

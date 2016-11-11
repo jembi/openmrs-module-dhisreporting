@@ -16,6 +16,8 @@ public class DHISReportingConstants {
 	public static final File DHISREPORTING_FINAL_MAPPINGFILE = new File(
 			DHISREPORTING_DIRECTORY.getAbsolutePath() + File.separator + DHISREPORTING_MAPPING_FILENAME);
 
+	public static final String RPR_CONCEPTID = "dhisreporting.rprConceptId";
+
 	public static String BLOODSMEAR_CONCEPTID = "dhisreporting.bloodSmearConceptId";
 
 	public static String MICROFILARIA_CONCEPTID = "dhisreporting.microFilariaConceptId";

@@ -24,6 +24,8 @@ public class OpenMRSReportConcepts {
 
 	public static Concept HEMOGLOBIN = getConceptFromGPcode(DHISReportingConstants.HEMOGLOBIN_CONCEPTID);
 
+	public static Concept RPR = getConceptFromGPcode(DHISReportingConstants.RPR_CONCEPTID);
+
 	public static Concept FULLBLOODCOUNT = getConceptFromGPcode(DHISReportingConstants.FULLBLOODCOUNT_CONCEPTID);
 
 	public static Concept CREATINE = getConceptFromGPcode(DHISReportingConstants.CREATINE_CONCEPTID);
