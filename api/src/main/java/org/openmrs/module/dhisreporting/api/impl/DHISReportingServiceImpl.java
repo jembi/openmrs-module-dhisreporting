@@ -42,6 +42,7 @@ import org.openmrs.module.dhisconnector.api.model.DHISDataValueSet;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisconnector.api.model.DHISMapping;
 import org.openmrs.module.dhisconnector.api.model.DHISMappingElement;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.OpenMRSReportConcepts;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
@@ -163,7 +164,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				String mappedCode = Integer.toString(c.getQuestion().getConceptId());
 
 				map.setIndicator(code);
-				map.setDataElement(getValueFromMappings(mappedCode));
+				map.setDataElement(getValueFromMappings(DHISMappingType.INDICATOR_ + mappedCode));
 				mappings.add(map);
 				report.addIndicator(mappedCode, ind.getName(), ind);
 			}
@@ -253,7 +254,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		indicators.add(derebroSpinalFluid);
 
 		createNewDHISPeriodReportAndItsDHISConnectorMapping("HMIS Lab Request", "HMIS Auto-generated Lab Request",
-				indicators, DHISReportingConstants.LAB_REPORT_UUID, "HMIS_LAB_REQUEST", "Monthly");
+				indicators, DHISReportingConstants.LAB_REPORT_UUID, DHISMappingType.DATASET_ + "HMIS_LAB_REQUEST",
+				"Monthly");
 	}
 
 	@Override
@@ -337,7 +339,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				String column = columns.get(i).getName();
 
 				dv.setValue(row.getColumnValue(column).toString());
-				dv.setDataElement(getValueFromMappings(column));
+				dv.setDataElement(getValueFromMappings(DHISMappingType.INDICATOR_ + column));
 				dataValues.add(dv);
 			}
 			dataValueSet.setDataValues(dataValues);
@@ -363,8 +365,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		startDate.set(Calendar.DAY_OF_MONTH, 1);
 		if (defaultLocation != null && labReportDef != null) {
 			Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
-			String dataSetId = getValueFromMappings("HMIS_LAB_REQUEST");
-			String orgUnitId = getValueFromMappings(Context.getAdministrationService()
+			String dataSetId = getValueFromMappings(DHISMappingType.DATASET_ + "HMIS_LAB_REQUEST");
+			String orgUnitId = getValueFromMappings(DHISMappingType.LOCATION_ + Context.getAdministrationService()
 					.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_CODE));
 			String period = new SimpleDateFormat("yyyyMM").format(new Date());
 
