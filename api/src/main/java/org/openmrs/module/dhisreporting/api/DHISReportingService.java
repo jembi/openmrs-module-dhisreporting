@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.dhisreporting.api;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +21,8 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.report.Report;
@@ -58,7 +61,17 @@ public interface DHISReportingService extends OpenmrsService {
 
 	DHISImportSummary sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId);
 
-	String getValueFromMappings(String code);
-
 	DHISImportSummary runAndSendReportDataForTheCurrentMonth();
+
+	OpenMRSToDHISMapping getMapping(String openmrsIdOrCode, DHISMappingType mappingType);
+
+	List<OpenMRSToDHISMapping> getAllMappings();
+
+	OpenMRSToDHISMapping getMappingFromMappings(String code, DHISMappingType type);
+
+	OpenMRSToDHISMapping saveOrUpdateMapping(OpenMRSToDHISMapping mapping);
+
+	void deleteMapping(OpenMRSToDHISMapping mapping);
+
+	void writeContentToFile(String content, File file);
 }

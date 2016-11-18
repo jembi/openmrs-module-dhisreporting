@@ -1,6 +1,9 @@
-package org.openmrs.module.dhisreporting.web.controller;
+package org.openmrs.module.dhisreporting.web.resource;
 
+import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
+import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
@@ -11,15 +14,16 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceD
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 @Resource(name = RestConstants.VERSION_1
-		+ "/dhisconnector/openmrstodhismappings", supportedClass = OpenMRSToDHISMapping.class, supportedOpenmrsVersions = {
+		+ "/dhisreporting/openmrstodhismappings", supportedClass = OpenMRSToDHISMapping.class, supportedOpenmrsVersions = {
 				"1.8.*", "1.9.*, 1.10.*, 1.11.*", "1.12.*", "2.0.*" })
 public class OpenMRSToDHISMappingResource extends DataDelegatingCrudResource implements Retrievable {
 
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation arg0) {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addProperty("openmrsId");
+		description.addProperty("openmrsId", Representation.REF);
 		description.addProperty("dhisId", Representation.REF);
+		description.addProperty("type", Representation.REF);
 
 		return description;
 	}
@@ -39,8 +43,8 @@ public class OpenMRSToDHISMappingResource extends DataDelegatingCrudResource imp
 	}
 
 	@Override
-	public Object getByUniqueId(String arg0) {
-		return null;
+	public Object getByUniqueId(String openmrsIdOrCode) {
+		return Context.getService(DHISReportingService.class).getMapping(openmrsIdOrCode, DHISMappingType.INDICATOR_);
 	}
 
 	@Override

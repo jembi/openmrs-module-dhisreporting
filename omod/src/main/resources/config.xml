@@ -5,34 +5,40 @@
 	<id>${project.parent.artifactId}</id>
 	<name>${project.parent.name}</name>
 	<version>${project.parent.version}</version>
-	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
+	<package>${project.parent.groupId}.${project.parent.artifactId}
+	</package>
 	<author>k-joseph</author>
 	<description>
 		${project.parent.description}
 	</description>
-	<updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
+	<updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf
+	</updateURL>
 	<require_version>${openMRSVersion}</require_version>
 	<!-- / Module Properties -->
-	
+
 	<!-- Required Modules -->
-	<require_modules>																					
-		<require_module version="${dhisconnectorVersion}">org.openmrs.module.dhisconnector</require_module>		
-		<require_module version="${reportingVersion}">org.openmrs.module.reporting</require_module>
+	<require_modules>
+		<require_module version="${dhisconnectorVersion}">org.openmrs.module.dhisconnector
+		</require_module>
+		<require_module version="${reportingVersion}">org.openmrs.module.reporting
+		</require_module>
 	</require_modules>
 	<!-- / Required Modules -->
-	
+
 	<!-- Module Activator -->
-	<activator>${project.parent.groupId}.${project.parent.artifactId}.DHISReportingActivator</activator>
-	
-	
+	<activator>${project.parent.groupId}.${project.parent.artifactId}.DHISReportingActivator
+	</activator>
+
+
 	<!-- Adds link to admin page -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
-		<class>${project.parent.groupId}.${project.parent.artifactId}.extension.html.AdminList</class>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.extension.html.AdminList
+		</class>
 	</extension>
-	
+
 	<!-- Maps hibernate file's, if present -->
-	<mappingFiles>	
+	<mappingFiles>
 		DHISReporting.hbm.xml
 	</mappingFiles>
 
@@ -140,12 +146,18 @@
 	<globalProperty>
 		<property>dhisreporting.defaultLocationId</property>
 		<defaultValue>1</defaultValue>
-		<description>Default location id from OpenMRS that matches the next configuration of orgunit</description>
+		<description>Default location id from OpenMRS that matches the next
+			configuration of orgunit
+		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>dhisreporting.configuredDHISOrgUnitFosIdMatchingDefaultLocation</property>
+		<property>dhisreporting.configuredDHISOrgUnitFosIdMatchingDefaultLocation
+		</property>
 		<defaultValue>JEMBI</defaultValue>
-		<description>Configured organization unit code (the real id is mapped in the dhis-mappings.properties file) or fos id in Rwanda that matches the configured default location id</description>
+		<description>Configured organization unit code (the real id is mapped
+			in the dhis-mappings.properties file) or fos id in Rwanda that
+			matches the configured default location id
+		</description>
 	</globalProperty>
 </module>
 

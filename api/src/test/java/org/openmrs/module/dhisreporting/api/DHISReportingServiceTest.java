@@ -15,13 +15,20 @@ package org.openmrs.module.dhisreporting.api;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
+import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.dhisreporting.DHISReportingConstants;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -34,9 +41,16 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
  */
 public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 
+	GlobalProperty mappingsLocation = null;
+
 	@Test
 	public void shouldSetupContext() {
 		assertNotNull(Context.getService(DHISReportingService.class));
+	}
+
+	@Before
+	public void init() {
+		Context.getService(DHISReportingService.class).transferDHISMappingsToDataDirectory();
 	}
 
 	@Test
@@ -58,5 +72,49 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		}
 		Assert.assertNotNull(cohortIndicator);
 		Assert.assertNotNull(report);
+	}
+
+	@Test
+	public void test_getAllMappings() {
+		List<OpenMRSToDHISMapping> mappings = Context.getService(DHISReportingService.class).getAllMappings();
+		Assert.assertNotNull(mappings);
+		Assert.assertTrue(mappings.size() > 0);
+	}
+
+	@Test
+	public void test_saveOrEditAndDeleteMapping() {
+		List<OpenMRSToDHISMapping> mappings = Context.getService(DHISReportingService.class).getAllMappings();
+		Integer mappingsOriginalCount = mappings.size();
+		OpenMRSToDHISMapping map = Context.getService(DHISReportingService.class).getMapping("JEMBI",
+				DHISMappingType.LOCATION_);
+		OpenMRSToDHISMapping newMap = new OpenMRSToDHISMapping();
+		File mappingFile = DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE;
+
+		Assert.assertEquals("vjFcsoL24z5", map.getDhisId());
+
+		map.setDhisId("dhisNewId");
+		map = Context.getService(DHISReportingService.class).saveOrUpdateMapping(map);
+
+		Assert.assertEquals("dhisNewId", map.getDhisId());
+		Assert.assertEquals(mappingsOriginalCount.intValue(),
+				Context.getService(DHISReportingService.class).getAllMappings().size());
+		Assert.assertEquals(mappingFile.getAbsolutePath(),
+				DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE.getAbsolutePath());
+
+		newMap.setOpenmrsId("testOmrs");
+		newMap.setDhisId("testDHIS");
+		newMap.setType(DHISMappingType.INDICATOR_.name());
+		newMap = Context.getService(DHISReportingService.class).saveOrUpdateMapping(newMap);
+
+		Assert.assertEquals(mappingFile.getAbsolutePath(),
+				DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE.getAbsolutePath());
+		Assert.assertEquals("testDHIS", newMap.getDhisId());
+		Assert.assertEquals(mappingsOriginalCount.intValue() + 1,
+				Context.getService(DHISReportingService.class).getAllMappings().size());
+
+		Context.getService(DHISReportingService.class).deleteMapping(newMap);
+
+		Assert.assertEquals(mappingsOriginalCount.intValue(),
+				Context.getService(DHISReportingService.class).getAllMappings().size());
 	}
 }

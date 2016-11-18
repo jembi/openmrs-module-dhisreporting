@@ -14,9 +14,11 @@
 package org.openmrs.module.dhisreporting.api.impl;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
@@ -42,9 +44,10 @@ import org.openmrs.module.dhisconnector.api.model.DHISDataValueSet;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisconnector.api.model.DHISMapping;
 import org.openmrs.module.dhisconnector.api.model.DHISMappingElement;
-import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.OpenMRSReportConcepts;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
+import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
 import org.openmrs.module.reporting.ReportingConstants;
@@ -279,8 +282,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		}
 	}
 
-	@Override
-	public String getValueFromMappings(String code) {
+	private String getValueFromMappings(String code) {
 		FileInputStream fis;
 		BufferedReader br;
 		String objectMappedValue = null;
@@ -373,5 +375,207 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId);
 		}
 		return null;
+	}
+
+	@Override
+	public OpenMRSToDHISMapping getMapping(String openmrsIdOrCode, DHISMappingType mappingType) {
+		OpenMRSToDHISMapping mapping = new OpenMRSToDHISMapping();
+
+		mapping.setOpenmrsId(openmrsIdOrCode);
+		mapping.setType(mappingType.name());
+		mapping.setDhisId(getValueFromMappings(mappingType + openmrsIdOrCode));
+		if (StringUtils.isNotBlank(mapping.getOpenmrsId()) && StringUtils.isNotBlank(mapping.getDhisId()))
+			return mapping;
+		return null;
+	}
+
+	@Override
+	public List<OpenMRSToDHISMapping> getAllMappings() {
+		List<OpenMRSToDHISMapping> mappings = new ArrayList<OpenMRSToDHISMapping>();
+
+		FileInputStream fis;
+		BufferedReader br;
+
+		try {
+			fis = new FileInputStream(DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+			br = new BufferedReader(new InputStreamReader(fis));
+			String line = null;
+
+			while ((line = br.readLine()) != null) {
+				OpenMRSToDHISMapping map = new OpenMRSToDHISMapping();
+
+				if (line.matches("(" + DHISMappingType.DATASET_ + "|" + DHISMappingType.INDICATOR_ + "|"
+						+ DHISMappingType.LOCATION_ + ").*")) {
+					map.setType(line.split("_")[0] + "_");
+					map.setOpenmrsId(concateLines(line.split("=")[0].split("_"), "_", 0));
+					map.setDhisId(line.split("=")[1]);
+					mappings.add(map);
+				}
+			}
+
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return mappings;
+	}
+
+	private String concateLines(String[] s, String separator, int skipIndex) {
+		String result = "";
+		if (s.length > 0) {
+			for (int i = 0; i < s.length; i++) {
+				if (i != skipIndex) {
+					result = result + separator + s[i];
+				}
+			}
+		}
+		return result = result.replaceFirst(separator, "");
+	}
+
+	/**
+	 * @param code,
+	 *            includes type and openmrsid
+	 * @return
+	 */
+	@Override
+	public OpenMRSToDHISMapping getMappingFromMappings(String code, DHISMappingType type) {
+		OpenMRSToDHISMapping map = null;
+		FileInputStream fis;
+		BufferedReader br;
+
+		try {
+			fis = new FileInputStream(DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+			br = new BufferedReader(new InputStreamReader(fis));
+			String line = null;
+
+			while ((line = br.readLine()) != null) {
+				if (line.startsWith(type + code + "=")) {
+					map = new OpenMRSToDHISMapping();
+
+					map.setType(line.split("_")[0] + "_");
+					map.setOpenmrsId(code);
+					map.setDhisId(line.replace(type + code + "=", ""));
+				}
+			}
+
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
+
+	@Override
+	public OpenMRSToDHISMapping saveOrUpdateMapping(OpenMRSToDHISMapping mapping) {
+		FileInputStream fis;
+		BufferedReader br;
+		String newContent = "";
+		boolean editing = false;
+
+		if (mapping != null && StringUtils.isNotBlank(mapping.getType())
+				&& StringUtils.isNotBlank(mapping.getOpenmrsId()) && StringUtils.isNotBlank(mapping.getDhisId())) {
+			try {
+				fis = new FileInputStream(DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+				br = new BufferedReader(new InputStreamReader(fis));
+				String line = null;
+
+				// EDITING
+				while ((line = br.readLine()) != null) {
+					if (line.startsWith(mapping.getType() + mapping.getOpenmrsId() + "=")) {
+						editing = true;
+						newContent += mapping.getType() + mapping.getOpenmrsId() + "=" + mapping.getDhisId() + "\n";
+					} else {
+						newContent += line + "\n";
+					}
+				}
+
+				// ADDING NEW MAPPING
+				if (editing == false) {
+					newContent = "";
+					fis = new FileInputStream(DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+					br = new BufferedReader(new InputStreamReader(fis));
+					while ((line = br.readLine()) != null) {
+						String beforeLine = "##ending " + mapping.getType() + " mappings";
+						if (line.equals(beforeLine)) {
+							newContent += mapping.getType() + mapping.getOpenmrsId() + "=" + mapping.getDhisId() + "\n"
+									+ beforeLine + "\n";
+						} else {
+							newContent += line + "\n";
+						}
+					}
+				}
+				newContent = replaceLast(newContent, "\n", "");
+				writeContentToFile(newContent, DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+				br.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return mapping;
+	}
+
+	private String replaceLast(String string, String toBeReplaced, String replaceWith) {
+		if (StringUtils.isNotBlank(string)) {
+			StringBuffer sb = new StringBuffer(string);
+			sb.replace(string.lastIndexOf(toBeReplaced), string.lastIndexOf(toBeReplaced) + 1, replaceWith);
+			return sb.toString();
+		} else
+			return null;
+	}
+
+	@Override
+	public void deleteMapping(OpenMRSToDHISMapping mapping) {
+		FileInputStream fis;
+		BufferedReader br;
+		String newContent = "";
+		if (mapping != null && StringUtils.isNotBlank(mapping.getType())
+				&& StringUtils.isNotBlank(mapping.getOpenmrsId()) && StringUtils.isNotBlank(mapping.getDhisId())) {
+			try {
+				fis = new FileInputStream(DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+				br = new BufferedReader(new InputStreamReader(fis));
+				String line = null;
+
+				while ((line = br.readLine()) != null) {
+					// SKIP/DELETE existing mapping entry
+					if (!line.equals(mapping.getType() + mapping.getOpenmrsId() + "=" + mapping.getDhisId())) {
+						newContent += line + "\n";
+					}
+				}
+				newContent = replaceLast(newContent, "\n", "");
+				writeContentToFile(newContent, DHISReportingConstants.DHISREPORTING_TEMP_MAPPINGFILE);
+				FileUtils.copyFile(DHISReportingConstants.DHISREPORTING_TEMP_MAPPINGFILE,
+						DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+				DHISReportingConstants.DHISREPORTING_TEMP_MAPPINGFILE.delete();
+				br.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void writeContentToFile(String content, File file) {
+		if (StringUtils.isNotBlank(content) && file != null) {
+			try {
+				if (!file.exists()) {
+					file.createNewFile();
+				}
+
+				FileWriter fw = new FileWriter(file.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				bw.write(content);
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

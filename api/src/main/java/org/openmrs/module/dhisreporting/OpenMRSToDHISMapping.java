@@ -19,13 +19,26 @@ public class OpenMRSToDHISMapping {
 	@JsonProperty("dhisId")
 	private String dhisId;
 
+	@JsonProperty("openmrsId")
+	public String getOpenmrsId() {
+		return openmrsId;
+	}
+
+	@JsonProperty("type")
+	private String type;
+
 	public enum DHISMappingType {
 		INDICATOR_, DATASET_, LOCATION_
 	}
 
-	@JsonProperty("openmrsId")
-	public String getOpenmrsId() {
-		return openmrsId;
+	@JsonProperty("type")
+	public String getType() {
+		return type;
+	}
+
+	@JsonProperty("type")
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	@JsonProperty("openmrsId")
