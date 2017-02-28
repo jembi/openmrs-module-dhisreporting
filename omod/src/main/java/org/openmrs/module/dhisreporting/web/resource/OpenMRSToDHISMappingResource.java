@@ -44,7 +44,7 @@ public class OpenMRSToDHISMappingResource extends DataDelegatingCrudResource imp
 
 	@Override
 	public Object getByUniqueId(String openmrsIdOrCode) {
-		return Context.getService(DHISReportingService.class).getMapping(openmrsIdOrCode, DHISMappingType.INDICATOR_);
+		return Context.getService(DHISReportingService.class).getMapping(openmrsIdOrCode, DHISMappingType.CONCEPTDATAELEMENT);
 	}
 
 	@Override

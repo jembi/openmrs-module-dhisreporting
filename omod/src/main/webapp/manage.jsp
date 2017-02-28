@@ -6,6 +6,6 @@
 <p>Hello ${user.systemId}!</p>
 
 <form method="post">
-	<input type="submit" value="Test Sending monthly HMIS data">
+	<input type="submit" value="Test Sending monthly HMIS data with Lab report">
 </form>
 <%@ include file="/WEB-INF/template/footer.jsp"%>

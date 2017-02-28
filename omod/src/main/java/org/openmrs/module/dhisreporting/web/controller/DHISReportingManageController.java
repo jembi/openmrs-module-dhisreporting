@@ -23,6 +23,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.dhisconnector.api.DHISConnectorService;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.web.WebConstants;
@@ -59,5 +60,19 @@ public class DHISReportingManageController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/mappings", method = RequestMethod.GET)
+	public void mappings(ModelMap model) {
+		model.addAttribute("mappings", Context.getService(DHISReportingService.class).getAllMappings());
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/mappings", method = RequestMethod.POST)
+	public void postMappings(ModelMap model, HttpServletRequest request) {
+		model.addAttribute("mappings", Context.getService(DHISReportingService.class).getAllMappings());
+		model.addAttribute("dhisOrgUnits", Context.getService(DHISConnectorService.class).getDHIS2APIBackupPath());
+		// TODO get datasets using rest web services api from dhisconnector
+		// module
+		model.addAttribute("openmrsLocations", Context.getLocationService().getAllLocations());
 	}
 }

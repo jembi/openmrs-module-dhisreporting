@@ -159,5 +159,40 @@
 			matches the configured default location id
 		</description>
 	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.concept.viralLoad</property>
+		<defaultValue>856</defaultValue>
+		<description>Viral Load concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.concept.exitCareReason</property>
+		<defaultValue>1811</defaultValue>
+		<description>Reason Exit Care concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.concept.ARVDrugs</property>
+		<defaultValue>1085</defaultValue>
+		<description>ANTIRETROVIRAL DRUGS concept set id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.program.HIV</property>
+		<defaultValue>2</defaultValue>
+		<description>HIV program id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.program.TB</property>
+		<defaultValue>4</defaultValue>
+		<description>TB program id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.concept.hivStatus</property>
+		<defaultValue>2169</defaultValue>
+		<description>RESULT OF HIV TEST concept id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.concept.positive</property>
+		<defaultValue>703</defaultValue>
+		<description>POSITIVE concept id</description>
+	</globalProperty>
 </module>
 

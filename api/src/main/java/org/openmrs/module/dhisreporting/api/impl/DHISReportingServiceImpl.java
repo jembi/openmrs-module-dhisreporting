@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,6 @@ import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.EncounterCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
@@ -117,6 +117,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		cd.addParameter(ReportingConstants.START_DATE_PARAMETER);
 		cd.addParameter(ReportingConstants.END_DATE_PARAMETER);
 		cd.addParameter(ReportingConstants.LOCATION_PARAMETER);
+		cd.addParameter(new Parameter("onOrAfter", "On Or After", Date.class));
+		cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
+		cd.addParameter(new Parameter("locationList", "Location", Location.class));
 
 		return Context.getService(CohortDefinitionService.class).saveDefinition(cd);
 	}
@@ -125,12 +128,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	public CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription,
 			CodedObsCohortDefinition obsCohort) {
 		CohortIndicator indicator = new CohortIndicator();
-		EncounterCohortDefinition atSite = new EncounterCohortDefinition();
+		Map<String, Object> mappings = new HashMap<String, Object>();
 
 		setBasicOpenMRSObjectProps(indicator);
-		atSite.setName("At Site");
-		atSite.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
 		indicator.getParameters().clear();
 		indicator.addParameter(ReportingConstants.START_DATE_PARAMETER);
 		indicator.addParameter(ReportingConstants.END_DATE_PARAMETER);
@@ -138,49 +138,62 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		indicator.setName(indicatorName);
 		indicator.setDescription(indicatorDescription);
 		indicator.setType(IndicatorType.COUNT);
-		indicator.setLocationFilter(atSite, "locationList=${location}");
-		indicator.setCohortDefinition(obsCohort, "");
+		mappings.put("startDate", "${startDate}");
+		mappings.put("endDate", "${endDate}");
+		mappings.put("location", "${location}");
+		mappings.put("onOrAfter", "${startDate}");
+		mappings.put("onOrBefore", "${endDate}");
+		mappings.put("locationList", "${location}");
+
+		indicator.setCohortDefinition(obsCohort, mappings);
 
 		return Context.getService(IndicatorService.class).saveDefinition(indicator);
 	}
 
 	@Override
-	public PeriodIndicatorReportDefinition createNewDHISPeriodReportAndItsDHISConnectorMapping(String reportName,
-			String reportDrescription, List<CohortIndicator> indicators, String uuid, String dataSetCode,
-			String dataSetPeriod) {
-		PeriodIndicatorReportDefinition report = new PeriodIndicatorReportDefinition();
-		List<DHISMappingElement> mappings = new ArrayList<DHISMappingElement>();
-		DHISMapping mapping = new DHISMapping();
+	public PeriodIndicatorReportDefinition createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting(
+			String reportName, String reportDrescription, List<CohortIndicator> indicators, String uuid,
+			String dataSetCode, String dataSetPeriod) {
+		PeriodIndicatorReportDefinition report = (PeriodIndicatorReportDefinition) Context
+				.getService(ReportDefinitionService.class).getDefinitionByUuid(uuid);
 
-		setBasicOpenMRSObjectProps(report);
-		report.setDescription(reportDrescription);
-		report.setupDataSetDefinition();
-		report.setName(reportName);
-		if (StringUtils.isNotBlank(uuid))
-			report.setUuid(uuid);
+		if (report == null) {
+			report = new PeriodIndicatorReportDefinition();
+			List<DHISMappingElement> mappings = new ArrayList<DHISMappingElement>();
+			DHISMapping mapping = new DHISMapping();
 
-		if (indicators != null) {
-			for (CohortIndicator ind : indicators) {
-				String code = ind.getName().replaceAll(" ", "").replaceAll("-", "");
-				DHISMappingElement map = new DHISMappingElement();
-				CodedObsCohortDefinition c = (CodedObsCohortDefinition) ind.getCohortDefinition().getParameterizable();
-				String mappedCode = Integer.toString(c.getQuestion().getConceptId());
+			setBasicOpenMRSObjectProps(report);
+			report.setDescription(reportDrescription);
+			report.setupDataSetDefinition();
+			report.setName(reportName);
+			if (StringUtils.isNotBlank(uuid))
+				report.setUuid(uuid);
 
-				map.setIndicator(code);
-				map.setDataElement(getValueFromMappings(DHISMappingType.INDICATOR_ + mappedCode));
-				mappings.add(map);
-				report.addIndicator(mappedCode, ind.getName(), ind);
+			if (indicators != null) {
+				for (CohortIndicator ind : indicators) {
+					String code = ind.getName().replaceAll(" ", "").replaceAll("-", "");
+					DHISMappingElement map = new DHISMappingElement();
+					CodedObsCohortDefinition c = (CodedObsCohortDefinition) ind.getCohortDefinition()
+							.getParameterizable();
+					String mappedCode = Integer.toString(c.getQuestion().getConceptId());
+
+					map.setIndicator(code);
+					map.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + mappedCode));
+					mappings.add(map);
+					report.addIndicator(mappedCode, ind.getName(), ind);
+				}
 			}
-		}
-		mapping.setName(reportName);
-		mapping.setCreated(Calendar.getInstance(Context.getLocale()).getTimeInMillis());
-		mapping.setDataSetUID(getValueFromMappings(dataSetCode));
-		mapping.setPeriodType(dataSetPeriod);
-		mapping.setPeriodIndicatorReportGUID(report.getUuid());
-		mapping.setElements(mappings);
-		Context.getService(DHISConnectorService.class).saveMapping(mapping);
+			mapping.setName(reportName);
+			mapping.setCreated(Calendar.getInstance(Context.getLocale()).getTimeInMillis());
+			mapping.setDataSetUID(getValueFromMappings(dataSetCode));
+			mapping.setPeriodType(dataSetPeriod);
+			mapping.setPeriodIndicatorReportGUID(report.getUuid());
+			mapping.setElements(mappings);
+			Context.getService(DHISConnectorService.class).saveMapping(mapping);
 
-		return Context.getService(ReportDefinitionService.class).saveDefinition(report);
+			return Context.getService(ReportDefinitionService.class).saveDefinition(report);
+		}
+		return report;
 	}
 
 	private void setBasicOpenMRSObjectProps(OpenmrsMetadata omrs) {
@@ -256,9 +269,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		indicators.add(widal);
 		indicators.add(derebroSpinalFluid);
 
-		createNewDHISPeriodReportAndItsDHISConnectorMapping("HMIS Lab Request", "HMIS Auto-generated Lab Request",
-				indicators, DHISReportingConstants.LAB_REPORT_UUID, DHISMappingType.DATASET_ + "HMIS_LAB_REQUEST",
-				"Monthly");
+		createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting("HMIS Lab Request",
+				"HMIS Auto-generated Lab Request", indicators, DHISReportingConstants.LAB_REPORT_UUID,
+				DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST", "Monthly");
 	}
 
 	@Override
@@ -341,7 +354,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				String column = columns.get(i).getName();
 
 				dv.setValue(row.getColumnValue(column).toString());
-				dv.setDataElement(getValueFromMappings(DHISMappingType.INDICATOR_ + column));
+				dv.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column));
 				dataValues.add(dv);
 			}
 			dataValueSet.setDataValues(dataValues);
@@ -367,8 +380,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		startDate.set(Calendar.DAY_OF_MONTH, 1);
 		if (defaultLocation != null && labReportDef != null) {
 			Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
-			String dataSetId = getValueFromMappings(DHISMappingType.DATASET_ + "HMIS_LAB_REQUEST");
-			String orgUnitId = getValueFromMappings(DHISMappingType.LOCATION_ + Context.getAdministrationService()
+			String dataSetId = getValueFromMappings(DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST");
+			String orgUnitId = getValueFromMappings(DHISMappingType.LOCATION + "_" + Context.getAdministrationService()
 					.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_CODE));
 			String period = new SimpleDateFormat("yyyyMM").format(new Date());
 
@@ -383,7 +396,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 		mapping.setOpenmrsId(openmrsIdOrCode);
 		mapping.setType(mappingType.name());
-		mapping.setDhisId(getValueFromMappings(mappingType + openmrsIdOrCode));
+		mapping.setDhisId(getValueFromMappings(mappingType + "_" + openmrsIdOrCode));
 		if (StringUtils.isNotBlank(mapping.getOpenmrsId()) && StringUtils.isNotBlank(mapping.getDhisId()))
 			return mapping;
 		return null;
@@ -404,9 +417,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			while ((line = br.readLine()) != null) {
 				OpenMRSToDHISMapping map = new OpenMRSToDHISMapping();
 
-				if (line.matches("(" + DHISMappingType.DATASET_ + "|" + DHISMappingType.INDICATOR_ + "|"
-						+ DHISMappingType.LOCATION_ + ").*")) {
-					map.setType(line.split("_")[0] + "_");
+				if (line.matches("(" + DHISMappingType.DATASET + "|" + DHISMappingType.CONCEPTDATAELEMENT + "|"
+						+ DHISMappingType.LOCATION + ").*")) {
+					map.setType(line.split("_")[0]);
 					map.setOpenmrsId(concateLines(line.split("=")[0].split("_"), "_", 0));
 					map.setDhisId(line.split("=")[1]);
 					mappings.add(map);
@@ -454,7 +467,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				if (line.startsWith(type + code + "=")) {
 					map = new OpenMRSToDHISMapping();
 
-					map.setType(line.split("_")[0] + "_");
+					map.setType(line.split("_")[0]);
 					map.setOpenmrsId(code);
 					map.setDhisId(line.replace(type + code + "=", ""));
 				}
@@ -485,9 +498,10 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 				// EDITING
 				while ((line = br.readLine()) != null) {
-					if (line.startsWith(mapping.getType() + mapping.getOpenmrsId() + "=")) {
+					if (line.startsWith(mapping.getType() + "_" + mapping.getOpenmrsId() + "=")) {
 						editing = true;
-						newContent += mapping.getType() + mapping.getOpenmrsId() + "=" + mapping.getDhisId() + "\n";
+						newContent += mapping.getType() + "_" + mapping.getOpenmrsId() + "=" + mapping.getDhisId()
+								+ "\n";
 					} else {
 						newContent += line + "\n";
 					}
@@ -501,8 +515,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					while ((line = br.readLine()) != null) {
 						String beforeLine = "##ending " + mapping.getType() + " mappings";
 						if (line.equals(beforeLine)) {
-							newContent += mapping.getType() + mapping.getOpenmrsId() + "=" + mapping.getDhisId() + "\n"
-									+ beforeLine + "\n";
+							newContent += mapping.getType() + "_" + mapping.getOpenmrsId() + "=" + mapping.getDhisId()
+									+ "\n" + beforeLine + "\n";
 						} else {
 							newContent += line + "\n";
 						}
@@ -543,7 +557,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 				while ((line = br.readLine()) != null) {
 					// SKIP/DELETE existing mapping entry
-					if (!line.equals(mapping.getType() + mapping.getOpenmrsId() + "=" + mapping.getDhisId())) {
+					if (!line.equals(mapping.getType() + "_" + mapping.getOpenmrsId() + "=" + mapping.getDhisId())) {
 						newContent += line + "\n";
 					}
 				}

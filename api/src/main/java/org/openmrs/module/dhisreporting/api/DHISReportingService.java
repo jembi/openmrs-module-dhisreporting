@@ -48,7 +48,7 @@ public interface DHISReportingService extends OpenmrsService {
 	CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription,
 			CodedObsCohortDefinition obsCohort);
 
-	PeriodIndicatorReportDefinition createNewDHISPeriodReportAndItsDHISConnectorMapping(String reportName,
+	PeriodIndicatorReportDefinition createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting(String reportName,
 			String reportDrescription, List<CohortIndicator> indicators, String uuid, String dataSetCode,
 			String dataSetPeriod);
 

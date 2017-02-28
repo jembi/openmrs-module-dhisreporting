@@ -61,7 +61,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		CohortIndicator cohortIndicator = Context.getService(DHISReportingService.class)
 				.saveNewDHISCohortIndicator("test", null, cohort);
 		ReportDefinition report = Context.getService(DHISReportingService.class)
-				.createNewDHISPeriodReportAndItsDHISConnectorMapping("test", null,
+				.createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting("test", null,
 						Collections.singletonList(cohortIndicator), null, "", "");
 		try {
 			Cohort c = Context.getService(CohortDefinitionService.class).evaluate(cohort, null);
@@ -86,7 +86,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		List<OpenMRSToDHISMapping> mappings = Context.getService(DHISReportingService.class).getAllMappings();
 		Integer mappingsOriginalCount = mappings.size();
 		OpenMRSToDHISMapping map = Context.getService(DHISReportingService.class).getMapping("JEMBI",
-				DHISMappingType.LOCATION_);
+				DHISMappingType.LOCATION);
 		OpenMRSToDHISMapping newMap = new OpenMRSToDHISMapping();
 		File mappingFile = DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE;
 
@@ -103,7 +103,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 
 		newMap.setOpenmrsId("testOmrs");
 		newMap.setDhisId("testDHIS");
-		newMap.setType(DHISMappingType.INDICATOR_.name());
+		newMap.setType(DHISMappingType.CONCEPTDATAELEMENT.name());
 		newMap = Context.getService(DHISReportingService.class).saveOrUpdateMapping(newMap);
 
 		Assert.assertEquals(mappingFile.getAbsolutePath(),
