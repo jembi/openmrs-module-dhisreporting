@@ -130,17 +130,17 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		// testing with queries; 15:19, 20:24, 25:49, >=50, <1, >15
 
 		AgeRange infant = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("<=1",
-				DurationUnit.YEARS);
+				DurationUnit.YEARS, DurationUnit.YEARS);
 		AgeRange adult = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject(">=15",
-				DurationUnit.YEARS);
+				DurationUnit.YEARS, DurationUnit.YEARS);
 		AgeRange infant1 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("<12",
-				DurationUnit.MONTHS);
+				DurationUnit.MONTHS, DurationUnit.MONTHS);
 		AgeRange adult1 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject(">15",
-				DurationUnit.YEARS);
+				DurationUnit.YEARS, DurationUnit.YEARS);
 		AgeRange m1519 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("15:19",
-				DurationUnit.MONTHS);
+				DurationUnit.MONTHS, DurationUnit.MONTHS);
 		AgeRange y2549 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("25:49",
-				DurationUnit.YEARS);
+				DurationUnit.YEARS, DurationUnit.YEARS);
 
 		Assert.assertEquals(DurationUnit.YEARS, infant.getMaxAgeUnit());
 		Assert.assertEquals(DurationUnit.YEARS, adult1.getMinAgeUnit());

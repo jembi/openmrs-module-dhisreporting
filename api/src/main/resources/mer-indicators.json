@@ -1,0 +1,669 @@
+[
+   {
+      "code":"PREP_NEW",
+      "name":"Number of individuals who have been newly enrolled on (oral) antiretroviral pre-exposure prophylaxis (PrEP) to prevent HIV infection in the reporting period",
+      "description":"",
+      "numerator":"Number of individuals who received PrEP to prevention HIV infection in the reporting period",
+      "denominator":"",
+      "aggregation":{
+         "name":"Count all patients over 15 years given PrEP",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Received PrEP by:  Age/Sex",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "reportUuid":"",
+         "category":"Prevention",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"VMMC_CIRC",
+      "name":"Number of males circumcised as part of the voluntary medical male circumcision (VMMC) for HIV prevention program within the reporting period",
+      "description":"",
+      "numerator":"Number of males circumcised as part of VMMC within the reporting period",
+      "denominator":"",
+      "aggregation":{
+         "name":"Count all circumcised male patients",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Circumcised as part of VMMC by: - Age - HIV status - HIV outome - Circumcision Technique/ follow-up status",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"Prevention",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"HTS_TST",
+      "name":"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
+      "description":"",
+      "numerator":"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
+      "denominator":"",
+      "aggregation":{
+         "name":"Count all adult patients who were tested for HIV infection and received their results",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Received HTS and results according to: - Community service delivery modality - Facillity service delivery modality - Age/Sex/Result received by Service Modaility",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"90: Knowing your HIV status",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"PMTCT_STAT",
+      "name":"Percentage of pregnant women with known HIV status at antenatal care (includes those who already knew their HIV status prior to ANC), disaggregated by HIV result",
+      "description":"",
+      "numerator":"Number of women with known HIV status + number of women attending ANC testing for HIV with newly diagnosed results, attending ANC for a new pregnancy in the reporting period",
+      "denominator":"Number of new ANC clients in the reporting period",
+      "aggregation":{
+         "name":"Count all female pregnant patients who know their HIV status",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Known HIV status during pregnancy according to: - Positivity status - Known/New status by age Number of new ANC clients by:  - Age",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"90: Knowing your HIV status",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"PMTCT_EID",
+      "name":"Percentage of infants born to HIV-positive women who had a virologic HIV test done within 12 months of birth, disaggregated by HIV result",
+      "description":"",
+      "numerator":"Number of infants who had a virologic HIV test within 12 months of birth, during the the reporting period",
+      "denominator":"Calculated indicator [PMTCT_STAT_POS]",
+      "aggregation":{
+         "name":"Count all infants under 12 months who were born to HIV positive women and tested for HIV infection according to time period after birth and HIV status",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of infants by: - Infant Test (<2m of birth + 2-12m of birth) - Results (positive Infant Test)PMTCT_STAT_POS",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"90: Knowing your HIV status",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TB_ART",
+      "name":"Percentage of new and relapse TB cases with documented HIV status, disaggregated by HIV result",
+      "description":"",
+      "numerator":"Number of new and relapse TB cases with documented HIV status, during the reporting period",
+      "denominator":"Total number of new and relapsed TB cases, during the reporting period",
+      "aggregation":{
+         "name":"Count all patients with a documented HIV status and TB finding",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of TB cases according to: - Age/Sex  Number of TB cases with HIV positive statuses by: - Age/Sex - HIV result",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"90-90: On ART",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TX_NEW",
+      "name":"Number of adults and children newly enrolled on antiretroviral therapy (ART)",
+      "description":"",
+      "numerator":"Number of adults and children newly enrolled on antiretroviral therapy (ART)",
+      "denominator":"",
+      "aggregation":{
+         "name":"Count all patients newly enrolled on ART in the reporting period",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of new ART enrollments by: - Age/Sex - TB status - HIV status - Pregnancy & breastfeeding status",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"90-90: On ART",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TX_CURR",
+      "name":"Number of adults and children currently receiving antiretroviral therapy (ART)",
+      "description":"",
+      "numerator":"Number of adults and children currently receiving antiretroviral therapy (ART)",
+      "denominator":"",
+      "aggregation":{
+         "name":"Count all adults and children who received ART during the reporting period",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of ART enrollments by: - Age/Sex",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"90-90: On ART",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"PMTCT_ART",
+      "name":"Percentage of HIV-positive pregnant women who received ART to reduce the risk of mother-to-child transmission (MTCT) during pregnancy",
+      "description":"",
+      "numerator":"Number of HIV-infected pregnant women who received ART during pregnancy for PMTCT, during the reporting period  ",
+      "denominator":"Calculated indicator [PMTCT_STAT_POS]",
+      "aggregation":{
+         "name":"Count all HIV infected women who were on PMTCT in the reporting period",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of HIV-positive pregnant women on ART by: - Maternal Regimen Type (New on ART, Already on ART) PMTCT_STAT_POS",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"90-90: On ART",
+         "period":"Quarterly",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"PMTCT_FO",
+      "name":"Percentage of final outcomes among HIV exposed infants registered in a birth cohort",
+      "description":"",
+      "numerator":"Number of HIV-exposed infants with a documented outcome by 18 months of age disaggregated by outcome type",
+      "denominator":"Number of HIV-exposed infants who were born 24 months prior to the reporting period and registered in the birth cohort",
+      "aggregation":{
+         "name":"Count all infants under 24 months of age born to HIV-infected mothers according to outcome",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of infants by: - Age/Sex - Maternal HIV status (positive) - HIV outcome - Mortality - time since birth",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TX_RET",
+      "name":"Percentage of adults and children known to be on treatment 12 months after initiation of antiretroviral therapy (Note: reporting 24 and 36 months is recommended, but optional)",
+      "description":"",
+      "numerator":"Number of adults and children who are still on treatment at 12 months after initiating ART",
+      "denominator":"Total number of adults and children who initiated ART in the 12 months prior to the beginning of the reporting period, including those who have died and those who have stopped ART. Does not include transfer outs",
+      "aggregation":{
+         "name":"Count all adults and children alive and recieving ART 12 months after enrollment on ART",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of ART patients by: -Age/Sex - Pregnancy/breastfeeding - Retention (+24 motnhs)",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TX_PVLS",
+      "name":"Percentage of ART patients with a viral load result documented in the medical record and/or laboratory information systems (LIS) within the past 12 months with a suppressed viral load (<1000 copies/ml)",
+      "description":"",
+      "numerator":"Number of adult and pediatric patients on ART with suppressed viral load results (<1,000 copies/ml) documented in the medical records and /or supporting laboratory results within the past 12 months",
+      "denominator":"Number of adult and pediatric ART patients with a viral load result documented in the patient medical record and /or laboratory records in the past 12 months",
+      "aggregation":{
+         "name":"Count all adults and children who received ART with a VL recorded during the last 12 months",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"Number of ART patients by: - Age/Sex - Last VL recorded",
+         "ageQueries":"",
+         "sex":"M,F",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TB_PREV",
+      "name":"Proportion of ART patients who completed a standard course of TB preventive therapy within the reporting period",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TB_STAT",
+      "name":"Percentage of new and relapse TB cases with documented HIV status, disaggregated by HIV result",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"TX_TB",
+      "name":"The proportion of ART patients who were screened who are receiving TB treatment",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"KP_PREV",
+      "name":"Number of key populations reached with individual and/or small group-level HIV prevention interventions designed for the target population",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"PP_PREV",
+      "name":"Number of the priority populations (PP) reached with the standardized, evidence-based intervention(s) required that are designed to promote the adoption of HIV prevention behaviors and service uptake",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"OVC_SERV",
+      "name":"Number of beneficiaries served by PEPFAR OVC programs for children and families affected by HIV",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"OVC_HIVSTAT",
+      "name":"Percentage of orphans and vulnerable children (<18 years old) with HIV status reported to implementing partner (including status not reported), disaggregated by status type",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"SC_STOCK",
+      "name":"Percentage of storage sites where commodities are stocked according to plan, by level in supply system",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"SemiAnnually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"KP_MAT",
+      "name":"Number of people who inject drugs (PWID) on medication-assisted therapy (MAT)",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"GEND_GBV",
+      "name":"Number of people receiving post-gender based violence (GBV) clinical care based on the minimum package NOTE: The indicator DOES NOT measure delivery of GBV prevention activities",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"FPINT_SITE",
+      "name":"Number of HIV service delivery points (SDP) at a site supported by PEPFAR that are providing integrated voluntary family planning (FP) services",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"HRH_PRE",
+      "name":"Number of new health workers who graduated from a pre-service training institution or program as a result of PEPFAR-supported strengthening efforts, within the reporting period, by select cadre",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"HRH_CURR",
+      "name":"Number of health worker full-time equivalents who are working on any HIV-related activities i.e. prevention, treatment and other HIV support and are receiving any type of support from PEPFAR at facility and sites, community sites, and at the above-site level",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"HRH_STAFF",
+      "name":"Number of health worker full-time equivalents who are working on any HIV-related activities i.e. prevention, treatment and other HIV support at PEPFAR-supported facility sites",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"EMR_SITE",
+      "name":"Number of PEPFAR-supported facility-based service delivery points supported by your organization that have an electronic medical record system",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"LAB_PTCQI",
+      "name":"Number of laboratories and blood centers/banks: A. Engaged in Continuous Quality Improvement (CQI) activities B. Audited and achieved accreditation C. Performing an HIV-related test and participating in and passing Proficiency Testing (PT)",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   },
+   {
+      "code":"INVS_COMD",
+      "name":"Number of HIV program related commodities purchased and dollars spent in the last 12 months",
+      "description":"",
+      "numerator":"",
+      "denominator":"",
+      "aggregation":{
+         "name":"",
+         "cohortUuid":""
+      },
+      "disaggregation":{
+         "name":"",
+         "ageQueries":"",
+         "sex":"",
+         "coded":""
+      },
+      "openmrsReport":{
+         "uuid":"",
+         "category":"",
+         "period":"Annually",
+         "cohortUuid":""
+      }
+   }
+]

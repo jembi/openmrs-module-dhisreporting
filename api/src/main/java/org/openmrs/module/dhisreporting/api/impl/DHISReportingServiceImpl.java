@@ -602,13 +602,13 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 * @return
 	 */
 	@Override
-	public AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit ageUnit) {
+	public AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit minAgeUnit, DurationUnit maxAgeUnit) {
 		AgeRange ageRange = null;
-		if (StringUtils.isNotBlank(ageQuery)) {
+		if (StringUtils.isNotBlank(ageQuery) && minAgeUnit != null && maxAgeUnit != null) {
 			ageRange = new AgeRange();
 
-			ageRange.setMinAgeUnit(ageUnit);
-			ageRange.setMaxAgeUnit(ageUnit);
+			ageRange.setMinAgeUnit(minAgeUnit);
+			ageRange.setMaxAgeUnit(maxAgeUnit);
 
 			if (ageQuery.indexOf("<=") >= 0) {
 				ageRange.setMinAge(0);

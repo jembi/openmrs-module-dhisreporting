@@ -1,5 +1,13 @@
 package org.openmrs.module.dhisreporting;
 
+import org.openmrs.module.reporting.indicator.CohortIndicator;
+import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
+
+/**
+ * 
+ * @author k-joseph
+ *
+ */
 public class PepfarIndicator {
 
 	private String indicatorName;
@@ -9,12 +17,29 @@ public class PepfarIndicator {
 	private String indicatorCode;
 
 	/**
-	 * required
+	 * numerator, denominator, aggregators are text descriptions of what should
+	 * be part of the indicator
 	 */
-	private Object numerator;
+	private String numerator;
 
-	private Object denominator;
+	private String denominator;
 
-	private Object aggregators;
+	private String aggregation;
+	
+	private String disaggregation;
+
+	/**
+	 * Required
+	 */
+	private CohortIndicator indicator;
+
+	private PeriodIndicatorReportDefinition report;
+
+	enum ReportingPeriod {
+		DAILY, MONTHLY, QUARTERY, SEMIANNUALLY, ANNUALLY
+	}
+
+	public PepfarIndicator(CohortIndicator indicator) {
+	}
 
 }

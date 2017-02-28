@@ -86,5 +86,5 @@ public interface DHISReportingService extends OpenmrsService {
 	 * @see DHISReportingServiceImpl#convertAgeQueryToAgeRangeObject(String,
 	 *      DurationUnit)
 	 */
-	AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit ageUnit);
+	AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit minAgeUnit, DurationUnit maxAgeUnit);
 }
