@@ -40,6 +40,9 @@ public class AgeRange {
 	// CONSTRUCTORS
 	// ***********************
 
+	public AgeRange() {
+	}
+
 	/**
 	 * Range only Constructor
 	 */

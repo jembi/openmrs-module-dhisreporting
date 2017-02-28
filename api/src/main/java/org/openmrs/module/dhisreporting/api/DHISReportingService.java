@@ -21,9 +21,12 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
+import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
+import org.openmrs.module.dhisreporting.api.impl.DHISReportingServiceImpl;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
+import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.report.Report;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
@@ -74,4 +77,14 @@ public interface DHISReportingService extends OpenmrsService {
 	void deleteMapping(OpenMRSToDHISMapping mapping);
 
 	void writeContentToFile(String content, File file);
+
+	/**
+	 * @should rightly handle an ageQuery and create an ageRange object from it
+	 * @param ageQuery
+	 * @param ageUnit
+	 * @return
+	 * @see DHISReportingServiceImpl#convertAgeQueryToAgeRangeObject(String,
+	 *      DurationUnit)
+	 */
+	AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit ageUnit);
 }

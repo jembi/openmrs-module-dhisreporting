@@ -45,6 +45,7 @@ import org.openmrs.module.dhisconnector.api.model.DHISDataValueSet;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisconnector.api.model.DHISMapping;
 import org.openmrs.module.dhisconnector.api.model.DHISMappingElement;
+import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.OpenMRSReportConcepts;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
@@ -54,6 +55,7 @@ import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
+import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -591,5 +593,41 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * @param ageQuery,
+	 *            examples include;15:19, 20:24, 25:49, >=50, <1
+	 * @return
+	 */
+	@Override
+	public AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit ageUnit) {
+		AgeRange ageRange = null;
+		if (StringUtils.isNotBlank(ageQuery)) {
+			ageRange = new AgeRange();
+
+			ageRange.setMinAgeUnit(ageUnit);
+			ageRange.setMaxAgeUnit(ageUnit);
+
+			if (ageQuery.indexOf("<=") >= 0) {
+				ageRange.setMinAge(0);
+				ageRange.setMaxAge(Integer.parseInt(ageQuery.split("<=")[1]));
+			} else if (ageQuery.indexOf(">=") >= 0) {
+				ageRange.setMinAge(Integer.parseInt(ageQuery.split(">=")[1]));
+			} else if (ageQuery.indexOf("<") >= 0) {
+				ageRange.setMinAge(0);
+				ageRange.setMaxAge(Integer.parseInt(ageQuery.split("<")[1]) - 1);
+			} else if (ageQuery.indexOf(">") >= 0) {
+				ageRange.setMinAge(Integer.parseInt(ageQuery.split(">")[1]) + 1);
+			} else if (ageQuery.indexOf(":") >= 0) {
+				ageRange.setMinAge(Integer.parseInt(ageQuery.split(":")[0]));
+				ageRange.setMaxAge(Integer.parseInt(ageQuery.split(":")[1]));
+			} else {
+				ageRange = null;
+			}
+		}
+
+		return ageRange;
 	}
 }

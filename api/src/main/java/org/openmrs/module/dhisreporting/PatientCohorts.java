@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.databene.domain.person.Gender;
 import org.openmrs.Concept;
 import org.openmrs.Program;
 import org.openmrs.api.PatientSetService.TimeModifier;
