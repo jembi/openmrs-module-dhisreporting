@@ -3,8 +3,10 @@ package org.openmrs.module.dhisreporting;
 import javax.annotation.Generated;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.json.simple.JSONObject;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
 
@@ -19,7 +21,7 @@ import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefin
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({ "indicatorName", "indicatorDescription", "indicatorCode", "numerator", "denominator",
-		"aggregation", "disaggregation" })
+		"aggregation", "disaggregation", "openmrsReportRefs" })
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class MerIndicator {
@@ -38,9 +40,11 @@ public class MerIndicator {
 
 	private String denominator;
 
-	private String aggregation;
+	private JSONObject aggregation;
 
-	private String disaggregation;
+	private JSONObject disaggregation;
+
+	private JSONObject openmrsReportRefs;
 
 	/**
 	 * Required
@@ -53,62 +57,75 @@ public class MerIndicator {
 		DAILY, MONTHLY, QUARTERY, SEMIANNUALLY, ANNUALLY
 	}
 
-	public MerIndicator(CohortIndicator indicator) {
-	}
-
+	@JsonProperty("indicatorName")
 	public String getIndicatorName() {
 		return indicatorName;
 	}
 
+	@JsonProperty("indicatorName")
 	public void setIndicatorName(String indicatorName) {
 		this.indicatorName = indicatorName;
 	}
 
+	@JsonProperty("indicatorDescription")
 	public String getIndicatorDescription() {
 		return indicatorDescription;
 	}
 
+	@JsonProperty("indicatorDescription")
 	public void setIndicatorDescription(String indicatorDescription) {
 		this.indicatorDescription = indicatorDescription;
 	}
 
+	@JsonProperty("indicatorCode")
 	public String getIndicatorCode() {
 		return indicatorCode;
 	}
 
+	@JsonProperty("indicatorCode")
 	public void setIndicatorCode(String indicatorCode) {
 		this.indicatorCode = indicatorCode;
 	}
 
+	@JsonProperty("numerator")
 	public String getNumerator() {
 		return numerator;
 	}
 
+	@JsonProperty("numerator")
 	public void setNumerator(String numerator) {
 		this.numerator = numerator;
 	}
 
+	@JsonProperty("denominator")
 	public String getDenominator() {
 		return denominator;
 	}
 
+	@JsonProperty("denominator")
 	public void setDenominator(String denominator) {
 		this.denominator = denominator;
 	}
 
-	public String getAggregation() {
+	@JsonProperty("aggregation")
+	public JSONObject getAggregation() {
 		return aggregation;
 	}
 
-	public void setAggregation(String aggregation) {
+	@JsonProperty("aggregation")
+	public void setAggregation(JSONObject aggregation) {
+		// TODO using this here set report and indicator properties heres
 		this.aggregation = aggregation;
 	}
 
-	public String getDisaggregation() {
+	@JsonProperty("disaggregation")
+	public JSONObject getDisaggregation() {
 		return disaggregation;
 	}
 
-	public void setDisaggregation(String disaggregation) {
+	@JsonProperty("disaggregation")
+	public void setDisaggregation(JSONObject disaggregation) {
+		// TODO using this here set report and indicator properties heres
 		this.disaggregation = disaggregation;
 	}
 
@@ -116,16 +133,17 @@ public class MerIndicator {
 		return indicator;
 	}
 
-	public void setIndicator(CohortIndicator indicator) {
-		this.indicator = indicator;
-	}
-
 	public PeriodIndicatorReportDefinition getReport() {
 		return report;
 	}
 
-	public void setReport(PeriodIndicatorReportDefinition report) {
-		this.report = report;
+	public JSONObject getOpenmrsReportRefs() {
+		return openmrsReportRefs;
+	}
+
+	public void setOpenmrsReportRefs(JSONObject openmrsReportRefs) {
+		// TODO using this here set report and indicator properties heres
+		this.openmrsReportRefs = openmrsReportRefs;
 	}
 
 }

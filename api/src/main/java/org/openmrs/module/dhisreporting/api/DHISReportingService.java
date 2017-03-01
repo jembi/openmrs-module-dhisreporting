@@ -23,6 +23,7 @@ import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisreporting.AgeRange;
+import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.impl.DHISReportingServiceImpl;
@@ -95,4 +96,15 @@ public interface DHISReportingService extends OpenmrsService {
 	 * @return
 	 */
 	JSONArray readJSONArrayFromFile(String fileLocation);
+
+	/**
+	 * @should Parse JSONArray From FileSystem into List of MerIndicator objects
+	 * @param merIndicatorsFileLocation
+	 * @param startingIndex
+	 * @param endindIndex
+	 * @return
+	 */
+	List<MerIndicator> getMerIndicators(String merIndicatorsFileLocation, Integer startingFrom, Integer endingAt);
+
+	MerIndicator getMerIndicator(String code);
 }

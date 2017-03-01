@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
@@ -30,6 +31,7 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
+import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -169,12 +171,35 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 	 */
 	@Test
 	@Verifies(value = "should parse json file well into json array", method = "readJSONArrayFromFile(String)")
-
 	public void readJSONArrayFromFile_shouldParseJsonFileWellIntoJSONArray() {
 		JSONArray json = Context.getService(DHISReportingService.class).readJSONArrayFromFile(getClass()
 				.getClassLoader().getResource(DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILENAME).getFile());
 
 		Assert.assertEquals("PREP_NEW", (String) ((JSONObject) json.get(0)).get("code"));
 		Assert.assertEquals("M,F", (String) ((JSONObject) ((JSONObject) json.get(0)).get("disaggregation")).get("sex"));
+		Assert.assertTrue(StringUtils.isBlank((String) ((JSONObject) json.get(1)).get("description")));
+	}
+
+	/**
+	 * Also tests starting and ending indexes which work as paging supports
+	 * 
+	 * @see {@link DHISReportingService#getMerIndicators(String, Integer, Integer)}
+	 * 
+	 */
+	@Test
+	@Verifies(value = "should Parse JSONArray From FileSystem into List of MerIndicator objects", method = "getMerIndicators(String, Integer, Integer)")
+	public void getMerIndicators_shouldParseJSONArrayFromFileSystemIntoListofMerIndicatorObjects() {
+		List<MerIndicator> indicators = Context.getService(DHISReportingService.class)
+				.getMerIndicators(
+						getClass().getClassLoader()
+								.getResource(DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILENAME).getFile(),
+						1, 10);
+		Assert.assertEquals(10, indicators.size());
+		Assert.assertTrue(StringUtils.isBlank(indicators.get(9).getIndicatorDescription()));
+		Assert.assertEquals("VMMC_CIRC", indicators.get(1).getIndicatorCode());
+		Assert.assertEquals("Received PrEP by:  Age/Sex", indicators.get(0).getDisaggregation().get("name"));
+		Assert.assertEquals(
+				"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
+				indicators.get(2).getNumerator());
 	}
 }

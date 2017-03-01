@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -50,6 +51,7 @@ import org.openmrs.module.dhisconnector.api.model.DHISMapping;
 import org.openmrs.module.dhisconnector.api.model.DHISMappingElement;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
+import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.OpenMRSReportConcepts;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
@@ -645,12 +647,69 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	public JSONArray readJSONArrayFromFile(String fileLocation) {
 		JSONParser parser = new JSONParser();
 
-		try {
-			Object obj = parser.parse(new FileReader(fileLocation));
-			return (JSONArray) obj;
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (new File(fileLocation).exists()) {
+			try {
+				Object obj = parser.parse(new FileReader(fileLocation));
+				return (JSONArray) obj;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else
 			return null;
+	}
+
+	/**
+	 * Acts as the runtime MER indicators database;<br />
+	 * Should be Invoked when adding, editing, deleting or doing any mer
+	 * indicators manipulations
+	 * 
+	 * @param startingFrom,
+	 *            item number based on size to start from just as when paging
+	 * @param endindAt,
+	 *            item number based on size to end at just as when paging
+	 * @return
+	 */
+	@Override
+	public List<MerIndicator> getMerIndicators(String merIndicatorsFileLocation, Integer startingFrom,
+			Integer endindAt) {
+		List<MerIndicator> merIndicators = new ArrayList<MerIndicator>();
+		JSONArray indicators = readJSONArrayFromFile(
+				StringUtils.isNotBlank(merIndicatorsFileLocation) ? merIndicatorsFileLocation
+						: DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE.getAbsolutePath());
+
+		if (indicators != null && !indicators.isEmpty()) {
+			for (int i = (startingFrom != null && startingFrom > 0 ? startingFrom - 1 : 0); i <= (endindAt != null
+					&& endindAt <= indicators.size() ? endindAt - 1 : indicators.size()); i++) {
+				JSONObject json = (JSONObject) indicators.get(i);
+				MerIndicator indicator = new MerIndicator();
+
+				indicator.setIndicatorName((String) json.get("name"));
+				indicator.setIndicatorCode((String) json.get("code"));
+				indicator.setIndicatorDescription((String) json.get("description"));
+				indicator.setNumerator((String) json.get("numerator"));
+				indicator.setDenominator((String) json.get("denominator"));
+				indicator.setAggregation((JSONObject) json.get("aggregation"));
+				indicator.setDisaggregation((JSONObject) json.get("disaggregation"));
+				indicator.setOpenmrsReportRefs((JSONObject) json.get("openmrsReport"));
+
+				merIndicators.add(indicator);
+			}
 		}
+
+		return merIndicators;
+	}
+
+	@Override
+	public MerIndicator getMerIndicator(String code) {
+		List<MerIndicator> allIndicators = getMerIndicators(null, null, null);
+
+		if (StringUtils.isNotBlank(code)) {
+			for (int i = 0; i > allIndicators.size(); i++) {
+				if (code.equals(allIndicators.get(i).getIndicatorCode()))
+					return allIndicators.get(i);
+			}
+		}
+		return null;
 	}
 }
