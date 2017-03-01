@@ -12,54 +12,54 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DataDelegatingCrudR
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 @Resource(name = RestConstants.VERSION_1
 		+ "/dhisreporting/merindicators", supportedClass = MerIndicator.class, supportedOpenmrsVersions = { "1.8.*",
 				"1.9.*, 1.10.*, 1.11.*", "1.12.*", "2.0.*" })
-
 public class MerIndicatorResource extends DataDelegatingCrudResource implements Retrievable {
 
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation arg0) {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 
-		description.addProperty("indicatorName", Representation.REF);
-		description.addProperty("indicatorDescription", Representation.REF);
-		description.addProperty("indicatorCode", Representation.REF);
-		description.addProperty("numerator", Representation.REF);
-		description.addProperty("denominator", Representation.REF);
-		description.addProperty("aggregation", Representation.REF);
-		description.addProperty("disaggregation", Representation.REF);
-		description.addProperty("openmrsReportRefs", Representation.REF);
+		description.addProperty("indicatorName");
+		description.addProperty("indicatorDescription");
+		description.addProperty("indicatorCode");
+		description.addProperty("numerator");
+		description.addProperty("denominator");
+		description.addProperty("aggregation");
+		description.addProperty("disaggregation");
+		description.addProperty("openmrsReportRefs");
+		description.addSelfLink();
+		description.addLink("full", ".?v=" + RestConstants.REPRESENTATION_FULL);
 
 		return description;
 	}
 
 	@Override
-	public Object newDelegate() {
-		// TODO Auto-generated method stub
-		return null;
+	public MerIndicator newDelegate() {
+		return null;// TODO new MerIndicator();
 	}
 
 	@Override
-	public Object save(Object arg0) {
-		// TODO Auto-generated method stub
+	public MerIndicator save(Object arg0) {
+		// TODO
 		return null;
 	}
 
 	@Override
 	protected void delete(Object arg0, String arg1, RequestContext arg2) throws ResponseException {
-		// TODO Auto-generated method stub
+		// TODO
 
 	}
 
 	@Override
-	public Object getByUniqueId(String merIndicatorCode) {
+	public MerIndicator getByUniqueId(String merIndicatorCode) {
 		return Context.getService(DHISReportingService.class).getMerIndicator(merIndicatorCode);
 	}
 
 	@Override
 	public void purge(Object arg0, RequestContext arg1) throws ResponseException {
-		// TODO Auto-generated method stub
 
 	}
 
