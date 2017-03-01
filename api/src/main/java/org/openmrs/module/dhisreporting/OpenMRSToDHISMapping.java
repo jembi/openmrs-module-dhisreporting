@@ -23,10 +23,8 @@ public class OpenMRSToDHISMapping {
 	@JsonProperty("type")
 	private String type;
 
-	@JsonProperty("openmrsName")
 	private String openmrsName;
 
-	@JsonProperty("dhisName")
 	private String dhisName;
 
 	public enum DHISMappingType {
@@ -63,7 +61,6 @@ public class OpenMRSToDHISMapping {
 		this.dhisId = dhisId;
 	}
 
-	@JsonProperty("openmrsName")
 	public String getOpenmrsName() {
 		if (StringUtils.isNotBlank(getOpenmrsId()) && DHISMappingType.CONCEPTDATAELEMENT.name().equals(getType())) {
 			return Context.getConceptService().getConcept(Integer.parseInt(getOpenmrsId())).getName().getName();
@@ -71,7 +68,6 @@ public class OpenMRSToDHISMapping {
 		return openmrsName;
 	}
 
-	@JsonProperty("dhisName")
 	public String getDhisName() {
 		return dhisName;
 	}

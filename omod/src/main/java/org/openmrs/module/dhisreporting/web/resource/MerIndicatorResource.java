@@ -1,5 +1,8 @@
 package org.openmrs.module.dhisreporting.web.resource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
@@ -10,6 +13,7 @@ import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.Retrievable;
 import org.openmrs.module.webservices.rest.web.resource.impl.DataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
+import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -27,13 +31,35 @@ public class MerIndicatorResource extends DataDelegatingCrudResource implements 
 		description.addProperty("indicatorCode");
 		description.addProperty("numerator");
 		description.addProperty("denominator");
-		description.addProperty("aggregation");
-		description.addProperty("disaggregation");
-		description.addProperty("openmrsReportRefs");
-		description.addSelfLink();
-		description.addLink("full", ".?v=" + RestConstants.REPRESENTATION_FULL);
+		// description.addProperty("aggregation");
+		// description.addProperty("disaggregation");
+		// description.addProperty("openmrsReportRefs");
 
 		return description;
+	}
+
+	@Override
+	public DelegatingResourceDescription getCreatableProperties() {
+		DelegatingResourceDescription description = new DelegatingResourceDescription();
+
+		description.addProperty("indicatorName");
+		description.addProperty("indicatorDescription");
+		description.addProperty("indicatorCode");
+		description.addProperty("numerator");
+		description.addProperty("denominator");
+
+		return description;
+	}
+
+	@Override
+	protected NeedsPaging<MerIndicator> doGetAll(RequestContext context) {
+
+		List<MerIndicator> mappings = Context.getService(DHISReportingService.class).getMerIndicators(null, null, null);
+
+		if (mappings == null)
+			mappings = new ArrayList<MerIndicator>();
+
+		return new NeedsPaging<MerIndicator>(mappings, context);
 	}
 
 	@Override

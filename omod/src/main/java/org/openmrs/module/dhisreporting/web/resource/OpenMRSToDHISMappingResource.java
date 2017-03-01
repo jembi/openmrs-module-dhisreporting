@@ -21,9 +21,9 @@ public class OpenMRSToDHISMappingResource extends DataDelegatingCrudResource imp
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation arg0) {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addProperty("openmrsId", Representation.REF);
-		description.addProperty("dhisId", Representation.REF);
-		description.addProperty("type", Representation.REF);
+		description.addProperty("openmrsId");
+		description.addProperty("dhisId");
+		description.addProperty("type");
 
 		return description;
 	}
@@ -44,7 +44,8 @@ public class OpenMRSToDHISMappingResource extends DataDelegatingCrudResource imp
 
 	@Override
 	public Object getByUniqueId(String openmrsIdOrCode) {
-		return Context.getService(DHISReportingService.class).getMapping(openmrsIdOrCode, DHISMappingType.CONCEPTDATAELEMENT);
+		return Context.getService(DHISReportingService.class).getMapping(openmrsIdOrCode,
+				DHISMappingType.CONCEPTDATAELEMENT);
 	}
 
 	@Override

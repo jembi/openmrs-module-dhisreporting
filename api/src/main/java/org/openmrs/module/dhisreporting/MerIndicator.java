@@ -21,7 +21,7 @@ import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefin
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({ "indicatorCode", "indicatorName", "indicatorDescription", "numerator", "denominator",
-		"aggregation", "disaggregation", "openmrsReportRefs" })
+		/*"aggregation", "disaggregation", "openmrsReportRefs"*/ })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MerIndicator {
 
