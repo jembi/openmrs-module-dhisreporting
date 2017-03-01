@@ -18,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,6 +34,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.OpenmrsMetadata;
@@ -277,18 +280,25 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	@Override
-	public void transferDHISMappingsToDataDirectory() {
+	public void transferDHISReportingFilesToDataDirectory() {
 		if (!DHISReportingConstants.DHISREPORTING_DIRECTORY.exists()) {
 			DHISReportingConstants.DHISREPORTING_DIRECTORY.mkdirs();
 		}
 
 		File mappingsFile = new File(getClass().getClassLoader()
 				.getResource(DHISReportingConstants.DHISREPORTING_MAPPING_FILENAME).getFile());
+		File merIndicatorsFile = new File(getClass().getClassLoader()
+				.getResource(DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILENAME).getFile());
 
 		try {
 			try {
-				if (!DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE.exists())
-					FileUtils.copyFile(mappingsFile, DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+				if (DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE.exists())
+					DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE.delete();
+				if (DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE.exists())
+					DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE.delete();
+
+				FileUtils.copyFile(merIndicatorsFile, DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE);
+				FileUtils.copyFile(mappingsFile, DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -629,5 +639,18 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		}
 
 		return ageRange;
+	}
+
+	@Override
+	public JSONArray readJSONArrayFromFile(String fileLocation) {
+		JSONParser parser = new JSONParser();
+
+		try {
+			Object obj = parser.parse(new FileReader(fileLocation));
+			return (JSONArray) obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

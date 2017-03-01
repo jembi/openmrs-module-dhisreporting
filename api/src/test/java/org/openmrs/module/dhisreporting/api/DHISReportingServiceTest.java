@@ -19,6 +19,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +55,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 
 	@Before
 	public void init() {
-		Context.getService(DHISReportingService.class).transferDHISMappingsToDataDirectory();
+		Context.getService(DHISReportingService.class).transferDHISReportingFilesToDataDirectory();
 	}
 
 	@Test
@@ -160,5 +162,19 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals(new Integer(19), m1519.getMaxAge());
 		Assert.assertEquals(new Integer(25), y2549.getMinAge());
 		Assert.assertEquals(new Integer(49), y2549.getMaxAge());
+	}
+
+	/**
+	 * @see {@link DHISReportingService#readJSONArrayFromFile(String)}
+	 */
+	@Test
+	@Verifies(value = "should parse json file well into json array", method = "readJSONArrayFromFile(String)")
+
+	public void readJSONArrayFromFile_shouldParseJsonFileWellIntoJSONArray() {
+		JSONArray json = Context.getService(DHISReportingService.class).readJSONArrayFromFile(getClass()
+				.getClassLoader().getResource(DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILENAME).getFile());
+
+		Assert.assertEquals("PREP_NEW", (String) ((JSONObject) json.get(0)).get("code"));
+		Assert.assertEquals("M,F", (String) ((JSONObject) ((JSONObject) json.get(0)).get("disaggregation")).get("sex"));
 	}
 }

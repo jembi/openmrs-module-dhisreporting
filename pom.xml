@@ -55,6 +55,12 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>reportingrest-api</artifactId>
+                <version>1.5</version>
+                <scope>provided</scope>
+            </dependency>
+			<dependency>
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>serialization.xstream-api</artifactId>
 				<version>${serializationVersion}</version>

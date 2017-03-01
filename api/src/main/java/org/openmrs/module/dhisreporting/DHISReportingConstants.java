@@ -58,4 +58,23 @@ public class DHISReportingConstants {
 	public static String DEFAULT_LOCATION_ID = "dhisreporting.defaultLocationId";
 
 	public static String CONFIGURED_ORGUNIT_CODE = "dhisreporting.configuredDHISOrgUnitFosIdMatchingDefaultLocation";
+
+	public static String VIRALLOAD_CONCEPTID = "dhisreporting.concept.viralLoad";
+
+	public static String EXITCAREREASON_CONCEPTID = "dhisreporting.concept.exitCareReason";
+
+	public static String ARVDRUGS_CONCEPTSETID = "dhisreporting.concept.ARVDrugs";
+
+	public static String HIV_PROGRAMID = "dhisreporting.program.HIV";
+
+	public static String TB_PROGRAMID = "dhisreporting.program.TB";
+
+	public static String HIVSTATUS_CONCEPTID = "dhisreporting.concept.hivStatus";
+
+	public static String POSITIVE_CONCEPTID = "dhisreporting.concept.positive";
+
+	public static String DHISREPORTING_MER_INDICATORS_FILENAME = "mer-indicators.json";
+
+	public static File DHISREPORTING_MER_INDICATORS_FILE = new File(
+			DHISREPORTING_DIRECTORY.getAbsolutePath() + File.separator + DHISREPORTING_MER_INDICATORS_FILENAME);
 }

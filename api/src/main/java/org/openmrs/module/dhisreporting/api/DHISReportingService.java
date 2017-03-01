@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
@@ -57,7 +58,7 @@ public interface DHISReportingService extends OpenmrsService {
 
 	void createCohortQueriesIndicatorsAndLabReport();
 
-	void transferDHISMappingsToDataDirectory();
+	void transferDHISReportingFilesToDataDirectory();
 
 	Report runPeriodIndicatorReport(PeriodIndicatorReportDefinition reportDef, Date startDate, Date endDate,
 			Location location);
@@ -87,4 +88,11 @@ public interface DHISReportingService extends OpenmrsService {
 	 *      DurationUnit)
 	 */
 	AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit minAgeUnit, DurationUnit maxAgeUnit);
+
+	/**
+	 * @should parse json file well into json array
+	 * @param fileLocation
+	 * @return
+	 */
+	JSONArray readJSONArrayFromFile(String fileLocation);
 }
