@@ -9,17 +9,15 @@ import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
+import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.Retrievable;
 import org.openmrs.module.webservices.rest.web.resource.impl.DataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-@Controller
-@RequestMapping("/rest/" + RestConstants.VERSION_1 + "/dhisreporting/merindicators")
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @Resource(name = RestConstants.VERSION_1
 		+ "/dhisreporting/merindicators", supportedClass = MerIndicator.class, supportedOpenmrsVersions = { "1.8.*",
@@ -27,17 +25,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MerIndicatorResource extends DataDelegatingCrudResource implements Retrievable {
 
 	@Override
-	public DelegatingResourceDescription getRepresentationDescription(Representation arg0) {
+	public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 
-		description.addProperty("indicatorName");
-		description.addProperty("indicatorDescription");
-		description.addProperty("indicatorCode");
-		description.addProperty("numerator");
-		description.addProperty("denominator");
-		// description.addProperty("aggregation");
-		// description.addProperty("disaggregation");
-		// description.addProperty("openmrsReportRefs");
+		if (rep instanceof DefaultRepresentation) {
+			description.addProperty("indicatorName");
+			description.addProperty("indicatorDescription");
+			description.addProperty("indicatorCode");
+			description.addProperty("numerator");
+			description.addProperty("denominator");
+		} else if (rep instanceof FullRepresentation) {
+			description.addProperty("indicatorName");
+			description.addProperty("indicatorDescription");
+			description.addProperty("indicatorCode");
+			description.addProperty("numerator");
+			description.addProperty("denominator");
+			description.addProperty("aggregation");
+			description.addProperty("disaggregation");
+			description.addProperty("openmrsReportRefs");
+		}
 
 		return description;
 	}
@@ -51,6 +57,9 @@ public class MerIndicatorResource extends DataDelegatingCrudResource implements 
 		description.addProperty("indicatorCode");
 		description.addProperty("numerator");
 		description.addProperty("denominator");
+		description.addProperty("aggregation", Representation.FULL);
+		description.addProperty("disaggregation", Representation.FULL);
+		description.addProperty("openmrsReportRefs", Representation.FULL);
 
 		return description;
 	}

@@ -12,11 +12,7 @@ import org.openmrs.module.webservices.rest.web.resource.api.Retrievable;
 import org.openmrs.module.webservices.rest.web.resource.impl.DataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-@Controller
-@RequestMapping("/rest/" + RestConstants.VERSION_1 + "/dhisreporting/openmrstodhismappings")
 @Resource(name = RestConstants.VERSION_1
 		+ "/dhisreporting/openmrstodhismappings", supportedClass = OpenMRSToDHISMapping.class, supportedOpenmrsVersions = {
 				"1.8.*", "1.9.*, 1.10.*, 1.11.*", "1.12.*", "2.0.*" })
