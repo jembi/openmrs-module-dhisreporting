@@ -29,20 +29,21 @@ public class MerIndicatorResource extends DataDelegatingCrudResource implements 
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 
 		if (rep instanceof DefaultRepresentation) {
-			description.addProperty("indicatorName");
-			description.addProperty("indicatorDescription");
 			description.addProperty("indicatorCode");
-			description.addProperty("numerator");
-			description.addProperty("denominator");
+			description.addProperty("indicatorName");
+			description.addProperty("active");
+			description.addProperty("indicatorDescription");
 		} else if (rep instanceof FullRepresentation) {
-			description.addProperty("indicatorName");
-			description.addProperty("indicatorDescription");
 			description.addProperty("indicatorCode");
+			description.addProperty("indicatorName");
+			description.addProperty("active");
+			description.addProperty("indicatorDescription");
 			description.addProperty("numerator");
 			description.addProperty("denominator");
 			description.addProperty("aggregation");
 			description.addProperty("disaggregation");
 			description.addProperty("openmrsReportRefs");
+			description.addProperty("dhisMeta");
 		}
 
 		return description;

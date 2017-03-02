@@ -20,8 +20,8 @@ import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefin
  */
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({ "indicatorCode", "indicatorName", "indicatorDescription", "numerator", "denominator",
-		"aggregation", "disaggregation", "openmrsReportRefs" })
+@JsonPropertyOrder({ "indicatorCode", "indicatorName", "active", "indicatorDescription", "numerator", "denominator",
+		"aggregation", "disaggregation", "openmrsReportRefs", "dhisMeta" })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MerIndicator {
 
@@ -39,10 +39,10 @@ public class MerIndicator {
 	 * the indicator
 	 */
 	@JsonProperty("numerator")
-	private String numerator;
+	private JSONObject numerator;
 
 	@JsonProperty("denominator")
-	private String denominator;
+	private JSONObject denominator;
 
 	@JsonProperty("aggregation")
 	private JSONObject aggregation;
@@ -52,6 +52,17 @@ public class MerIndicator {
 
 	@JsonProperty("openmrsReportRefs")
 	private JSONObject openmrsReportRefs;
+
+	@JsonProperty("dhisMeta")
+	private JSONObject dhisMeta;
+
+	/**
+	 * Used to either activate or disable an indicator from being executed (run
+	 * OpenMRS local report and create or include in mapping as well as submit
+	 * indicator evaluation into configured external DHIS instance)
+	 */
+	@JsonProperty("active")
+	private Boolean active;
 
 	/**
 	 * Required
@@ -95,22 +106,22 @@ public class MerIndicator {
 	}
 
 	@JsonProperty("numerator")
-	public String getNumerator() {
+	public JSONObject getNumerator() {
 		return numerator;
 	}
 
 	@JsonProperty("numerator")
-	public void setNumerator(String numerator) {
+	public void setNumerator(JSONObject numerator) {
 		this.numerator = numerator;
 	}
 
 	@JsonProperty("denominator")
-	public String getDenominator() {
+	public JSONObject getDenominator() {
 		return denominator;
 	}
 
 	@JsonProperty("denominator")
-	public void setDenominator(String denominator) {
+	public void setDenominator(JSONObject denominator) {
 		this.denominator = denominator;
 	}
 
@@ -151,6 +162,31 @@ public class MerIndicator {
 	public void setOpenmrsReportRefs(JSONObject openmrsReportRefs) {
 		// TODO using this here set report and indicator properties heres
 		this.openmrsReportRefs = openmrsReportRefs;
+	}
+
+	@JsonProperty("dhisMeta")
+	public JSONObject getDhisMeta() {
+		return dhisMeta;
+	}
+
+	@JsonProperty("dhisMeta")
+	public void setDhisMeta(JSONObject dhisMeta) {
+		this.dhisMeta = dhisMeta;
+	}
+
+	@JsonProperty("active")
+	public boolean isActive() {
+		return active;
+	}
+
+	@JsonProperty("active")
+	public Boolean getActive() {
+		return isActive();
+	}
+
+	@JsonProperty("active")
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 }

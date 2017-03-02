@@ -687,13 +687,16 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				indicator.setIndicatorName((String) json.get("name"));
 				indicator.setIndicatorCode((String) json.get("code"));
 				indicator.setIndicatorDescription((String) json.get("description"));
-				indicator.setNumerator((String) json.get("numerator"));
-				indicator.setDenominator((String) json.get("denominator"));
+				indicator.setNumerator((JSONObject) json.get("numerator"));
+				indicator.setDenominator((JSONObject) json.get("denominator"));
 				indicator.setAggregation((JSONObject) json.get("aggregation"));
 				indicator.setDisaggregation((JSONObject) json.get("disaggregation"));
 				indicator.setOpenmrsReportRefs((JSONObject) json.get("openmrsReport"));
+				indicator.setDhisMeta((JSONObject) json.get("dhisMeta"));
+				indicator.setActive((Boolean) json.get("active"));
 
-				merIndicators.add(indicator);
+				if (indicator.isActive())
+					merIndicators.add(indicator);
 			}
 		}
 

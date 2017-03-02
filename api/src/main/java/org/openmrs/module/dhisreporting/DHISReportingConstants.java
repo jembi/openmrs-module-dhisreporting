@@ -77,4 +77,12 @@ public class DHISReportingConstants {
 
 	public static File DHISREPORTING_MER_INDICATORS_FILE = new File(
 			DHISREPORTING_DIRECTORY.getAbsolutePath() + File.separator + DHISREPORTING_MER_INDICATORS_FILENAME);
+
+	public static String REPORT_UUID_PREVENTION = "7e1623bc-ff30-11e6-bc64-92361f002671";
+
+	public static String REPORT_UUID_HIVSTATUS = "7e162484-ff30-11e6-bc64-92361f002671";
+
+	public static String REPORT_UUID_ONART = "7e162556-ff30-11e6-bc64-92361f002671";
+
+	public static String REPORT_UUID_OTHER = "7e162628-ff30-11e6-bc64-92361f002671";
 }

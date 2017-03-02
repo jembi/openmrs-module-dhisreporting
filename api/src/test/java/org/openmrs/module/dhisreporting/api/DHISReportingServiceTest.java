@@ -175,8 +175,8 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		JSONArray json = Context.getService(DHISReportingService.class).readJSONArrayFromFile(getClass()
 				.getClassLoader().getResource(DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILENAME).getFile());
 
-		Assert.assertEquals("PREP_NEW", (String) ((JSONObject) json.get(0)).get("code"));
-		Assert.assertEquals("M,F", (String) ((JSONObject) ((JSONObject) json.get(0)).get("disaggregation")).get("sex"));
+		Assert.assertEquals("PREP_NEW", ((JSONObject) json.get(0)).get("code"));
+		Assert.assertEquals("M,F", ((JSONObject) ((JSONObject) json.get(0)).get("disaggregation")).get("sex"));
 		Assert.assertTrue(StringUtils.isBlank((String) ((JSONObject) json.get(1)).get("description")));
 	}
 
@@ -200,7 +200,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals("Received PrEP by:  Age/Sex", indicators.get(0).getDisaggregation().get("name"));
 		Assert.assertEquals(
 				"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
-				indicators.get(2).getNumerator());
+				indicators.get(2).getNumerator().get("name"));
 	}
 
 	@Test
@@ -210,6 +210,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals(
 				"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
 				HTS_TST.getIndicatorName());
+		Assert.assertTrue(HTS_TST.isActive());
 		Assert.assertEquals(
 				"Received HTS and results according to: - Community service delivery modality - Facillity service delivery modality - Age/Sex/Result received by Service Modaility",
 				(String) HTS_TST.getDisaggregation().get("name"));
