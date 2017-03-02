@@ -202,4 +202,16 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 				"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
 				indicators.get(2).getNumerator());
 	}
+
+	@Test
+	public void getMerIndicator() {
+		MerIndicator HTS_TST = Context.getService(DHISReportingService.class).getMerIndicator("HTS_TST");
+
+		Assert.assertEquals(
+				"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
+				HTS_TST.getIndicatorName());
+		Assert.assertEquals(
+				"Received HTS and results according to: - Community service delivery modality - Facillity service delivery modality - Age/Sex/Result received by Service Modaility",
+				(String) HTS_TST.getDisaggregation().get("name"));
+	}
 }

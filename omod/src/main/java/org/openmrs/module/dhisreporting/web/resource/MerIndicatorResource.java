@@ -15,7 +15,11 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DataDelegatingCrudR
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+@Controller
+@RequestMapping("/rest/" + RestConstants.VERSION_1 + "/dhisreporting/merindicators")
 @SuppressWarnings({ "unchecked", "rawtypes" })
 @Resource(name = RestConstants.VERSION_1
 		+ "/dhisreporting/merindicators", supportedClass = MerIndicator.class, supportedOpenmrsVersions = { "1.8.*",
@@ -53,7 +57,6 @@ public class MerIndicatorResource extends DataDelegatingCrudResource implements 
 
 	@Override
 	protected NeedsPaging<MerIndicator> doGetAll(RequestContext context) {
-
 		List<MerIndicator> mappings = Context.getService(DHISReportingService.class).getMerIndicators(null, null, null);
 
 		if (mappings == null)
@@ -76,7 +79,6 @@ public class MerIndicatorResource extends DataDelegatingCrudResource implements 
 	@Override
 	protected void delete(Object arg0, String arg1, RequestContext arg2) throws ResponseException {
 		// TODO
-
 	}
 
 	@Override

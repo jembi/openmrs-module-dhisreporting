@@ -680,7 +680,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 		if (indicators != null && !indicators.isEmpty()) {
 			for (int i = (startingFrom != null && startingFrom > 0 ? startingFrom - 1 : 0); i <= (endindAt != null
-					&& endindAt <= indicators.size() ? endindAt - 1 : indicators.size()); i++) {
+					&& endindAt <= indicators.size() ? endindAt - 1 : indicators.size() - 1); i++) {
 				JSONObject json = (JSONObject) indicators.get(i);
 				MerIndicator indicator = new MerIndicator();
 
@@ -702,11 +702,11 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	@Override
 	public MerIndicator getMerIndicator(String code) {
-		List<MerIndicator> allIndicators = getMerIndicators(null, null, null);
-
 		if (StringUtils.isNotBlank(code)) {
-			for (int i = 0; i > allIndicators.size(); i++) {
-				if (code.equals(allIndicators.get(i).getIndicatorCode()))
+			List<MerIndicator> allIndicators = getMerIndicators(null, null, null);
+
+			for (int i = 0; i < allIndicators.size(); i++) {
+				if (code.equals((String) allIndicators.get(i).getIndicatorCode()))
 					return allIndicators.get(i);
 			}
 		}
