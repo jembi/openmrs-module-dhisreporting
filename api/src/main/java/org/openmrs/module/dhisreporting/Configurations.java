@@ -19,6 +19,10 @@ public class Configurations {
 		return conceptId != null ? Context.getConceptService().getConcept(conceptId) : null;
 	}
 
+	public Concept getDxfToAdxSwitchConcept() {
+		return getConceptByGpCode(DHISReportingConstants.DXFTOADXSWITCH_CONCEPTID);
+	}
+
 	public Concept getViralLoadConcept() {
 		return getConceptByGpCode(DHISReportingConstants.VIRALLOAD_CONCEPTID);
 	}
