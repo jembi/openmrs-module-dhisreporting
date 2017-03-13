@@ -86,5 +86,5 @@ public class DHISReportingConstants {
 
 	public static String REPORT_UUID_OTHER = "7e162628-ff30-11e6-bc64-92361f002671";
 	
-	public static String DXFTOADXSWITCH_CONCEPTID = "dhisreporting.config.dxfToAdxSwitch";
+	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
 }
