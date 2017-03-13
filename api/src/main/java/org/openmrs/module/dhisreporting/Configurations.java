@@ -20,7 +20,7 @@ public class Configurations {
 	}
 
 	public Boolean getDxfToAdxSwitchConcept() {
-		return "true".equals(getConceptByGpCode(DHISReportingConstants.DXF_TO_ADX_SWITCH));
+		return "true".equals(Context.getAdministrationService().getGlobalProperty(DXF_TO_ADX_SWITCH));
 	}
 
 	public Concept getViralLoadConcept() {
