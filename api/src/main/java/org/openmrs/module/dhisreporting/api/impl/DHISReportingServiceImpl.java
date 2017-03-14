@@ -46,17 +46,16 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dhisconnector.api.DHISConnectorService;
 import org.openmrs.module.dhisconnector.api.model.DHISDataValue;
 import org.openmrs.module.dhisconnector.api.model.DHISDataValueSet;
-import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisconnector.api.model.DHISMapping;
 import org.openmrs.module.dhisconnector.api.model.DHISMappingElement;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
-import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.OpenMRSReportConcepts;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
+import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
@@ -351,7 +350,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	@Override
-	public DHISImportSummary sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId) {
+	//TODO migrating this to DHISConnector module to support scheduling this call in it
+	//TODO may either be dxf or adx summary
+	public Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId) {
 		Map<String, DataSet> dataSets = report.getReportData().getDataSets();
 		List<DHISDataValue> dataValues = new ArrayList<DHISDataValue>();
 
@@ -382,7 +383,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	@Override
-	public DHISImportSummary runAndSendReportDataForTheCurrentMonth() {
+	public Object runAndSendReportDataForTheCurrentMonth() {
 		Location defaultLocation = Context.getLocationService().getLocation(Integer.parseInt(
 				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID)));
 
@@ -610,7 +611,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	/**
 	 * 
 	 * @param ageQuery,
-	 *            examples include;15:19, 20:24, 25:49, >=50, <1
+	 *            examples include;15-19, 20-24, 25-49, >=50, <1
 	 * @return
 	 */
 	@Override
@@ -632,9 +633,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				ageRange.setMaxAge(Integer.parseInt(ageQuery.split("<")[1]) - 1);
 			} else if (ageQuery.indexOf(">") >= 0) {
 				ageRange.setMinAge(Integer.parseInt(ageQuery.split(">")[1]) + 1);
-			} else if (ageQuery.indexOf(":") >= 0) {
-				ageRange.setMinAge(Integer.parseInt(ageQuery.split(":")[0]));
-				ageRange.setMaxAge(Integer.parseInt(ageQuery.split(":")[1]));
+			} else if (ageQuery.indexOf("-") >= 0) {
+				ageRange.setMinAge(Integer.parseInt(ageQuery.split("-")[0]));
+				ageRange.setMaxAge(Integer.parseInt(ageQuery.split("-")[1]));
 			} else {
 				ageRange = null;
 			}

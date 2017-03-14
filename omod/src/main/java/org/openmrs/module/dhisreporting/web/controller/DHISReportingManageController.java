@@ -47,7 +47,7 @@ public class DHISReportingManageController {
 
 	@RequestMapping(value = "/module/dhisreporting/manage", method = RequestMethod.POST)
 	public void postManage(ModelMap model, HttpServletRequest request) {
-		DHISImportSummary feedback = Context.getService(DHISReportingService.class)
+		DHISImportSummary feedback = (DHISImportSummary) Context.getService(DHISReportingService.class)
 				.runAndSendReportDataForTheCurrentMonth();
 
 		try {

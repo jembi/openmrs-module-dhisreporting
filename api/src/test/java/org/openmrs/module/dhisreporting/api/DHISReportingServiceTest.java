@@ -31,9 +31,9 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
-import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
+import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DurationUnit;
@@ -131,7 +131,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 	@Test
 	@Verifies(value = "should rightly handle an ageQuery and create an ageRange object from it", method = "convertAgeQueryToAgeRangeObject(String, DurationUnit)")
 	public void convertAgeQueryToAgeRangeObject_shouldRightlyHandleAnAgeQueryAndCreateAnAgeRangeObjectFromIt() {
-		// testing with queries; 15:19, 20:24, 25:49, >=50, <1, >15
+		// testing with queries; 15-19, 20-24, 25-49, >=50, <1, >15
 
 		AgeRange infant = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("<=1",
 				DurationUnit.YEARS, DurationUnit.YEARS);
@@ -141,9 +141,9 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 				DurationUnit.MONTHS, DurationUnit.MONTHS);
 		AgeRange adult1 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject(">15",
 				DurationUnit.YEARS, DurationUnit.YEARS);
-		AgeRange m1519 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("15:19",
+		AgeRange m1519 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("15-19",
 				DurationUnit.MONTHS, DurationUnit.MONTHS);
-		AgeRange y2549 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("25:49",
+		AgeRange y2549 = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject("25-49",
 				DurationUnit.YEARS, DurationUnit.YEARS);
 
 		Assert.assertEquals(DurationUnit.YEARS, infant.getMaxAgeUnit());

@@ -1,4 +1,4 @@
-package org.openmrs.module.dhisreporting;
+package org.openmrs.module.dhisreporting.reporting;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,6 +7,9 @@ import java.util.List;
 import org.openmrs.Concept;
 import org.openmrs.Program;
 import org.openmrs.api.PatientSetService.TimeModifier;
+import org.openmrs.module.dhisreporting.AgeRange;
+import org.openmrs.module.dhisreporting.Configurations;
+import org.openmrs.module.dhisreporting.Gender;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;

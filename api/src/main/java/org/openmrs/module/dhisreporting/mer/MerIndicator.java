@@ -1,4 +1,4 @@
-package org.openmrs.module.dhisreporting;
+package org.openmrs.module.dhisreporting.mer;
 
 import javax.annotation.Generated;
 

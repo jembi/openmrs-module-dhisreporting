@@ -21,12 +21,11 @@ import org.json.simple.JSONArray;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisreporting.AgeRange;
-import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.impl.DHISReportingServiceImpl;
+import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
@@ -64,9 +63,9 @@ public interface DHISReportingService extends OpenmrsService {
 	Report runPeriodIndicatorReport(PeriodIndicatorReportDefinition reportDef, Date startDate, Date endDate,
 			Location location);
 
-	DHISImportSummary sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId);
+	Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId);
 
-	DHISImportSummary runAndSendReportDataForTheCurrentMonth();
+	Object runAndSendReportDataForTheCurrentMonth();
 
 	OpenMRSToDHISMapping getMapping(String openmrsIdOrCode, DHISMappingType mappingType);
 

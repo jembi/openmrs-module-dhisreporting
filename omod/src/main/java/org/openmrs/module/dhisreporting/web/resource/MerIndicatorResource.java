@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.dhisreporting.MerIndicator;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
+import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
