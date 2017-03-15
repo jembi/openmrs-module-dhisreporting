@@ -16,8 +16,10 @@ import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.ProgramEnrollmentCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 
 public class PatientCohorts {
 	private Configurations config = new Configurations();
@@ -26,15 +28,17 @@ public class PatientCohorts {
 		GenderCohortDefinition cd = new GenderCohortDefinition();
 
 		if (gender.equals(Gender.FEMALE)) {
-			cd.setName("Female Patients");
+			cd.setName("femaleGender");
 			cd.setDescription("Patients whose gender is F");
 			cd.setFemaleIncluded(true);
 		} else if (gender.equals(Gender.MALE)) {
-			cd.setName("Male Patients");
+			cd.setName("maleGender");
 			cd.setDescription("Patients whose gender is M");
 			cd.setMaleIncluded(true);
 		} else {
-
+			cd.setName("unknownGender");
+			cd.setDescription("Patients whose gender is not known");
+			cd.setUnknownGenderIncluded(true);
 		}
 
 		return cd;
@@ -48,7 +52,7 @@ public class PatientCohorts {
 			cd.setMinAgeUnit(ageRange.getMinAgeUnit());
 			cd.setMaxAge(ageRange.getMaxAge());
 			cd.setMaxAgeUnit(ageRange.getMaxAgeUnit());
-
+			cd.setName(ageRange.toWordString() + "Age");
 			cd.setDescription(ageRange.getMinAge() != null && ageRange.getMaxAge() != null
 					? ageRange.getMinAge() + " " + ageRange.getMinAgeUnit() + " to " + ageRange.getMaxAgeUnit() : null);
 		}
@@ -126,5 +130,36 @@ public class PatientCohorts {
 			obsCohortDefinition.setValueList(valueList);
 		}
 		return obsCohortDefinition;
+	}
+
+	public CohortDefinitionDimension createGenderDimension(String[] genders) {
+		if (genders != null && genders.length > 0) {
+			CohortDefinitionDimension genderDimension = new CohortDefinitionDimension();
+			genderDimension.setName("gender");
+			for (int i = 0; i < genders.length; i++) {
+				if ("Male".equalsIgnoreCase(genders[i]))
+					genderDimension.addCohortDefinition("male", genderPatients(Gender.MALE), null);
+				else if ("Female".equalsIgnoreCase(genders[i]))
+					genderDimension.addCohortDefinition("female", genderPatients(Gender.FEMALE), null);
+			}
+			return genderDimension;
+		}
+		return null;
+	}
+
+	public CohortDefinitionDimension createAgeDimension(String[] ageQueries) {
+		if (ageQueries != null && ageQueries.length > 0) {
+			CohortDefinitionDimension ageDimension = new CohortDefinitionDimension();
+
+			ageDimension.setName("age");
+			for (int i = 0; i < ageQueries.length; i++) {
+				AgeRange ar = new AgeRange(ageQueries[i], DurationUnit.YEARS, DurationUnit.YEARS);
+				AgeCohortDefinition ad = patientsInAgeRange(ar);
+
+				ageDimension.addCohortDefinition(ad.getName(), ad, null);
+			}
+			return ageDimension;
+		}
+		return null;
 	}
 }

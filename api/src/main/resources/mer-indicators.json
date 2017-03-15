@@ -18,8 +18,13 @@
       },
       "disaggregation":{
          "name":"Received PrEP by:  Age/Sex",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -55,8 +60,13 @@
       },
       "disaggregation":{
          "name":"Circumcised as part of VMMC by: - Age - HIV status - HIV outome - Circumcision Technique/ follow-up status",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -92,8 +102,13 @@
       },
       "disaggregation":{
          "name":"Received HTS and results according to: - Community service delivery modality - Facillity service delivery modality - Age/Sex/Result received by Service Modaility",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -129,8 +144,13 @@
       },
       "disaggregation":{
          "name":"Known HIV status during pregnancy according to: - Positivity status - Known/New status by age Number of new ANC clients by:  - Age",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -166,8 +186,13 @@
       },
       "disaggregation":{
          "name":"Number of infants by: - Infant Test (<2m of birth + 2-12m of birth) - Results (positive Infant Test)PMTCT_STAT_POS",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -203,8 +228,13 @@
       },
       "disaggregation":{
          "name":"Number of TB cases according to: - Age/Sex  Number of TB cases with HIV positive statuses by: - Age/Sex - HIV result",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -240,8 +270,13 @@
       },
       "disaggregation":{
          "name":"Number of new ART enrollments by: - Age/Sex - TB status - HIV status - Pregnancy & breastfeeding status",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -277,8 +312,13 @@
       },
       "disaggregation":{
          "name":"Number of ART enrollments by: - Age/Sex",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -314,8 +354,13 @@
       },
       "disaggregation":{
          "name":"Number of HIV-positive pregnant women on ART by: - Maternal Regimen Type (New on ART, Already on ART) PMTCT_STAT_POS",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -351,8 +396,13 @@
       },
       "disaggregation":{
          "name":"Number of infants by: - Age/Sex - Maternal HIV status (positive) - HIV outcome - Mortality - time since birth",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -388,8 +438,13 @@
       },
       "disaggregation":{
          "name":"Number of ART patients by: -Age/Sex - Pregnancy/breastfeeding - Retention (+24 motnhs)",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -425,8 +480,13 @@
       },
       "disaggregation":{
          "name":"Number of ART patients by: - Age/Sex - Last VL recorded",
-         "ageQueries":"",
-         "sex":"M,F",
+         "ageQueries":[
+
+         ],
+         "sex":[
+            "Male",
+            "Female"
+         ],
          "coded":"",
          "inherent":""
       },
@@ -462,8 +522,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -499,8 +563,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -536,8 +604,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -573,8 +645,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -610,8 +686,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -647,8 +727,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -684,8 +768,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -721,8 +809,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -758,8 +850,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -795,8 +891,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -832,8 +932,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -869,8 +973,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -906,8 +1014,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -943,8 +1055,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -980,8 +1096,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -1017,8 +1137,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },
@@ -1054,8 +1178,12 @@
       },
       "disaggregation":{
          "name":"",
-         "ageQueries":"",
-         "sex":"",
+         "ageQueries":[
+
+         ],
+         "sex":[
+
+         ],
          "coded":"",
          "inherent":""
       },

@@ -34,8 +34,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -350,8 +353,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	@Override
-	//TODO migrating this to DHISConnector module to support scheduling this call in it
-	//TODO may either be dxf or adx summary
+	// TODO migrating this to DHISConnector module to support scheduling this
+	// call in it
+	// TODO may either be dxf or adx summary
 	public Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId) {
 		Map<String, DataSet> dataSets = report.getReportData().getDataSets();
 		List<DHISDataValue> dataValues = new ArrayList<DHISDataValue>();
@@ -616,32 +620,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 */
 	@Override
 	public AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit minAgeUnit, DurationUnit maxAgeUnit) {
-		AgeRange ageRange = null;
-		if (StringUtils.isNotBlank(ageQuery) && minAgeUnit != null && maxAgeUnit != null) {
-			ageRange = new AgeRange();
-
-			ageRange.setMinAgeUnit(minAgeUnit);
-			ageRange.setMaxAgeUnit(maxAgeUnit);
-
-			if (ageQuery.indexOf("<=") >= 0) {
-				ageRange.setMinAge(0);
-				ageRange.setMaxAge(Integer.parseInt(ageQuery.split("<=")[1]));
-			} else if (ageQuery.indexOf(">=") >= 0) {
-				ageRange.setMinAge(Integer.parseInt(ageQuery.split(">=")[1]));
-			} else if (ageQuery.indexOf("<") >= 0) {
-				ageRange.setMinAge(0);
-				ageRange.setMaxAge(Integer.parseInt(ageQuery.split("<")[1]) - 1);
-			} else if (ageQuery.indexOf(">") >= 0) {
-				ageRange.setMinAge(Integer.parseInt(ageQuery.split(">")[1]) + 1);
-			} else if (ageQuery.indexOf("-") >= 0) {
-				ageRange.setMinAge(Integer.parseInt(ageQuery.split("-")[0]));
-				ageRange.setMaxAge(Integer.parseInt(ageQuery.split("-")[1]));
-			} else {
-				ageRange = null;
-			}
-		}
-
-		return ageRange;
+		return new AgeRange(ageQuery, minAgeUnit, maxAgeUnit);
 	}
 
 	@Override
@@ -678,27 +657,17 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		JSONArray indicators = readJSONArrayFromFile(
 				StringUtils.isNotBlank(merIndicatorsFileLocation) ? merIndicatorsFileLocation
 						: DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE.getAbsolutePath());
+		ObjectMapper mapper = new ObjectMapper();
 
-		if (indicators != null && !indicators.isEmpty()) {
-			for (int i = (startingFrom != null && startingFrom > 0 ? startingFrom - 1 : 0); i <= (endindAt != null
-					&& endindAt <= indicators.size() ? endindAt - 1 : indicators.size() - 1); i++) {
-				JSONObject json = (JSONObject) indicators.get(i);
-				MerIndicator indicator = new MerIndicator();
-
-				indicator.setIndicatorName((String) json.get("name"));
-				indicator.setIndicatorCode((String) json.get("code"));
-				indicator.setIndicatorDescription((String) json.get("description"));
-				indicator.setNumerator((JSONObject) json.get("numerator"));
-				indicator.setDenominator((JSONObject) json.get("denominator"));
-				indicator.setAggregation((JSONObject) json.get("aggregation"));
-				indicator.setDisaggregation((JSONObject) json.get("disaggregation"));
-				indicator.setOpenmrsReportRefs((JSONObject) json.get("openmrsReport"));
-				indicator.setDhisMeta((JSONObject) json.get("dhisMeta"));
-				indicator.setActive((Boolean) json.get("active"));
-
-				if (indicator.isActive())
-					merIndicators.add(indicator);
-			}
+		try {
+			merIndicators = mapper.readValue(indicators.toJSONString(),
+					TypeFactory.collectionType(List.class, MerIndicator.class));
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		return merIndicators;
@@ -710,7 +679,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			List<MerIndicator> allIndicators = getMerIndicators(null, null, null);
 
 			for (int i = 0; i < allIndicators.size(); i++) {
-				if (code.equals((String) allIndicators.get(i).getIndicatorCode()))
+				if (code.equals((String) allIndicators.get(i).getCode()))
 					return allIndicators.get(i);
 			}
 		}

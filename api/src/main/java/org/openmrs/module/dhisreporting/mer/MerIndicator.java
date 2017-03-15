@@ -6,7 +6,6 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.json.simple.JSONObject;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
 
@@ -20,41 +19,41 @@ import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefin
  */
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({ "indicatorCode", "indicatorName", "active", "indicatorDescription", "numerator", "denominator",
-		"aggregation", "disaggregation", "openmrsReportRefs", "dhisMeta" })
+@JsonPropertyOrder({ "code", "name", "active", "description", "numerator", "denominator",
+		"aggregation", "disaggregation", "openmrsReport", "dhisMeta" })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MerIndicator {
 
-	@JsonProperty("indicatorName")
-	private String indicatorName;
+	@JsonProperty("name")
+	private String name;
 
-	@JsonProperty("indicatorDescription")
-	private String indicatorDescription;
+	@JsonProperty("description")
+	private String description;
 
-	@JsonProperty("indicatorCode")
-	private String indicatorCode;
+	@JsonProperty("code")
+	private String code;
 
 	/**
 	 * numerator, denominator are text descriptions of what should be part of
 	 * the indicator
 	 */
 	@JsonProperty("numerator")
-	private JSONObject numerator;
+	private MerIndicatorNumeratorOrDenominator numerator;
 
 	@JsonProperty("denominator")
-	private JSONObject denominator;
+	private MerIndicatorNumeratorOrDenominator denominator;
 
 	@JsonProperty("aggregation")
-	private JSONObject aggregation;
+	private MerIndicatorAggregation aggregation;
 
 	@JsonProperty("disaggregation")
-	private JSONObject disaggregation;
+	private MerIndicatorDisaggregation disaggregation;
 
-	@JsonProperty("openmrsReportRefs")
-	private JSONObject openmrsReportRefs;
+	@JsonProperty("openmrsReport")
+	private MerIndicatorOpenmrsReport openmrsReport;
 
 	@JsonProperty("dhisMeta")
-	private JSONObject dhisMeta;
+	private MerIndicatorDhisMeta dhisMeta;
 
 	/**
 	 * Used to either activate or disable an indicator from being executed (run
@@ -75,74 +74,74 @@ public class MerIndicator {
 		DAILY, MONTHLY, QUARTERY, SEMIANNUALLY, ANNUALLY
 	}
 
-	@JsonProperty("indicatorName")
-	public String getIndicatorName() {
-		return indicatorName;
+	@JsonProperty("name")
+	public String getName() {
+		return name;
 	}
 
-	@JsonProperty("indicatorName")
-	public void setIndicatorName(String indicatorName) {
-		this.indicatorName = indicatorName;
+	@JsonProperty("name")
+	public void setName(String indicatorName) {
+		this.name = indicatorName;
 	}
 
-	@JsonProperty("indicatorDescription")
-	public String getIndicatorDescription() {
-		return indicatorDescription;
+	@JsonProperty("description")
+	public String getDescription() {
+		return description;
 	}
 
-	@JsonProperty("indicatorDescription")
-	public void setIndicatorDescription(String indicatorDescription) {
-		this.indicatorDescription = indicatorDescription;
+	@JsonProperty("description")
+	public void setDescription(String indicatorDescription) {
+		this.description = indicatorDescription;
 	}
 
-	@JsonProperty("indicatorCode")
-	public String getIndicatorCode() {
-		return indicatorCode;
+	@JsonProperty("code")
+	public String getCode() {
+		return code;
 	}
 
-	@JsonProperty("indicatorCode")
-	public void setIndicatorCode(String indicatorCode) {
-		this.indicatorCode = indicatorCode;
+	@JsonProperty("code")
+	public void setCode(String indicatorCode) {
+		this.code = indicatorCode;
 	}
 
 	@JsonProperty("numerator")
-	public JSONObject getNumerator() {
+	public MerIndicatorNumeratorOrDenominator getNumerator() {
 		return numerator;
 	}
 
 	@JsonProperty("numerator")
-	public void setNumerator(JSONObject numerator) {
+	public void setNumerator(MerIndicatorNumeratorOrDenominator numerator) {
 		this.numerator = numerator;
 	}
 
 	@JsonProperty("denominator")
-	public JSONObject getDenominator() {
+	public MerIndicatorNumeratorOrDenominator getDenominator() {
 		return denominator;
 	}
 
 	@JsonProperty("denominator")
-	public void setDenominator(JSONObject denominator) {
+	public void setDenominator(MerIndicatorNumeratorOrDenominator denominator) {
 		this.denominator = denominator;
 	}
 
 	@JsonProperty("aggregation")
-	public JSONObject getAggregation() {
+	public MerIndicatorAggregation getAggregation() {
 		return aggregation;
 	}
 
 	@JsonProperty("aggregation")
-	public void setAggregation(JSONObject aggregation) {
+	public void setAggregation(MerIndicatorAggregation aggregation) {
 		// TODO using this here set report and indicator properties heres
 		this.aggregation = aggregation;
 	}
 
 	@JsonProperty("disaggregation")
-	public JSONObject getDisaggregation() {
+	public MerIndicatorDisaggregation getDisaggregation() {
 		return disaggregation;
 	}
 
 	@JsonProperty("disaggregation")
-	public void setDisaggregation(JSONObject disaggregation) {
+	public void setDisaggregation(MerIndicatorDisaggregation disaggregation) {
 		// TODO using this here set report and indicator properties heres
 		this.disaggregation = disaggregation;
 	}
@@ -155,22 +154,22 @@ public class MerIndicator {
 		return report;
 	}
 
-	public JSONObject getOpenmrsReportRefs() {
-		return openmrsReportRefs;
+	public MerIndicatorOpenmrsReport getOpenmrsReport() {
+		return openmrsReport;
 	}
 
-	public void setOpenmrsReportRefs(JSONObject openmrsReportRefs) {
+	public void setOpenmrsReport(MerIndicatorOpenmrsReport openmrsReport) {
 		// TODO using this here set report and indicator properties heres
-		this.openmrsReportRefs = openmrsReportRefs;
+		this.openmrsReport = openmrsReport;
 	}
 
 	@JsonProperty("dhisMeta")
-	public JSONObject getDhisMeta() {
+	public MerIndicatorDhisMeta getDhisMeta() {
 		return dhisMeta;
 	}
 
 	@JsonProperty("dhisMeta")
-	public void setDhisMeta(JSONObject dhisMeta) {
+	public void setDhisMeta(MerIndicatorDhisMeta dhisMeta) {
 		this.dhisMeta = dhisMeta;
 	}
 

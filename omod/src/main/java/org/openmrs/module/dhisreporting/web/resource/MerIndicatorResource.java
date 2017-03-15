@@ -29,20 +29,20 @@ public class MerIndicatorResource extends DataDelegatingCrudResource implements 
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 
 		if (rep instanceof DefaultRepresentation) {
-			description.addProperty("indicatorCode");
-			description.addProperty("indicatorName");
+			description.addProperty("code");
+			description.addProperty("name");
 			description.addProperty("active");
-			description.addProperty("indicatorDescription");
+			description.addProperty("description");
 		} else if (rep instanceof FullRepresentation) {
-			description.addProperty("indicatorCode");
-			description.addProperty("indicatorName");
+			description.addProperty("code");
+			description.addProperty("name");
 			description.addProperty("active");
-			description.addProperty("indicatorDescription");
+			description.addProperty("description");
 			description.addProperty("numerator");
 			description.addProperty("denominator");
 			description.addProperty("aggregation");
 			description.addProperty("disaggregation");
-			description.addProperty("openmrsReportRefs");
+			description.addProperty("openmrsReport");
 			description.addProperty("dhisMeta");
 		}
 
@@ -53,14 +53,14 @@ public class MerIndicatorResource extends DataDelegatingCrudResource implements 
 	public DelegatingResourceDescription getCreatableProperties() {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 
-		description.addProperty("indicatorName");
-		description.addProperty("indicatorDescription");
-		description.addProperty("indicatorCode");
+		description.addProperty("name");
+		description.addProperty("description");
+		description.addProperty("code");
 		description.addProperty("numerator");
 		description.addProperty("denominator");
 		description.addProperty("aggregation", Representation.FULL);
 		description.addProperty("disaggregation", Representation.FULL);
-		description.addProperty("openmrsReportRefs", Representation.FULL);
+		description.addProperty("openmrsReport", Representation.FULL);
 
 		return description;
 	}

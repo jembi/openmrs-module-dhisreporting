@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.dhisreporting;
 
+import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.module.reporting.common.Age;
 import org.openmrs.module.reporting.common.Age.Unit;
 import org.openmrs.module.reporting.common.DurationUnit;
@@ -41,6 +43,32 @@ public class AgeRange {
 	// ***********************
 
 	public AgeRange() {
+	}
+
+	public AgeRange(String ageQuery, DurationUnit minAgeUnit, DurationUnit maxAgeUnit) {
+		if (StringUtils.isNotBlank(ageQuery) && minAgeUnit != null && maxAgeUnit != null) {
+			setMinAgeUnit(minAgeUnit);
+			setMaxAgeUnit(maxAgeUnit);
+
+			if (ageQuery.endsWith("+")) {
+				ageQuery = ">=" + Integer.parseInt(ageQuery.split("+")[0]);
+			}
+			if (ageQuery.indexOf("<=") >= 0) {
+				setMinAge(0);
+				setMaxAge(Integer.parseInt(ageQuery.split("<=")[1]));
+			} else if (ageQuery.indexOf(">=") >= 0) {
+				setMinAge(Integer.parseInt(ageQuery.split(">=")[1]));
+			} else if (ageQuery.indexOf("<") >= 0) {
+				setMinAge(0);
+				setMaxAge(Integer.parseInt(ageQuery.split("<")[1]) - 1);
+			} else if (ageQuery.indexOf(">") >= 0) {
+				setMinAge(Integer.parseInt(ageQuery.split(">")[1]) + 1);
+			} else if (ageQuery.indexOf("-") >= 0) {
+				setMinAge(Integer.parseInt(ageQuery.split("-")[0]));
+				setMaxAge(Integer.parseInt(ageQuery.split("-")[1]));
+			}
+		}
+
 	}
 
 	/**
@@ -101,8 +129,23 @@ public class AgeRange {
 	/**
 	 * @see Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return ObjectUtil.nvlStr(minAge, 0) + ObjectUtil.decode(maxAge, "+", "-" + maxAge);
+	}
+
+	public String toWordString() {
+		NumberToWord numWorder = new NumberToWord();
+
+		return ObjectUtil
+				.nvlStr(numWorder.convert(minAge)
+						.replaceAll(" ",
+								""),
+						0)
+				+ (maxAge != null
+						? ObjectUtil.decode(WordUtils.capitalize(numWorder.convert(maxAge).replaceAll(" ", "")), "+",
+								"To" + WordUtils.capitalize(numWorder.convert(maxAge).replaceAll(" ", "")))
+						: "AndAbove");
 	}
 
 	// ***********************
