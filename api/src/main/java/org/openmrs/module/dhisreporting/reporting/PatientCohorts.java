@@ -52,7 +52,7 @@ public class PatientCohorts {
 			cd.setMinAgeUnit(ageRange.getMinAgeUnit());
 			cd.setMaxAge(ageRange.getMaxAge());
 			cd.setMaxAgeUnit(ageRange.getMaxAgeUnit());
-			cd.setName(ageRange.toWordString() + "Age");
+			cd.setName(ageRange.toWordString() + "ofAge");
 			cd.setDescription(ageRange.getMinAge() != null && ageRange.getMaxAge() != null
 					? ageRange.getMinAge() + " " + ageRange.getMinAgeUnit() + " to " + ageRange.getMaxAgeUnit() : null);
 		}
@@ -147,13 +147,13 @@ public class PatientCohorts {
 		return null;
 	}
 
-	public CohortDefinitionDimension createAgeDimension(String[] ageQueries) {
+	public CohortDefinitionDimension createAgeDimension(String[] ageQueries, DurationUnit durationUnit) {
 		if (ageQueries != null && ageQueries.length > 0) {
 			CohortDefinitionDimension ageDimension = new CohortDefinitionDimension();
 
 			ageDimension.setName("age");
 			for (int i = 0; i < ageQueries.length; i++) {
-				AgeRange ar = new AgeRange(ageQueries[i], DurationUnit.YEARS, DurationUnit.YEARS);
+				AgeRange ar = new AgeRange(ageQueries[i], durationUnit, durationUnit);
 				AgeCohortDefinition ad = patientsInAgeRange(ar);
 
 				ageDimension.addCohortDefinition(ad.getName(), ad, null);
