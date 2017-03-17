@@ -86,6 +86,16 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
+				<excludes>
+                	<exclude>**/*.xlsx</exclude>
+            	</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+                	<include>**/*.xlsx</include>
+            	</includes>
 			</resource>
 			<resource>
 				<directory>src/main/webapp</directory>

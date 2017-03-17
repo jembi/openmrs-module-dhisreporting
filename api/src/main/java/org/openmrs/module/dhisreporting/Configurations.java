@@ -1,14 +1,15 @@
 package org.openmrs.module.dhisreporting;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.context.Context;
 
 /**
  * Configurable global properties and objects
  * 
- * @author k-joseph
- * TODO expose these as Rest web services
+ * @author k-joseph TODO expose these as Rest web services
  */
 public class Configurations {
 
@@ -19,8 +20,9 @@ public class Configurations {
 		return conceptId != null ? Context.getConceptService().getConcept(conceptId) : null;
 	}
 
-	public Boolean getDxfToAdxSwitchConcept() {
-		return "true".equals(Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DXF_TO_ADX_SWITCH));
+	public Boolean dxfToAdxSwitch() {
+		return "true"
+				.equals(Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DXF_TO_ADX_SWITCH));
 	}
 
 	public Concept getViralLoadConcept() {
@@ -60,5 +62,24 @@ public class Configurations {
 		Integer programId = program != null ? Integer.parseInt(program) : null;
 
 		return programId != null ? Context.getProgramWorkflowService().getProgram(programId) : null;
+	}
+
+	public Boolean madeLocalMappingsChanges() {
+		return "true".equals(Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.MADE_LOCAL_MAPPING_CHANGES));
+	}
+
+	public Location getCurrentOpenmrsLocationMatchedWithDHIS2() {
+		String mapping = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT);
+
+		return StringUtils.isNotBlank(mapping) && mapping.indexOf(":") > -1
+				? Context.getLocationService().getLocationByUuid(mapping.split(":")[0]) : null;
+	}
+
+	public String getCurrentDHIS2OrgUnitUidMapped() {
+		String mapping = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT);
+		return StringUtils.isNotBlank(mapping) && mapping.indexOf(":") > -1 ? mapping.split(":")[1] : null;
 	}
 }

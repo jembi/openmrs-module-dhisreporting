@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +35,19 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -52,12 +61,14 @@ import org.openmrs.module.dhisconnector.api.model.DHISDataValueSet;
 import org.openmrs.module.dhisconnector.api.model.DHISMapping;
 import org.openmrs.module.dhisconnector.api.model.DHISMappingElement;
 import org.openmrs.module.dhisreporting.AgeRange;
+import org.openmrs.module.dhisreporting.Configurations;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.OpenMRSReportConcepts;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -90,6 +101,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	protected final Log log = LogFactory.getLog(this.getClass());
 
 	private DHISReportingDAO dao;
+
+	private Configurations configs = new Configurations();
 
 	/**
 	 * @param dao
@@ -293,6 +306,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				.getResource(DHISReportingConstants.DHISREPORTING_MAPPING_FILENAME).getFile());
 		File merIndicatorsFile = new File(getClass().getClassLoader()
 				.getResource(DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILENAME).getFile());
+		File indicatorMappingsFile = new File(
+				getClass().getClassLoader().getResource(DHISReportingConstants.INDICATOR_MAPPING_FILE_NAME).getFile());
 
 		try {
 			try {
@@ -300,9 +315,13 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE.delete();
 				if (DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE.exists())
 					DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE.delete();
+				if (DHISReportingConstants.INDICATOR_MAPPING_FILE.exists() && !configs.madeLocalMappingsChanges())
+					DHISReportingConstants.INDICATOR_MAPPING_FILE.delete();
 
 				FileUtils.copyFile(merIndicatorsFile, DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILE);
 				FileUtils.copyFile(mappingsFile, DHISReportingConstants.DHISREPORTING_FINAL_MAPPINGFILE);
+				if (!configs.madeLocalMappingsChanges())
+					FileUtils.copyFile(indicatorMappingsFile, DHISReportingConstants.INDICATOR_MAPPING_FILE);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -684,5 +703,60 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * 
+	 * @param mappingFileLocation,
+	 *            excell mappings file
+	 * @return
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<IndicatorMapping> getIndicatorMappings(String mappingFileLocation) {
+		try {
+			FileInputStream inp = new FileInputStream(new File(mappingFileLocation));
+			ObjectMapper mapper = new ObjectMapper();
+			Workbook workbook = WorkbookFactory.create(inp);
+
+			// Spreadsheet need be of one sheet obtained and used here.
+			Sheet sheet = workbook.getSheetAt(0);
+
+			JSONArray rows = new JSONArray();
+			Row fRow = null;
+			JSONArray fJRow = new JSONArray();
+
+			for (Iterator<Row> rowsIT = sheet.rowIterator(); rowsIT.hasNext();) {
+				Row row = rowsIT.next();
+
+				if (fRow == null) {
+					for (Iterator<Cell> cellsIT = row.cellIterator(); cellsIT.hasNext();) {
+						Cell cell = cellsIT.next();
+						fJRow.add(cell.getStringCellValue());
+					}
+					fRow = row;
+				} else {
+					JSONObject cells = new JSONObject();
+
+					for (Iterator<Cell> cellsIT = row.cellIterator(); cellsIT.hasNext();) {
+						Cell cell = cellsIT.next();
+						cells.put((String) fJRow.get(cell.getColumnIndex()), cell.getStringCellValue());
+					}
+					rows.add(cells);
+				}
+			}
+
+			return mapper.readValue(rows.toJSONString(),
+					TypeFactory.collectionType(List.class, IndicatorMapping.class));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (EncryptedDocumentException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<IndicatorMapping>();
 	}
 }

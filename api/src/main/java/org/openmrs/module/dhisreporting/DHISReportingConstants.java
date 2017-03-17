@@ -85,6 +85,15 @@ public class DHISReportingConstants {
 	public static String REPORT_UUID_ONART = "7e162556-ff30-11e6-bc64-92361f002671";
 
 	public static String REPORT_UUID_OTHER = "7e162628-ff30-11e6-bc64-92361f002671";
-	
+
 	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
+
+	public static String INDICATOR_MAPPING_FILE_NAME = "pepfar-meta-datim.xlsx";
+
+	public static File INDICATOR_MAPPING_FILE = new File(
+			DHISREPORTING_DIRECTORY.getAbsolutePath() + File.separator + INDICATOR_MAPPING_FILE_NAME);
+
+	public static String MADE_LOCAL_MAPPING_CHANGES = "dhisreporting.mappings.madeChanges";
+
+	public static String MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT = "dhisreporting.mappings.matchCurrentOpenMRSLocationToDHISOrgUnit";
 }

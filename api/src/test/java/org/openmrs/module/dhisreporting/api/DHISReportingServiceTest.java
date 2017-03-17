@@ -34,6 +34,7 @@ import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
@@ -178,7 +179,8 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 				.getClassLoader().getResource(DHISReportingConstants.DHISREPORTING_MER_INDICATORS_FILENAME).getFile());
 
 		Assert.assertEquals("PREP_NEW", ((JSONObject) json.get(0)).get("code"));
-		//Assert.assertEquals("Male","Female", ((JSONObject) ((JSONObject) json.get(0)).get("disaggregation")).get("sex"));
+		// Assert.assertEquals("Male","Female", ((JSONObject) ((JSONObject)
+		// json.get(0)).get("disaggregation")).get("sex"));
 		Assert.assertTrue(StringUtils.isBlank((String) ((JSONObject) json.get(1)).get("description")));
 	}
 
@@ -200,10 +202,13 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals(10, indicators.size());
 		Assert.assertTrue(StringUtils.isBlank(indicators.get(9).getDescription()));
 		Assert.assertEquals("VMMC_CIRC", indicators.get(1).getCode());
-		/*Assert.assertEquals("Received PrEP by:  Age/Sex", indicators.get(0).getDisaggregation().get("name"));
-		Assert.assertEquals(
-				"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
-				indicators.get(2).getNumerator().get("name"));*/
+		/*
+		 * Assert.assertEquals("Received PrEP by:  Age/Sex",
+		 * indicators.get(0).getDisaggregation().get("name"));
+		 * Assert.assertEquals(
+		 * "Number of individuals who (a) received HTS and (b) their test results in the reporting period"
+		 * , indicators.get(2).getNumerator().get("name"));
+		 */
 	}
 
 	@Test
@@ -215,8 +220,21 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 				"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
 				HTS_TST.getName());
 		Assert.assertTrue(HTS_TST.isActive());
-		/*Assert.assertEquals(
-				"Received HTS and results according to: - Community service delivery modality - Facillity service delivery modality - Age/Sex/Result received by Service Modaility",
-				(String) HTS_TST.getDisaggregation().get("name"));*/
+		/*
+		 * Assert.assertEquals(
+		 * "Received HTS and results according to: - Community service delivery modality - Facillity service delivery modality - Age/Sex/Result received by Service Modaility"
+		 * , (String) HTS_TST.getDisaggregation().get("name"));
+		 */
+	}
+
+	@Test
+	public void testConvertingExcellIntoJSON() {
+		List<IndicatorMapping> mappings = Context.getService(DHISReportingService.class)
+				.getIndicatorMappings((getClass().getClassLoader()
+						.getResource(DHISReportingConstants.INDICATOR_MAPPING_FILE_NAME).getFile()));
+
+		Assert.assertFalse(mappings.get(0).getActive());
+		Assert.assertEquals("TB_STAT (N, TA) TARGET: New/Relapsed TB",
+				mappings.get(mappings.size() - 1).getDataelement_name());
 	}
 }

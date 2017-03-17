@@ -1,8 +1,8 @@
 [
    {
       "code":"PREP_NEW",
-      "name":"Number of individuals who have been newly enrolled on (oral) antiretroviral pre-exposure prophylaxis (PrEP) to prevent HIV infection in the reporting period",
-      "description":"",
+      "description":"Number of individuals who have been newly enrolled on (oral) antiretroviral pre-exposure prophylaxis (PrEP) to prevent HIV infection in the reporting period",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -43,8 +43,8 @@
    },
    {
       "code":"VMMC_CIRC",
-      "name":"Number of males circumcised as part of the voluntary medical male circumcision (VMMC) for HIV prevention program within the reporting period",
-      "description":"",
+      "description":"Number of males circumcised as part of the voluntary medical male circumcision (VMMC) for HIV prevention program within the reporting period",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -85,8 +85,8 @@
    },
    {
       "code":"HTS_TST",
-      "name":"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
-      "description":"",
+      "description":"Number of individuals who (a) received HTS and (b) their test results in the reporting period",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -127,8 +127,8 @@
    },
    {
       "code":"PMTCT_STAT",
-      "name":"Percentage of pregnant women with known HIV status at antenatal care (includes those who already knew their HIV status prior to ANC), disaggregated by HIV result",
-      "description":"",
+      "description":"Percentage of pregnant women with known HIV status at antenatal care (includes those who already knew their HIV status prior to ANC), disaggregated by HIV result",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -169,8 +169,8 @@
    },
    {
       "code":"PMTCT_EID",
-      "name":"Percentage of infants born to HIV-positive women who had a virologic HIV test done within 12 months of birth, disaggregated by HIV result",
-      "description":"",
+      "description":"Percentage of infants born to HIV-positive women who had a virologic HIV test done within 12 months of birth, disaggregated by HIV result",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -211,8 +211,8 @@
    },
    {
       "code":"TB_ART",
-      "name":"Percentage of new and relapse TB cases with documented HIV status, disaggregated by HIV result",
-      "description":"",
+      "description":"Percentage of new and relapse TB cases with documented HIV status, disaggregated by HIV result",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -253,8 +253,8 @@
    },
    {
       "code":"TX_NEW",
-      "name":"Number of adults and children newly enrolled on antiretroviral therapy (ART)",
-      "description":"",
+      "description":"Number of adults and children newly enrolled on antiretroviral therapy (ART)",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -295,8 +295,8 @@
    },
    {
       "code":"TX_CURR",
-      "name":"Number of adults and children currently receiving antiretroviral therapy (ART)",
-      "description":"",
+      "description":"Number of adults and children currently receiving antiretroviral therapy (ART)",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -337,8 +337,8 @@
    },
    {
       "code":"PMTCT_ART",
-      "name":"Percentage of HIV-positive pregnant women who received ART to reduce the risk of mother-to-child transmission (MTCT) during pregnancy",
-      "description":"",
+      "description":"Percentage of HIV-positive pregnant women who received ART to reduce the risk of mother-to-child transmission (MTCT) during pregnancy",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -379,8 +379,8 @@
    },
    {
       "code":"PMTCT_FO",
-      "name":"Percentage of final outcomes among HIV exposed infants registered in a birth cohort",
-      "description":"",
+      "description":"Percentage of final outcomes among HIV exposed infants registered in a birth cohort",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -421,8 +421,8 @@
    },
    {
       "code":"TX_RET",
-      "name":"Percentage of adults and children known to be on treatment 12 months after initiation of antiretroviral therapy (Note: reporting 24 and 36 months is recommended, but optional)",
-      "description":"",
+      "description":"Percentage of adults and children known to be on treatment 12 months after initiation of antiretroviral therapy (Note: reporting 24 and 36 months is recommended, but optional)",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -463,8 +463,8 @@
    },
    {
       "code":"TX_PVLS",
-      "name":"Percentage of ART patients with a viral load result documented in the medical record and/or laboratory information systems (LIS) within the past 12 months with a suppressed viral load (<1000 copies/ml)",
-      "description":"",
+      "description":"Percentage of ART patients with a viral load result documented in the medical record and/or laboratory information systems (LIS) within the past 12 months with a suppressed viral load (<1000 copies/ml)",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -505,8 +505,8 @@
    },
    {
       "code":"TB_PREV",
-      "name":"Proportion of ART patients who completed a standard course of TB preventive therapy within the reporting period",
-      "description":"",
+      "description":"Proportion of ART patients who completed a standard course of TB preventive therapy within the reporting period",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -546,8 +546,8 @@
    },
    {
       "code":"TB_STAT",
-      "name":"Percentage of new and relapse TB cases with documented HIV status, disaggregated by HIV result",
-      "description":"",
+      "description":"Percentage of new and relapse TB cases with documented HIV status, disaggregated by HIV result",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -587,8 +587,8 @@
    },
    {
       "code":"TX_TB",
-      "name":"The proportion of ART patients who were screened who are receiving TB treatment",
-      "description":"",
+      "description":"The proportion of ART patients who were screened who are receiving TB treatment",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -628,8 +628,8 @@
    },
    {
       "code":"KP_PREV",
-      "name":"Number of key populations reached with individual and/or small group-level HIV prevention interventions designed for the target population",
-      "description":"",
+      "description":"Number of key populations reached with individual and/or small group-level HIV prevention interventions designed for the target population",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -669,8 +669,8 @@
    },
    {
       "code":"PP_PREV",
-      "name":"Number of the priority populations (PP) reached with the standardized, evidence-based intervention(s) required that are designed to promote the adoption of HIV prevention behaviors and service uptake",
-      "description":"",
+      "description":"Number of the priority populations (PP) reached with the standardized, evidence-based intervention(s) required that are designed to promote the adoption of HIV prevention behaviors and service uptake",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -710,8 +710,8 @@
    },
    {
       "code":"OVC_SERV",
-      "name":"Number of beneficiaries served by PEPFAR OVC programs for children and families affected by HIV",
-      "description":"",
+      "description":"Number of beneficiaries served by PEPFAR OVC programs for children and families affected by HIV",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -751,8 +751,8 @@
    },
    {
       "code":"OVC_HIVSTAT",
-      "name":"Percentage of orphans and vulnerable children (<18 years old) with HIV status reported to implementing partner (including status not reported), disaggregated by status type",
-      "description":"",
+      "description":"Percentage of orphans and vulnerable children (<18 years old) with HIV status reported to implementing partner (including status not reported), disaggregated by status type",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -792,8 +792,8 @@
    },
    {
       "code":"SC_STOCK",
-      "name":"Percentage of storage sites where commodities are stocked according to plan, by level in supply system",
-      "description":"",
+      "description":"Percentage of storage sites where commodities are stocked according to plan, by level in supply system",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -833,8 +833,8 @@
    },
    {
       "code":"KP_MAT",
-      "name":"Number of people who inject drugs (PWID) on medication-assisted therapy (MAT)",
-      "description":"",
+      "description":"Number of people who inject drugs (PWID) on medication-assisted therapy (MAT)",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -874,8 +874,8 @@
    },
    {
       "code":"GEND_GBV",
-      "name":"Number of people receiving post-gender based violence (GBV) clinical care based on the minimum package NOTE: The indicator DOES NOT measure delivery of GBV prevention activities",
-      "description":"",
+      "description":"Number of people receiving post-gender based violence (GBV) clinical care based on the minimum package NOTE: The indicator DOES NOT measure delivery of GBV prevention activities",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -915,8 +915,8 @@
    },
    {
       "code":"FPINT_SITE",
-      "name":"Number of HIV service delivery points (SDP) at a site supported by PEPFAR that are providing integrated voluntary family planning (FP) services",
-      "description":"",
+      "description":"Number of HIV service delivery points (SDP) at a site supported by PEPFAR that are providing integrated voluntary family planning (FP) services",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -956,8 +956,8 @@
    },
    {
       "code":"HRH_PRE",
-      "name":"Number of new health workers who graduated from a pre-service training institution or program as a result of PEPFAR-supported strengthening efforts, within the reporting period, by select cadre",
-      "description":"",
+      "description":"Number of new health workers who graduated from a pre-service training institution or program as a result of PEPFAR-supported strengthening efforts, within the reporting period, by select cadre",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -997,8 +997,8 @@
    },
    {
       "code":"HRH_CURR",
-      "name":"Number of health worker full-time equivalents who are working on any HIV-related activities i.e. prevention, treatment and other HIV support and are receiving any type of support from PEPFAR at facility and sites, community sites, and at the above-site level",
-      "description":"",
+      "description":"Number of health worker full-time equivalents who are working on any HIV-related activities i.e. prevention, treatment and other HIV support and are receiving any type of support from PEPFAR at facility and sites, community sites, and at the above-site level",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -1038,8 +1038,8 @@
    },
    {
       "code":"HRH_STAFF",
-      "name":"Number of health worker full-time equivalents who are working on any HIV-related activities i.e. prevention, treatment and other HIV support at PEPFAR-supported facility sites",
-      "description":"",
+      "description":"Number of health worker full-time equivalents who are working on any HIV-related activities i.e. prevention, treatment and other HIV support at PEPFAR-supported facility sites",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -1079,8 +1079,8 @@
    },
    {
       "code":"EMR_SITE",
-      "name":"Number of PEPFAR-supported facility-based service delivery points supported by your organization that have an electronic medical record system",
-      "description":"",
+      "description":"Number of PEPFAR-supported facility-based service delivery points supported by your organization that have an electronic medical record system",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -1120,8 +1120,8 @@
    },
    {
       "code":"LAB_PTCQI",
-      "name":"Number of laboratories and blood centers/banks: A. Engaged in Continuous Quality Improvement (CQI) activities B. Audited and achieved accreditation C. Performing an HIV-related test and participating in and passing Proficiency Testing (PT)",
-      "description":"",
+      "description":"Number of laboratories and blood centers/banks: A. Engaged in Continuous Quality Improvement (CQI) activities B. Audited and achieved accreditation C. Performing an HIV-related test and participating in and passing Proficiency Testing (PT)",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
@@ -1161,8 +1161,8 @@
    },
    {
       "code":"INVS_COMD",
-      "name":"Number of HIV program related commodities purchased and dollars spent in the last 12 months",
-      "description":"",
+      "description":"Number of HIV program related commodities purchased and dollars spent in the last 12 months",
+      "name":"",
       "active":true,
       "numerator":{
          "cohortUuid":"",
