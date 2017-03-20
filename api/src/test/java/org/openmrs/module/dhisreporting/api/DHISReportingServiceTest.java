@@ -229,12 +229,14 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 
 	@Test
 	public void testConvertingExcellIntoJSON() {
+		String mappingFile = getClass().getClassLoader().getResource(DHISReportingConstants.INDICATOR_MAPPING_FILE_NAME)
+				.getFile();
 		List<IndicatorMapping> mappings = Context.getService(DHISReportingService.class)
-				.getIndicatorMappings((getClass().getClassLoader()
-						.getResource(DHISReportingConstants.INDICATOR_MAPPING_FILE_NAME).getFile()));
+				.getIndicatorMappings(mappingFile);
 
 		Assert.assertFalse(mappings.get(0).getActive());
-		Assert.assertEquals("TB_STAT (N, TA) TARGET: New/Relapsed TB",
-				mappings.get(mappings.size() - 1).getDataelement_name());
+		Assert.assertEquals("PREP_NEW_D_DSD_Age",
+				mappings.get(0).getDataelementCode());
 	}
+
 }

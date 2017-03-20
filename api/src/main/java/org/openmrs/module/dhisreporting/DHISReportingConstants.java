@@ -88,7 +88,7 @@ public class DHISReportingConstants {
 
 	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
 
-	public static String INDICATOR_MAPPING_FILE_NAME = "pepfar-meta-datim.xlsx";
+	public static String INDICATOR_MAPPING_FILE_NAME = "pepfar-meta-datim.csv";
 
 	public static File INDICATOR_MAPPING_FILE = new File(
 			DHISREPORTING_DIRECTORY.getAbsolutePath() + File.separator + INDICATOR_MAPPING_FILE_NAME);

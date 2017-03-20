@@ -2,6 +2,7 @@ package org.openmrs.module.dhisreporting.mapping;
 
 import javax.annotation.Generated;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -16,58 +17,26 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @Generated("org.jsonschema2pojo")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IndicatorMapping {
-	private String dataelement_name;
-	private String dataelement_code;
-	private String categoryoptioncombo_name;
-	private String categoryoptioncombo_code;
-	private String categoryoptioncombo_uid;
+	private String dataelementName;
+	private String dataelementCode;
+	private String categoryoptioncomboName;
+	private String categoryoptioncomboCode;
+	private String categoryoptioncomboUid;
 	private String dataset;
 	private DisaggregationCategory disaggregationCategory;
 	private Boolean active;
+	private String activeString;
 	private String openmrsReportUuid;
 
+	/**
+	 * All blank disaggregation categories or categoryoptioncomboName should
+	 * rather be marked as NULL
+	 * 
+	 * @author k-joseph
+	 *
+	 */
 	public enum DisaggregationCategory {
-		AGE, DEFAULT, NULL, CODED, INHERENT, GENDER
-	}
-
-	public String getDataelement_name() {
-		return dataelement_name;
-	}
-
-	public void setDataelement_name(String dataelement_name) {
-		this.dataelement_name = dataelement_name;
-	}
-
-	public String getDataelement_code() {
-		return dataelement_code;
-	}
-
-	public void setDataelement_code(String dataelement_code) {
-		this.dataelement_code = dataelement_code;
-	}
-
-	public String getCategoryoptioncombo_name() {
-		return categoryoptioncombo_name;
-	}
-
-	public void setCategoryoptioncombo_name(String categoryoptioncombo_name) {
-		this.categoryoptioncombo_name = categoryoptioncombo_name;
-	}
-
-	public String getCategoryoptioncombo_code() {
-		return categoryoptioncombo_code;
-	}
-
-	public void setCategoryoptioncombo_code(String categoryoptioncombo_code) {
-		this.categoryoptioncombo_code = categoryoptioncombo_code;
-	}
-
-	public String getCategoryoptioncombo_uid() {
-		return categoryoptioncombo_uid;
-	}
-
-	public void setCategoryoptioncombo_uid(String categoryoptioncombo_uid) {
-		this.categoryoptioncombo_uid = categoryoptioncombo_uid;
+		AGE, DEFAULT, NULL, CODED, INHERENT, GENDER, OTHER;
 	}
 
 	public String getDataset() {
@@ -100,6 +69,56 @@ public class IndicatorMapping {
 
 	public void setOpenmrsReportUuid(String openmrsReportUuid) {
 		this.openmrsReportUuid = openmrsReportUuid;
+	}
+
+	public String getCategoryoptioncomboName() {
+		return categoryoptioncomboName;
+	}
+
+	public void setCategoryoptioncomboName(String categoryoptioncomboName) {
+		this.categoryoptioncomboName = categoryoptioncomboName;
+	}
+
+	public String getDataelementName() {
+		return dataelementName;
+	}
+
+	public void setDataelementName(String dataelementName) {
+		this.dataelementName = dataelementName;
+	}
+
+	public String getCategoryoptioncomboCode() {
+		return categoryoptioncomboCode;
+	}
+
+	public void setCategoryoptioncomboCode(String categoryoptioncomboCode) {
+		this.categoryoptioncomboCode = categoryoptioncomboCode;
+	}
+
+	public String getCategoryoptioncomboUid() {
+		return categoryoptioncomboUid;
+	}
+
+	public void setCategoryoptioncomboUid(String categoryoptioncomboUid) {
+		this.categoryoptioncomboUid = categoryoptioncomboUid;
+	}
+
+	public String getDataelementCode() {
+		return dataelementCode;
+	}
+
+	public void setDataelementCode(String dataelementCode) {
+		this.dataelementCode = dataelementCode;
+	}
+
+	public String getActiveString() {
+		return activeString;
+	}
+
+	public void setActiveString(String activeString) {
+		this.activeString = activeString;
+		if (StringUtils.isNotBlank(activeString))
+			setActive("TRUE".equalsIgnoreCase(activeString));
 	}
 
 }

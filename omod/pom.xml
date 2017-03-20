@@ -91,13 +91,6 @@
             	</excludes>
 			</resource>
 			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<includes>
-                	<include>**/*.xlsx</include>
-            	</includes>
-			</resource>
-			<resource>
 				<directory>src/main/webapp</directory>
 				<filtering>false</filtering>
 				<excludes>

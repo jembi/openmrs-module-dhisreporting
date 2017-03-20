@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,13 +34,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -92,6 +84,8 @@ import org.openmrs.module.reporting.report.definition.service.ReportDefinitionSe
 import org.openmrs.module.reporting.report.renderer.RenderingMode;
 import org.openmrs.module.reporting.report.service.ReportService;
 import org.openmrs.module.reporting.web.renderers.DefaultWebRenderer;
+
+import liquibase.util.csv.opencsv.CSVReader;
 
 /**
  * It is a default implementation of {@link DHISReportingService}.
@@ -715,46 +709,31 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	@SuppressWarnings("unchecked")
 	public List<IndicatorMapping> getIndicatorMappings(String mappingFileLocation) {
 		try {
-			FileInputStream inp = new FileInputStream(new File(mappingFileLocation));
 			ObjectMapper mapper = new ObjectMapper();
-			Workbook workbook = WorkbookFactory.create(inp);
+			CSVReader reader = new CSVReader(new FileReader(StringUtils.isNotBlank(mappingFileLocation)
+					? mappingFileLocation : DHISReportingConstants.INDICATOR_MAPPING_FILE.getAbsolutePath()), ',');
+			String[] nextLine;
+			String[] firstLine = null;
+			JSONArray indicators = new JSONArray();
 
-			// Spreadsheet need be of one sheet obtained and used here.
-			Sheet sheet = workbook.getSheetAt(0);
+			while ((nextLine = reader.readNext()) != null) {
+				if (firstLine == null)
+					firstLine = nextLine;
+				else {
+					JSONObject obj = new JSONObject();
 
-			JSONArray rows = new JSONArray();
-			Row fRow = null;
-			JSONArray fJRow = new JSONArray();
+					for (int i = 0; i < nextLine.length; i++) {
+						String token = nextLine[i];
 
-			for (Iterator<Row> rowsIT = sheet.rowIterator(); rowsIT.hasNext();) {
-				Row row = rowsIT.next();
-
-				if (fRow == null) {
-					for (Iterator<Cell> cellsIT = row.cellIterator(); cellsIT.hasNext();) {
-						Cell cell = cellsIT.next();
-						fJRow.add(cell.getStringCellValue());
+						obj.put(firstLine[i], token);
+						indicators.add(obj);
 					}
-					fRow = row;
-				} else {
-					JSONObject cells = new JSONObject();
-
-					for (Iterator<Cell> cellsIT = row.cellIterator(); cellsIT.hasNext();) {
-						Cell cell = cellsIT.next();
-						cells.put((String) fJRow.get(cell.getColumnIndex()), cell.getStringCellValue());
-					}
-					rows.add(cells);
 				}
 			}
-
-			return mapper.readValue(rows.toJSONString(),
+			reader.close();
+			return mapper.readValue(indicators.toJSONString(),
 					TypeFactory.collectionType(List.class, IndicatorMapping.class));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (EncryptedDocumentException e) {
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new ArrayList<IndicatorMapping>();
