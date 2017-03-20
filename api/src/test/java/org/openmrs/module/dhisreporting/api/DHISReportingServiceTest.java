@@ -232,9 +232,9 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		String mappingFile = getClass().getClassLoader().getResource(DHISReportingConstants.INDICATOR_MAPPING_FILE_NAME)
 				.getFile();
 		List<IndicatorMapping> mappings = Context.getService(DHISReportingService.class)
-				.getIndicatorMappings(mappingFile);
+				.getAllIndicatorMappings(mappingFile);
 
-		Assert.assertFalse(mappings.get(0).getActive());
+		Assert.assertFalse(mappings.get(0).isActive());
 		Assert.assertEquals("PREP_NEW_D_DSD_Age",
 				mappings.get(0).getDataelementCode());
 	}

@@ -27,6 +27,8 @@ public class IndicatorMapping {
 	private Boolean active;
 	private String activeString;
 	private String openmrsReportUuid;
+	private String openmrsNumeratorCohortUuid;
+	private String openmrsDenominatorCohortUuid;
 
 	/**
 	 * All blank disaggregation categories or categoryoptioncomboName should
@@ -119,6 +121,26 @@ public class IndicatorMapping {
 		this.activeString = activeString;
 		if (StringUtils.isNotBlank(activeString))
 			setActive("TRUE".equalsIgnoreCase(activeString));
+	}
+
+	public Boolean isActive() {
+		return getActive();
+	}
+
+	public String getOpenmrsNumeratorCohortUuid() {
+		return openmrsNumeratorCohortUuid;
+	}
+
+	public void setOpenmrsNumeratorCohortUuid(String openmrsNumeratorCohortUuid) {
+		this.openmrsNumeratorCohortUuid = openmrsNumeratorCohortUuid;
+	}
+
+	public String getOpenmrsDenominatorCohortUuid() {
+		return openmrsDenominatorCohortUuid;
+	}
+
+	public void setOpenmrsDenominatorCohortUuid(String openmrsDenominatorCohortUuid) {
+		this.openmrsDenominatorCohortUuid = openmrsDenominatorCohortUuid;
 	}
 
 }

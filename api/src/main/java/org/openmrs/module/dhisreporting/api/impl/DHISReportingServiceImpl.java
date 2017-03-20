@@ -61,6 +61,7 @@ import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -700,6 +701,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	/**
+	 * Reads mappings from pepfar-meta-datim csv file, parses them to jackson to
+	 * map them to IndicatorMapping list
 	 * 
 	 * @param mappingFileLocation,
 	 *            excell mappings file
@@ -707,7 +710,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<IndicatorMapping> getIndicatorMappings(String mappingFileLocation) {
+	public List<IndicatorMapping> getAllIndicatorMappings(String mappingFileLocation) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			CSVReader reader = new CSVReader(new FileReader(StringUtils.isNotBlank(mappingFileLocation)
@@ -723,9 +726,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					JSONObject obj = new JSONObject();
 
 					for (int i = 0; i < nextLine.length; i++) {
-						String token = nextLine[i];
-
-						obj.put(firstLine[i], token);
+						obj.put(firstLine[i], nextLine[i]);
 						indicators.add(obj);
 					}
 				}
@@ -737,5 +738,23 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			e.printStackTrace();
 		}
 		return new ArrayList<IndicatorMapping>();
+	}
+
+	@Override
+	public List<IndicatorMapping> getIndicatorMappings(Boolean active, List<DisaggregationCategory> disaggs) {
+		List<IndicatorMapping> mappings = new ArrayList<IndicatorMapping>();
+
+		if (active != null && disaggs != null) {
+			for (IndicatorMapping mapping : getAllIndicatorMappings(null)) {
+				if (active.equals(mapping.isActive()) && disaggs.contains(mapping.getDisaggregationCategory())) {
+					mappings.add(mapping);
+				}
+			}
+		}
+		return mappings;
+	}
+	
+	public void setupOpenMRSReport() {
+		
 	}
 }

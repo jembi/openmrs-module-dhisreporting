@@ -26,6 +26,7 @@ import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.impl.DHISReportingServiceImpl;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.common.DurationUnit;
@@ -108,5 +109,7 @@ public interface DHISReportingService extends OpenmrsService {
 
 	MerIndicator getMerIndicator(String code);
 
-	List<IndicatorMapping> getIndicatorMappings(String mappingFileLocation);
+	List<IndicatorMapping> getAllIndicatorMappings(String mappingFileLocation);
+
+	List<IndicatorMapping> getIndicatorMappings(Boolean active, List<DisaggregationCategory> disaggs);
 }
