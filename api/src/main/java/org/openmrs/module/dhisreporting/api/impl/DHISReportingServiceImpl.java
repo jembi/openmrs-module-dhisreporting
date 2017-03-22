@@ -63,8 +63,12 @@ import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
+import org.openmrs.module.dhisreporting.reporting.MappedCohortIndicator;
+import org.openmrs.module.dhisreporting.reporting.PatientCohorts;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.dataset.DataSet;
@@ -74,6 +78,7 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.indicator.CohortIndicator.IndicatorType;
+import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.openmrs.module.reporting.indicator.service.IndicatorService;
 import org.openmrs.module.reporting.report.Report;
 import org.openmrs.module.reporting.report.ReportRequest;
@@ -98,6 +103,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	private DHISReportingDAO dao;
 
 	private Configurations configs = new Configurations();
+
+	private PatientCohorts cohorts = new PatientCohorts();
 
 	/**
 	 * @param dao
@@ -134,16 +141,13 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		cd.addParameter(ReportingConstants.START_DATE_PARAMETER);
 		cd.addParameter(ReportingConstants.END_DATE_PARAMETER);
 		cd.addParameter(ReportingConstants.LOCATION_PARAMETER);
-		cd.addParameter(new Parameter("onOrAfter", "On Or After", Date.class));
-		cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
-		cd.addParameter(new Parameter("locationList", "Location", Location.class));
 
 		return Context.getService(CohortDefinitionService.class).saveDefinition(cd);
 	}
 
 	@Override
 	public CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription,
-			CodedObsCohortDefinition obsCohort) {
+			CohortDefinition cohort, IndicatorType indicatorType, String indicatorUuid) {
 		CohortIndicator indicator = new CohortIndicator();
 		Map<String, Object> mappings = new HashMap<String, Object>();
 
@@ -153,16 +157,15 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		indicator.addParameter(ReportingConstants.END_DATE_PARAMETER);
 		indicator.addParameter(ReportingConstants.LOCATION_PARAMETER);
 		indicator.setName(indicatorName);
+		if (StringUtils.isNotBlank(indicatorUuid))
+			indicator.setUuid(indicatorUuid);
 		indicator.setDescription(indicatorDescription);
-		indicator.setType(IndicatorType.COUNT);
+		indicator.setType(indicatorType);
 		mappings.put("startDate", "${startDate}");
 		mappings.put("endDate", "${endDate}");
 		mappings.put("location", "${location}");
-		mappings.put("onOrAfter", "${startDate}");
-		mappings.put("onOrBefore", "${endDate}");
-		mappings.put("locationList", "${location}");
 
-		indicator.setCohortDefinition(obsCohort, mappings);
+		indicator.setCohortDefinition(cohort, mappings);
 
 		return Context.getService(IndicatorService.class).saveDefinition(indicator);
 	}
@@ -222,50 +225,143 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	@Override
-	public void createCohortQueriesIndicatorsAndLabReport() {
+	public void createCohortQueriesIndicatorsAndReports() {
+		/*
+		 * mappings trying to use the same mappings list to save memory of
+		 * loading it from csv every time while setting up another report
+		 */
+		List<IndicatorMapping> mappings = getAllIndicatorMappings(null);
+
 		if (Context.getService(ReportDefinitionService.class)
 				.getDefinitionByUuid(DHISReportingConstants.LAB_REPORT_UUID) == null) {
 			createNewLabPeriodReportAndItsDHISConnectorMapping();
+		}
+		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART)) == null) {
+			/*
+			 * createNewPeriodIndicatorONARTReportAndItsDHISConnectorMapping(
+			 * Context.getAdministrationService().getGlobalProperty(
+			 * DHISReportingConstants.REPORT_UUID_ONART), mappings);
+			 */
+		}
+		testPeriodIndicatorReportRendereing();
+	}
+
+	private void testPeriodIndicatorReportRendereing() {
+		String uuid = "uuuuuuuuuuuuuuuuuuuuuuuuid";
+
+		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(uuid) == null) {
+			CohortIndicator newOnART = saveNewDHISCohortIndicator("ART_NEW", "New On ART", cohorts.hivNewArtPatients(),
+					IndicatorType.COUNT, null);
+			CohortIndicator currOnART = saveNewDHISCohortIndicator("ART_CURR", "Current On ART",
+					cohorts.hivNewArtPatients(), IndicatorType.COUNT, null);
+			CohortIndicator inHIV = saveNewDHISCohortIndicator("IN_HIV", "In HIV Program",
+					cohorts.inHIVProgram(), IndicatorType.COUNT, null);
+			List<CohortIndicator> indicators = new ArrayList<CohortIndicator>();
+			PeriodIndicatorReportDefinition report = new PeriodIndicatorReportDefinition();
+			CohortDefinitionDimension above5AgeDisagg = cohorts.createAgeDimension(">=5", DurationUnit.YEARS);
+			CohortDefinitionDimension maleGenderDisagg = cohorts.createGenderDimension("Male");
+			Map<String, Object> mappings = new HashMap<String, Object>();
+			Map<String, String> onlyAgeDimension = new HashMap<String, String>();
+			Map<String, String> onlyGenderDimension = new HashMap<String, String>();
+			Map<String, String> bothGenderAndAgeDimension = new HashMap<String, String>();
+			Map<String, String> bothAgeAndGenderDimension = new HashMap<String, String>();
+			
+			mappings.put("startDate", "${startDate}");
+			mappings.put("endDate", "${endDate}");
+			mappings.put("location", "${location}");
+			onlyGenderDimension.put(maleGenderDisagg.getName(), maleGenderDisagg.getName());
+			onlyAgeDimension.put(above5AgeDisagg.getName(), above5AgeDisagg.getName());
+			bothGenderAndAgeDimension.put(maleGenderDisagg.getName(), maleGenderDisagg.getName());
+			bothGenderAndAgeDimension.put(above5AgeDisagg.getName(), above5AgeDisagg.getName());
+			bothAgeAndGenderDimension.put(above5AgeDisagg.getName(), above5AgeDisagg.getName());
+			bothAgeAndGenderDimension.put(maleGenderDisagg.getName(), maleGenderDisagg.getName());
+			// noDimension.put(above5AgeDisagg.getName(), "All");
+			// noDimension.put(maleGenderDisagg.getName(), "All");
+
+			report.addParameter(new Parameter("startDate", "Start Date", Date.class));
+			report.addParameter(new Parameter("endDate", "End Date", Date.class));
+			report.addParameter(new Parameter("location", "Health Center", Location.class));
+			/*
+			 * report.setBaseCohortDefinition(cohorts.
+			 * createParameterizedLocationCohort("At Location"),
+			 * ParameterizableUtil.createParameterMappings(
+			 * "location=${location}"));
+			 */
+			report.setName("ART");
+			report.setDescription("ART Piloting");
+
+			indicators.add(newOnART);
+			indicators.add(currOnART);
+			indicators.add(inHIV);
+			setBasicOpenMRSObjectProps(report);
+			report.setupDataSetDefinition();
+			report.addDimension(above5AgeDisagg.getName(), above5AgeDisagg);
+			report.addDimension(maleGenderDisagg.getName(), maleGenderDisagg);
+			if (StringUtils.isNotBlank(uuid))
+				report.setUuid(uuid);
+
+			if (indicators != null) {
+				for (CohortIndicator ind : indicators) {
+					report.addIndicator(ind.getName(), ind.getDescription(), ind);
+					report.addIndicator(ind.getName() + "_G", ind.getDescription(), ind, onlyGenderDimension);
+					report.addIndicator(ind.getName() + "_A", ind.getDescription(), ind, onlyAgeDimension);
+					report.addIndicator(ind.getName() + "_GA", ind.getDescription(), ind, bothGenderAndAgeDimension);
+					report.addIndicator(ind.getName() + "_AG", ind.getDescription(), ind, bothAgeAndGenderDimension);
+				}
+			}
+
+			Context.getService(ReportDefinitionService.class).saveDefinition(report);
 		}
 	}
 
 	private void createNewLabPeriodReportAndItsDHISConnectorMapping() {
 		CohortIndicator bloodSmear = saveNewDHISCohortIndicator("BLOOD SMEAR", "Auto generated BLOOD SMEAR",
-				createDHISObsCountCohortQuery("BLOOD SMEAR", OpenMRSReportConcepts.BLOODSMEAR));
+				createDHISObsCountCohortQuery("BLOOD SMEAR", OpenMRSReportConcepts.BLOODSMEAR), IndicatorType.COUNT,
+				null);
 		CohortIndicator microFilaria = saveNewDHISCohortIndicator("MICRO-FILARIA", "Auto generated MICRO-FILARIA",
-				createDHISObsCountCohortQuery("MICRO-FILARIA", OpenMRSReportConcepts.MICROFILARIA));
+				createDHISObsCountCohortQuery("MICRO-FILARIA", OpenMRSReportConcepts.MICROFILARIA), IndicatorType.COUNT,
+				null);
 		CohortIndicator trypanosoma = saveNewDHISCohortIndicator("TRYPANOSOMA", "Auto generated TRYPANOSOMA",
-				createDHISObsCountCohortQuery("TRYPANOSOMA", OpenMRSReportConcepts.TRYPANOSOMA));
+				createDHISObsCountCohortQuery("TRYPANOSOMA", OpenMRSReportConcepts.TRYPANOSOMA), IndicatorType.COUNT,
+				null);
 		CohortIndicator giardia = saveNewDHISCohortIndicator("GIARDIA", "Auto generated GIARDIA",
-				createDHISObsCountCohortQuery("GIARDIA", OpenMRSReportConcepts.GIARDIA));
+				createDHISObsCountCohortQuery("GIARDIA", OpenMRSReportConcepts.GIARDIA), IndicatorType.COUNT, null);
 		CohortIndicator ascariasis = saveNewDHISCohortIndicator("ASCARIASIS", "Auto generated ASCARIASIS",
-				createDHISObsCountCohortQuery("ASCARIASIS", OpenMRSReportConcepts.ASCARIASIS));
+				createDHISObsCountCohortQuery("ASCARIASIS", OpenMRSReportConcepts.ASCARIASIS), IndicatorType.COUNT,
+				null);
 		CohortIndicator anklyostiasis = saveNewDHISCohortIndicator("ANKLYOSTIASIS", "Auto generated ANKLYOSTIASIS",
-				createDHISObsCountCohortQuery("ANKLYOSTIASIS", OpenMRSReportConcepts.ANKLYOSTIASIS));
+				createDHISObsCountCohortQuery("ANKLYOSTIASIS", OpenMRSReportConcepts.ANKLYOSTIASIS),
+				IndicatorType.COUNT, null);
 		CohortIndicator taenia = saveNewDHISCohortIndicator("TAENIA", "Auto generated TAENIA",
-				createDHISObsCountCohortQuery("TAENIA", OpenMRSReportConcepts.TAENIA));
+				createDHISObsCountCohortQuery("TAENIA", OpenMRSReportConcepts.TAENIA), IndicatorType.COUNT, null);
 		CohortIndicator otherParasites = saveNewDHISCohortIndicator("OTHER PARASITES", "Auto generated OTHER PARASITES",
-				createDHISObsCountCohortQuery("OTHER PARASITES", OpenMRSReportConcepts.OTHERPARASITES));
+				createDHISObsCountCohortQuery("OTHER PARASITES", OpenMRSReportConcepts.OTHERPARASITES),
+				IndicatorType.COUNT, null);
 		CohortIndicator pregnantTest = saveNewDHISCohortIndicator("PREGNANCY TEST", "Auto generated PREGNANCY TEST",
-				createDHISObsCountCohortQuery("PREGNANCY TEST", OpenMRSReportConcepts.PREGNANCYTEST));
+				createDHISObsCountCohortQuery("PREGNANCY TEST", OpenMRSReportConcepts.PREGNANCYTEST),
+				IndicatorType.COUNT, null);
 		CohortIndicator hemoglobin = saveNewDHISCohortIndicator("HEMOGLOBIN", "Auto generated HEMOGLOBIN",
-				createDHISObsCountCohortQuery("HEMOGLOBIN", OpenMRSReportConcepts.RPR));
+				createDHISObsCountCohortQuery("HEMOGLOBIN", OpenMRSReportConcepts.RPR), IndicatorType.COUNT, null);
 		CohortIndicator rpr = saveNewDHISCohortIndicator("RAPID PLASMA REAGENT", "Auto generated RPR",
-				createDHISObsCountCohortQuery("RAPID PLASMA REAGENT", OpenMRSReportConcepts.RPR));
+				createDHISObsCountCohortQuery("RAPID PLASMA REAGENT", OpenMRSReportConcepts.RPR), IndicatorType.COUNT,
+				null);
 		CohortIndicator fullBloodCount = saveNewDHISCohortIndicator("FULL BLOOD COUNT",
 				"Auto generated FULL BLOOD COUNT",
-				createDHISObsCountCohortQuery("FULL BLOOD COUNT", OpenMRSReportConcepts.FULLBLOODCOUNT));
+				createDHISObsCountCohortQuery("FULL BLOOD COUNT", OpenMRSReportConcepts.FULLBLOODCOUNT),
+				IndicatorType.COUNT, null);
 		CohortIndicator creatine = saveNewDHISCohortIndicator("CREATINE", "Auto generated CREATINE",
-				createDHISObsCountCohortQuery("CREATINE", OpenMRSReportConcepts.CREATINE));
+				createDHISObsCountCohortQuery("CREATINE", OpenMRSReportConcepts.CREATINE), IndicatorType.COUNT, null);
 		CohortIndicator amylasse = saveNewDHISCohortIndicator("AMYLASSE", "Auto generated AMYLASSE",
-				createDHISObsCountCohortQuery("AMYLASSE", OpenMRSReportConcepts.AMYLASSE));
+				createDHISObsCountCohortQuery("AMYLASSE", OpenMRSReportConcepts.AMYLASSE), IndicatorType.COUNT, null);
 		CohortIndicator cd4Count = saveNewDHISCohortIndicator("CD4 COUNT", "Auto generated CD4 COUNT",
-				createDHISObsCountCohortQuery("CD4 COUNT", OpenMRSReportConcepts.CD4COUNT));
+				createDHISObsCountCohortQuery("CD4 COUNT", OpenMRSReportConcepts.CD4COUNT), IndicatorType.COUNT, null);
 		CohortIndicator widal = saveNewDHISCohortIndicator("WIDAL", "Auto generated WIDAL",
-				createDHISObsCountCohortQuery("WIDAL", OpenMRSReportConcepts.WIDAL));
+				createDHISObsCountCohortQuery("WIDAL", OpenMRSReportConcepts.WIDAL), IndicatorType.COUNT, null);
 		CohortIndicator derebroSpinalFluid = saveNewDHISCohortIndicator("DEREBRO SPINAL FLUID",
 				"Auto generated DEREBRO SPINAL FLUID",
-				createDHISObsCountCohortQuery("DEREBRO SPINAL FLUID", OpenMRSReportConcepts.DEREBROSPINALFLUID));
+				createDHISObsCountCohortQuery("DEREBRO SPINAL FLUID", OpenMRSReportConcepts.DEREBROSPINALFLUID),
+				IndicatorType.COUNT, null);
 		List<CohortIndicator> indicators = new ArrayList<CohortIndicator>();
 
 		indicators.add(bloodSmear);
@@ -287,8 +383,80 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		indicators.add(derebroSpinalFluid);
 
 		createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting("HMIS Lab Request",
-				"HMIS Auto-generated Lab Request", indicators, DHISReportingConstants.LAB_REPORT_UUID,
+				"HMIS Auto-generated Lab Request", indicators,
+				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.LAB_REPORT_UUID),
 				DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST", "Monthly");
+	}
+
+	/**
+	 * @param reportDefinitionUuid
+	 * @param mappings
+	 */
+	private void createNewPeriodIndicatorONARTReportAndItsDHISConnectorMapping(String reportDefinitionUuid,
+			List<IndicatorMapping> mappings) {
+		List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
+		String openmrsReportUuid = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
+		List<String> dataElementPrefixs = new ArrayList<String>();
+
+		disaggs.add(DisaggregationCategory.AGE);
+		disaggs.add(DisaggregationCategory.DEFAULT);
+		disaggs.add(DisaggregationCategory.GENDER);
+		dataElementPrefixs.add("TX_NEW");
+		dataElementPrefixs.add("TX_CURR");
+
+		/*
+		 * First piloting being limited to a few indicators with easy
+		 * disaggregations and existing openmrs Rwanda MoH data
+		 */
+		List<IndicatorMapping> filteredMappings = getIndicatorMappings(mappings, null, true, disaggs, openmrsReportUuid,
+				dataElementPrefixs);
+		List<MappedCohortIndicator> indicators = new ArrayList<MappedCohortIndicator>();
+		SqlCohortDefinition activeOnART = cohorts.hivActiveARTPatients();
+		SqlCohortDefinition newOnART = cohorts.hivNewArtPatients();
+
+		// creating cohort queries
+		for (IndicatorMapping mapping : filteredMappings) {
+			CohortIndicator indicator = null;
+			MappedCohortIndicator mIndicator = null;
+
+			if (mapping.getDataelementCode().startsWith("TX_NEW")) {
+				indicator = saveNewDHISCohortIndicator(mapping.getDataelementCode(), mapping.getDataelementName(),
+						newOnART, IndicatorType.COUNT, mapping.getOpenmrsNumeratorCohortUuid());
+			} else if (mapping.getDataelementCode().startsWith("TX_CURR")) {
+				indicator = saveNewDHISCohortIndicator(mapping.getDataelementCode(), mapping.getDataelementName(),
+						activeOnART, IndicatorType.COUNT, mapping.getOpenmrsNumeratorCohortUuid());
+			}
+			if (indicator != null) {
+				mIndicator = new MappedCohortIndicator(indicator, mapping);
+				indicators.add(mIndicator);
+			}
+		}
+
+		// creating cohort indicators
+		PeriodIndicatorReportDefinition report = (PeriodIndicatorReportDefinition) Context
+				.getService(ReportDefinitionService.class).getDefinitionByUuid(openmrsReportUuid);
+		String reportName = "On ART";
+
+		if (report == null) {
+			report = new PeriodIndicatorReportDefinition();
+
+			setBasicOpenMRSObjectProps(report);
+			report.setDescription("90-90: On ART");
+			report.setupDataSetDefinition();
+			report.setName(reportName);
+			if (StringUtils.isNotBlank(openmrsReportUuid))
+				report.setUuid(openmrsReportUuid);
+
+			if (indicators != null) {
+				for (MappedCohortIndicator ind : indicators) {
+					// TODO default disaggregations requires no dimensions
+					report.addIndicator(ind.getMapping().getDataelementCode(), ind.getMapping().getDataelementName(),
+							ind.getCohortIndicator());
+				}
+			}
+
+		}
 	}
 
 	@Override
@@ -379,7 +547,6 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			DHISDataValueSet dataValueSet = new DHISDataValueSet();
 			DataSet ds = dataSets.get("defaultDataSet");
 			List<DataSetColumn> columns = ds.getMetaData().getColumns();
-
 			DataSetRow row = ds.iterator().next();
 
 			for (int i = 0; i < columns.size(); i++) {
@@ -727,8 +894,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 					for (int i = 0; i < nextLine.length; i++) {
 						obj.put(firstLine[i], nextLine[i]);
-						indicators.add(obj);
 					}
+					indicators.add(obj);
 				}
 			}
 			reader.close();
@@ -740,21 +907,38 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return new ArrayList<IndicatorMapping>();
 	}
 
+	/**
+	 * indicatorMappings is provided to use less memory which would be used to
+	 * re-load the csv mapping file
+	 */
 	@Override
-	public List<IndicatorMapping> getIndicatorMappings(Boolean active, List<DisaggregationCategory> disaggs) {
-		List<IndicatorMapping> mappings = new ArrayList<IndicatorMapping>();
+	public List<IndicatorMapping> getIndicatorMappings(List<IndicatorMapping> indicatorMappings,
+			String mappingFileLocation, Boolean active, List<DisaggregationCategory> disaggs, String openmrsReportUuid,
+			List<String> dataElementPrefixs) {
+		List<IndicatorMapping> filteredMappings = new ArrayList<IndicatorMapping>();
 
-		if (active != null && disaggs != null) {
-			for (IndicatorMapping mapping : getAllIndicatorMappings(null)) {
-				if (active.equals(mapping.isActive()) && disaggs.contains(mapping.getDisaggregationCategory())) {
-					mappings.add(mapping);
+		if (active != null && disaggs != null && StringUtils.isNotBlank(openmrsReportUuid)
+				&& dataElementPrefixs != null) {
+			List<IndicatorMapping> mList = indicatorMappings != null ? indicatorMappings
+					: getAllIndicatorMappings(mappingFileLocation);
+
+			for (IndicatorMapping mapping : mList) {
+				if (active.equals(mapping.isActive()) && disaggs.contains(mapping.getDisaggregationCategory())
+						&& openmrsReportUuid.equals(mapping.getOpenmrsReportUuid())) {
+					boolean rightDataElements = false;
+
+					for (String pref : dataElementPrefixs) {
+						if (mapping.getDataelementName().startsWith(pref)) {
+							rightDataElements = true;
+							break;
+						}
+					}
+					if (rightDataElements) {
+						filteredMappings.add(mapping);
+					}
 				}
 			}
 		}
-		return mappings;
-	}
-	
-	public void setupOpenMRSReport() {
-		
+		return filteredMappings;
 	}
 }

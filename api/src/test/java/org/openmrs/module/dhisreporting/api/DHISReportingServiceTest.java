@@ -16,6 +16,7 @@ package org.openmrs.module.dhisreporting.api;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,12 +36,14 @@ import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
+import org.openmrs.module.reporting.indicator.CohortIndicator.IndicatorType;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
@@ -68,7 +71,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		CodedObsCohortDefinition cohort = Context.getService(DHISReportingService.class)
 				.createDHISObsCountCohortQuery("test", concept);
 		CohortIndicator cohortIndicator = Context.getService(DHISReportingService.class)
-				.saveNewDHISCohortIndicator("test", null, cohort);
+				.saveNewDHISCohortIndicator("test", null, cohort, IndicatorType.COUNT, null);
 		ReportDefinition report = Context.getService(DHISReportingService.class)
 				.createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting("test", null,
 						Collections.singletonList(cohortIndicator), null, "", "");
@@ -235,8 +238,32 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 				.getAllIndicatorMappings(mappingFile);
 
 		Assert.assertFalse(mappings.get(0).isActive());
-		Assert.assertEquals("PREP_NEW_D_DSD_Age",
-				mappings.get(0).getDataelementCode());
+		Assert.assertEquals("PREP_NEW_D_DSD_Age", mappings.get(0).getDataelementCode());
+	}
+
+	@Test
+	@Verifies(value = "should filter using activity, disaggregations, openmrs report and dhis data elements", method = "getIndicatorMappings(List<IndicatorMapping>, String, Boolean, List<DisaggregationCategory>, String,List<String>)")
+	public void getIndicatorMappings_shouldFilterUsingActivityDisaggsOpenMRSReportAndDHISDataElement() {
+		String mappingFile = getClass().getClassLoader().getResource(DHISReportingConstants.INDICATOR_MAPPING_FILE_NAME)
+				.getFile();
+		List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
+		/*
+		 * Context.getAdministrationService()
+		 * .getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
+		 */
+		String openmrsReportUuid = "7e162556-ff30-11e6-bc64-92361f002671";
+		List<String> dataElementPrefixs = new ArrayList<String>();
+
+		disaggs.add(DisaggregationCategory.AGE);
+		disaggs.add(DisaggregationCategory.DEFAULT);
+		disaggs.add(DisaggregationCategory.GENDER);
+		dataElementPrefixs.add("TX_NEW");
+		dataElementPrefixs.add("TX_CURR");
+
+		List<IndicatorMapping> mappings = Context.getService(DHISReportingService.class).getIndicatorMappings(null,
+				mappingFile, true, disaggs, openmrsReportUuid, dataElementPrefixs);
+
+		Assert.assertEquals(16, mappings.size());
 	}
 
 }

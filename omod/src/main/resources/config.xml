@@ -194,12 +194,52 @@
 	<globalProperty>
 		<property>dhisreporting.mappings.madeChanges</property>
 		<defaultValue>false</defaultValue>
-		<description>Set to true only if you have made changes to pepfar-meta-datim.xlsx mappings file</description>
+		<description>Set to true only if you have made changes to pepfar-meta-datim.csv mappings file</description>
 	</globalProperty>
 	<globalProperty>
 		<property>dhisreporting.mappings.matchCurrentOpenMRSLocationToDHISOrgUnit</property>
 		<defaultValue></defaultValue>
 		<description>format; (OpenMRSLocationUuiId:DHIS2OrgUnitUId)</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.newOnARTPeriodInMonths</property>
+		<defaultValue>3</defaultValue>
+		<description>period a patient is marked as being new on ART in months</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.preventionUuid</property>
+		<defaultValue>7e1623bc-ff30-11e6-bc64-92361f002671</defaultValue>
+		<description>prevention report uuid</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.hivStatus</property>
+		<defaultValue>7e162484-ff30-11e6-bc64-92361f002671</defaultValue>
+		<description>hiv status report uuid</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.onARTUuid</property>
+		<defaultValue>7e162556-ff30-11e6-bc64-92361f002671</defaultValue>
+		<description>on ART report uuid</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.othersUuid</property>
+		<defaultValue>7e162628-ff30-11e6-bc64-92361f002671</defaultValue>
+		<description>Other report uuid</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.cohort.tbARTdeno</property>
+		<defaultValue>389025b4-0e20-11e7-93ae-92361f002671</defaultValue>
+		<description>on TB_ART report denoniminator cohort uuid</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.dataset.onARTUid</property>
+		<defaultValue></defaultValue>
+		<description>on ART dhis dataset uid</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.dataset.onARTPeriodType</property>
+		<defaultValue>Daily</defaultValue>
+		<description>on ART dhis dataset periodType</description>
 	</globalProperty>
 </module>
 

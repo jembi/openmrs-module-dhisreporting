@@ -53,8 +53,8 @@ public class DHISReportingActivator implements ModuleActivator {
 	 */
 	public void started() {
 		Context.getService(DHISReportingService.class).transferDHISReportingFilesToDataDirectory();
-		Context.getService(DHISReportingService.class).createCohortQueriesIndicatorsAndLabReport();
-		
+		Context.getService(DHISReportingService.class).createCohortQueriesIndicatorsAndReports();
+
 		log.info("DHIS Reporting Module started");
 	}
 

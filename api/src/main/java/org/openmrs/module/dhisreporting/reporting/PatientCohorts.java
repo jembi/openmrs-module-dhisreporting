@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.PatientSetService.TimeModifier;
 import org.openmrs.module.dhisreporting.AgeRange;
@@ -12,6 +14,7 @@ import org.openmrs.module.dhisreporting.Configurations;
 import org.openmrs.module.dhisreporting.Gender;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.ProgramEnrollmentCohortDefinition;
@@ -44,6 +47,15 @@ public class PatientCohorts {
 		return cd;
 	}
 
+	public SqlCohortDefinition createParameterizedLocationCohort(String name) {
+		SqlCohortDefinition location = new SqlCohortDefinition();
+		location.setQuery(
+				"select p.patient_id from patient p, person_attribute pa, person_attribute_type pat where p.patient_id = pa.person_id and pat.name ='Health Center' and pa.voided = 0 and pat.person_attribute_type_id = pa.person_attribute_type_id and pa.value = :location");
+		location.setName(name);
+		location.addParameter(new Parameter("location", "location", Location.class));
+		return location;
+	}
+
 	public AgeCohortDefinition patientsInAgeRange(AgeRange ageRange) {
 		AgeCohortDefinition cd = new AgeCohortDefinition();
 
@@ -63,6 +75,7 @@ public class PatientCohorts {
 	private ProgramEnrollmentCohortDefinition inPrograms(String name, List<Program> programs) {
 		ProgramEnrollmentCohortDefinition pc = new ProgramEnrollmentCohortDefinition();
 
+		addBasicPeriodIndicatorParameters(pc);
 		pc.setName(name);
 		pc.setPrograms(programs);
 
@@ -73,6 +86,7 @@ public class PatientCohorts {
 		List<Program> programs = new ArrayList<Program>();
 
 		programs.add(config.getHIVProgram());
+		
 		return inPrograms("in HIV Program", programs);
 	}
 
@@ -90,25 +104,50 @@ public class PatientCohorts {
 	 * 
 	 * @return
 	 */
-	public SqlCohortDefinition hivActivePatients() {
+	public SqlCohortDefinition hivActiveARTPatients() {
 		SqlCohortDefinition sc = new SqlCohortDefinition();
 		String sql = "select distinct pp.patient_id from obs o inner join patient_program pp on o.person_id = pp.patient_id inner join orders ord on o.person_id = ord.patient_id where o.concept_id != "
-				+ config.getReasonForExitingCareConcept().getConceptId() + " and program_id = "
+				+ config.getReasonForExitingCareConcept().getConceptId() + " and pp.program_id = "
 				+ config.getHIVProgram().getProgramId()
 				+ " and ord.concept_id in (select distinct concept_id from concept_set where pp.date_completed is null and concept_set = "
 				+ config.getARVDrugsConceptSet().getConceptId()
 				+ ") and (o.obs_datetime between :startDate and :endDate)";
+		// ^ TODO should this be order startdate comparison or obs datatime
 
-		sc.setName("Active HIV Patients");
-		sc.addParameter(new Parameter("startDate", "startDate", Date.class));
-		sc.addParameter(new Parameter("endDate", "endDate", Date.class));
+		sc.setName("Active HIV ART Patients");
+		addBasicPeriodIndicatorParameters(sc);
 		sc.setQuery(sql);
 
 		return sc;
 	}
 
-	public InverseCohortDefinition nonHIVActivePatients() {
-		return new InverseCohortDefinition(hivActivePatients());
+	public SqlCohortDefinition hivNewArtPatients() {
+		SqlCohortDefinition sc = new SqlCohortDefinition();
+		String sql = "select distinct pp.patient_id from obs o inner join patient_program pp on o.person_id = pp.patient_id inner join orders ord on o.person_id = ord.patient_id where o.concept_id != "
+				+ config.getReasonForExitingCareConcept().getConceptId() + " and pp.program_id = "
+				+ config.getHIVProgram().getProgramId()
+				+ " and ord.concept_id in (select distinct concept_id from concept_set where pp.date_completed is null and concept_set = "
+				+ config.getARVDrugsConceptSet().getConceptId()
+				+ ") and (o.obs_datetime between :startDate and :endDate)"
+				+ (config.monthsConsideredNewOnART() != null ? " and o.obs_datetime >= (CURRENT_DATE() - INTERVAL "
+						+ config.monthsConsideredNewOnART() + " MONTH)" : "");
+		// ^ TODO should this be order startdate comparison or obs datatime
+
+		sc.setName("New HIV ART Patients");
+		addBasicPeriodIndicatorParameters(sc);
+		sc.setQuery(sql);
+
+		return sc;
+	}
+
+	private void addBasicPeriodIndicatorParameters(CohortDefinition cd) {
+		cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+		cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+		cd.addParameter(new Parameter("location", "location", Location.class));
+	}
+
+	public InverseCohortDefinition nonHIVActiveARTPatients() {
+		return new InverseCohortDefinition(hivActiveARTPatients());
 	}
 
 	public CodedObsCohortDefinition hivPositivePatients() {
@@ -129,35 +168,49 @@ public class PatientCohorts {
 			valueList.add(value);
 			obsCohortDefinition.setValueList(valueList);
 		}
+		addBasicPeriodIndicatorParameters(obsCohortDefinition);
+
 		return obsCohortDefinition;
 	}
 
-	public CohortDefinitionDimension createGenderDimension(String[] genders) {
-		if (genders != null && genders.length > 0) {
+	/**
+	 * 
+	 * @param genders
+	 * @return
+	 */
+	public CohortDefinitionDimension createGenderDimension(String gender) {
+		if (StringUtils.isNotBlank(gender)) {
 			CohortDefinitionDimension genderDimension = new CohortDefinitionDimension();
-			genderDimension.setName("gender");
-			for (int i = 0; i < genders.length; i++) {
-				if ("Male".equalsIgnoreCase(genders[i]))
-					genderDimension.addCohortDefinition("male", genderPatients(Gender.MALE), null);
-				else if ("Female".equalsIgnoreCase(genders[i]))
-					genderDimension.addCohortDefinition("female", genderPatients(Gender.FEMALE), null);
+
+			if ("Male".equalsIgnoreCase(gender)) {
+				genderDimension.setName("Male");
+				genderDimension.addCohortDefinition("Male", genderPatients(Gender.MALE), null);
+			} else if ("Female".equalsIgnoreCase(gender)) {
+				genderDimension.setName("Female");
+				genderDimension.addCohortDefinition("Female", genderPatients(Gender.FEMALE), null);
 			}
+			genderDimension
+					.addParameter(new Parameter(genderDimension.getName(), genderDimension.getName(), String.class));
 			return genderDimension;
 		}
 		return null;
 	}
 
-	public CohortDefinitionDimension createAgeDimension(String[] ageQueries, DurationUnit durationUnit) {
-		if (ageQueries != null && ageQueries.length > 0) {
+	/**
+	 * @param ageQuery
+	 * @param durationUnit
+	 * @return
+	 */
+	public CohortDefinitionDimension createAgeDimension(String ageQuery, DurationUnit durationUnit) {
+		if (StringUtils.isNotBlank(ageQuery)) {
 			CohortDefinitionDimension ageDimension = new CohortDefinitionDimension();
+			AgeRange ar = new AgeRange(ageQuery, durationUnit, durationUnit);
+			AgeCohortDefinition ad = patientsInAgeRange(ar);
 
-			ageDimension.setName("age");
-			for (int i = 0; i < ageQueries.length; i++) {
-				AgeRange ar = new AgeRange(ageQueries[i], durationUnit, durationUnit);
-				AgeCohortDefinition ad = patientsInAgeRange(ar);
+			ageDimension.setName(ad.getName());
+			ageDimension.addCohortDefinition(ad.getName(), ad, null);
+			ageDimension.addParameter(new Parameter(ageDimension.getName(), ageDimension.getName(), AgeRange.class));
 
-				ageDimension.addCohortDefinition(ad.getName(), ad, null);
-			}
 			return ageDimension;
 		}
 		return null;

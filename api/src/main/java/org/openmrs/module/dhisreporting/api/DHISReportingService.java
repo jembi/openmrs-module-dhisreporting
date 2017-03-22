@@ -29,8 +29,10 @@ import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
+import org.openmrs.module.reporting.indicator.CohortIndicator.IndicatorType;
 import org.openmrs.module.reporting.report.Report;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,13 +54,13 @@ public interface DHISReportingService extends OpenmrsService {
 	CodedObsCohortDefinition createDHISObsCountCohortQuery(String name, Concept concept);
 
 	CohortIndicator saveNewDHISCohortIndicator(String indicatorName, String indicatorDescription,
-			CodedObsCohortDefinition obsCohort);
+			CohortDefinition obsCohort, IndicatorType indicatorType, String indicatorUuid);
 
 	PeriodIndicatorReportDefinition createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting(String reportName,
 			String reportDrescription, List<CohortIndicator> indicators, String uuid, String dataSetCode,
 			String dataSetPeriod);
 
-	void createCohortQueriesIndicatorsAndLabReport();
+	void createCohortQueriesIndicatorsAndReports();
 
 	void transferDHISReportingFilesToDataDirectory();
 
@@ -111,5 +113,18 @@ public interface DHISReportingService extends OpenmrsService {
 
 	List<IndicatorMapping> getAllIndicatorMappings(String mappingFileLocation);
 
-	List<IndicatorMapping> getIndicatorMappings(Boolean active, List<DisaggregationCategory> disaggs);
+	/**
+	 * @should should filter using activity, disaggregations, openmrs report and
+	 *         dhis data elements
+	 * @param mappings
+	 * @param mappingFileLocation
+	 * @param active
+	 * @param disaggs
+	 * @param openmrsReportUuid
+	 * @param dataElementPrefixs
+	 * @return filtered indicatorMappings
+	 */
+	List<IndicatorMapping> getIndicatorMappings(List<IndicatorMapping> mappings, String mappingFileLocation,
+			Boolean active, List<DisaggregationCategory> disaggs, String openmrsReportUuid,
+			List<String> dataElementPrefixs);
 }

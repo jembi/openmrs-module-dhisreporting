@@ -78,13 +78,19 @@ public class DHISReportingConstants {
 	public static File DHISREPORTING_MER_INDICATORS_FILE = new File(
 			DHISREPORTING_DIRECTORY.getAbsolutePath() + File.separator + DHISREPORTING_MER_INDICATORS_FILENAME);
 
-	public static String REPORT_UUID_PREVENTION = "7e1623bc-ff30-11e6-bc64-92361f002671";
+	public static String REPORT_UUID_PREVENTION = "dhisreporting.reporting.preventionUuid";
 
-	public static String REPORT_UUID_HIVSTATUS = "7e162484-ff30-11e6-bc64-92361f002671";
+	public static String REPORT_UUID_HIVSTATUS = "dhisreporting.reporting.hivStatus";
 
-	public static String REPORT_UUID_ONART = "7e162556-ff30-11e6-bc64-92361f002671";
+	public static String REPORT_UUID_ONART = "dhisreporting.reporting.onARTUuid";
 
-	public static String REPORT_UUID_OTHER = "7e162628-ff30-11e6-bc64-92361f002671";
+	public static String COHORT_UUID_ONART_TB_ART_DENO = "dhisreporting.reporting.cohort.tbARTdeno";
+
+	public static String REPORT_UUID_OTHER = "dhisreporting.reporting.othersUuid";
+
+	public static String DHIS_DATASET_ONART_UID = "dhisreporting.dataset.onARTUid";
+
+	public static String DHIS_DATASET_ONART_PERIODTYPE = "dhisreporting.dataset.onARTPeriodType";
 
 	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
 
@@ -96,4 +102,6 @@ public class DHISReportingConstants {
 	public static String MADE_LOCAL_MAPPING_CHANGES = "dhisreporting.mappings.madeChanges";
 
 	public static String MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT = "dhisreporting.mappings.matchCurrentOpenMRSLocationToDHISOrgUnit";
+
+	public static String NEW_ON_ART_PERIOD_MONTHS = "dhisreporting.reporting.newOnARTPeriodInMonths";
 }

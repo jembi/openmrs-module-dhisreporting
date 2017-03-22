@@ -82,4 +82,11 @@ public class Configurations {
 				.getGlobalProperty(DHISReportingConstants.MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT);
 		return StringUtils.isNotBlank(mapping) && mapping.indexOf(":") > -1 ? mapping.split(":")[1] : null;
 	}
+
+	public Integer monthsConsideredNewOnART() {
+		String period = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.NEW_ON_ART_PERIOD_MONTHS);
+
+		return StringUtils.isNotBlank(period) ? Integer.parseInt(period) : null;
+	}
 }
