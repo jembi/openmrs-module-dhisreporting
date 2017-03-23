@@ -10,6 +10,11 @@
 		href="${pageContext.request.contextPath}/module/dhisreporting/manage.form"><spring:message
 				code="dhisreporting.manage" /></a>
 	</li>
+	<li
+		<c:if test='<%= request.getRequestURI().contains("/manage") %>'>class="active"</c:if>>
+		<a
+		href="${pageContext.request.contextPath}/module/dhisreporting/pepfar.form">PEPFAR MER 2.0 Indicator Reports</a>
+	</li>
 	
 	<!-- Add further links here -->
 </ul>

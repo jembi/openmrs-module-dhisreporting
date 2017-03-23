@@ -51,7 +51,7 @@ public class AgeRange {
 			setMaxAgeUnit(maxAgeUnit);
 
 			if (ageQuery.endsWith("+")) {
-				ageQuery = ">=" + Integer.parseInt(ageQuery.split("+")[0]);
+				ageQuery = ">=" + ageQuery.replace("+", "");
 			}
 			if (ageQuery.indexOf("<=") >= 0) {
 				setMinAge(0);

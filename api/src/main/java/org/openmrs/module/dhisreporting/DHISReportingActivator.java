@@ -70,6 +70,7 @@ public class DHISReportingActivator implements ModuleActivator {
 	 */
 	public void stopped() {
 		log.info("DHIS Reporting Module stopped");
+		//Context.getService(DHISReportingService.class).pepfarPage(null);
 	}
 
 }

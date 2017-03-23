@@ -3,9 +3,8 @@
 
 <%@ include file="template/localHeader.jsp"%>
 
-<p>Hello ${user.systemId}!</p>
-
 <form method="post">
-	<input type="submit" value="Test Sending monthly HMIS data with Lab report" disabled>
+	<input type="submit" value="Generate or Delete All Pepfar reports">
 </form>
+
 <%@ include file="/WEB-INF/template/footer.jsp"%>

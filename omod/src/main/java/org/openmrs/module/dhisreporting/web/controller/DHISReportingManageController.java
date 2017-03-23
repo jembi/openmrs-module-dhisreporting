@@ -75,4 +75,13 @@ public class DHISReportingManageController {
 		// module
 		model.addAttribute("openmrsLocations", Context.getLocationService().getAllLocations());
 	}
+
+	@RequestMapping(value = "/module/dhisreporting/pepfar", method = RequestMethod.GET)
+	public void pepfar(ModelMap model) {
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/pepfar", method = RequestMethod.POST)
+	public void submitPepfar(ModelMap model, HttpServletRequest request) {
+		Context.getService(DHISReportingService.class).pepfarPage(request);
+	}
 }

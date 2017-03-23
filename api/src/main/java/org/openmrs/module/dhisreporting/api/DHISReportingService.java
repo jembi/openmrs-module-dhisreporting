@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.json.simple.JSONArray;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -127,4 +129,8 @@ public interface DHISReportingService extends OpenmrsService {
 	List<IndicatorMapping> getIndicatorMappings(List<IndicatorMapping> mappings, String mappingFileLocation,
 			Boolean active, List<DisaggregationCategory> disaggs, String openmrsReportUuid,
 			List<String> dataElementPrefixs);
+
+	void createNewPeriodIndicatorONARTReportAndItsDHISConnectorMapping();
+
+	void pepfarPage(HttpServletRequest request);
 }
