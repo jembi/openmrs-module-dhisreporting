@@ -81,6 +81,7 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.indicator.CohortIndicator.IndicatorType;
+import org.openmrs.module.reporting.indicator.Indicator;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.openmrs.module.reporting.indicator.service.IndicatorService;
 import org.openmrs.module.reporting.report.Report;
@@ -431,8 +432,14 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 						"You have Successfully Created ON ART Report Definition!");
 		} else {
 			for (CohortIndicatorAndDimensionColumn c : onART.getIndicatorDataSetDefinition().getColumns()) {
-				Context.getService(IndicatorService.class).purgeDefinition(Context.getService(IndicatorService.class)
-						.getDefinitionByUuid(c.getIndicator().getUuidOfMappedOpenmrsObject()));
+				Mapped<? extends CohortIndicator> cInd = c.getIndicator();
+				Indicator cIndDef = cInd != null && StringUtils.isNotBlank(cInd.getUuidOfMappedOpenmrsObject())
+						? Context.getService(IndicatorService.class)
+								.getDefinitionByUuid(cInd.getUuidOfMappedOpenmrsObject())
+						: null;
+
+				if (cIndDef != null)
+					Context.getService(IndicatorService.class).purgeDefinition(cIndDef);
 			}
 			rDService.purgeDefinition(onART);
 			if (request != null)
@@ -526,13 +533,28 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 								dimensions.put(dim.getName(), dim.getName());
 							}
 						}
+						code += convertDimensionMappingsStringToCode(dimensions.toString());
+						report.addIndicator(code, description, indicator, dimensions);
+					} else {
+						report.addIndicator(code, description, indicator);
 					}
-					report.addIndicator(code, description, indicator, dimensions);
 				}
 			}
 			Context.getService(ReportDefinitionService.class).saveDefinition(report);
 
 		}
+	}
+
+	private String convertDimensionMappingsStringToCode(String dimensions) {
+		String code = "";
+		if (dimensions != null) {
+			// {oneToFourteenOfAge=oneToFourteenOfAge, Female=Female}
+			for (String dim : dimensions.replace("{", "").replace("}", "").split(", ")) {
+				code += "_" + dim.split("=")[0].toUpperCase();
+			}
+
+		}
+		return code;
 	}
 
 	@Override

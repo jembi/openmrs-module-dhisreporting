@@ -64,7 +64,7 @@ public class PatientCohorts {
 			cd.setMinAgeUnit(ageRange.getMinAgeUnit());
 			cd.setMaxAge(ageRange.getMaxAge());
 			cd.setMaxAgeUnit(ageRange.getMaxAgeUnit());
-			cd.setName(ageRange.toWordString() + "ofAge");
+			cd.setName(("zeroToZero".equals(ageRange.toWordString()) ? "belowOne" : ageRange.toWordString()) + "OfAge");
 			cd.setDescription(ageRange.getMinAge() != null && ageRange.getMaxAge() != null
 					? ageRange.getMinAge() + " " + ageRange.getMinAgeUnit() + " to " + ageRange.getMaxAgeUnit() : null);
 		}
@@ -86,7 +86,7 @@ public class PatientCohorts {
 		List<Program> programs = new ArrayList<Program>();
 
 		programs.add(config.getHIVProgram());
-		
+
 		return inPrograms("in HIV Program", programs);
 	}
 

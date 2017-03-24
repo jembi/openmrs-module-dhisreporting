@@ -11,7 +11,7 @@
 				code="dhisreporting.manage" /></a>
 	</li>
 	<li
-		<c:if test='<%= request.getRequestURI().contains("/manage") %>'>class="active"</c:if>>
+		<c:if test='<%= request.getRequestURI().contains("/pepfar") %>'>class="active"</c:if>>
 		<a
 		href="${pageContext.request.contextPath}/module/dhisreporting/pepfar.form">PEPFAR MER 2.0 Indicator Reports</a>
 	</li>
