@@ -78,7 +78,6 @@ import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition.CohortIndicatorAndDimensionColumn;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.openmrs.module.reporting.indicator.CohortIndicator.IndicatorType;
 import org.openmrs.module.reporting.indicator.Indicator;
@@ -245,75 +244,6 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			createNewPeriodIndicatorONARTReportAndItsDHISConnectorMapping();
 
 		}
-		// testPeriodIndicatorReportRendereing();
-	}
-
-	private void testPeriodIndicatorReportRendereing() {
-		String uuid = "uuuuuuuuuuuuuuuuuuuuuuuuid";
-
-		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(uuid) == null) {
-			CohortIndicator newOnART = saveNewDHISCohortIndicator("ART_NEW", "New On ART", cohorts.hivNewArtPatients(),
-					IndicatorType.COUNT, null);
-			CohortIndicator currOnART = saveNewDHISCohortIndicator("ART_CURR", "Current On ART",
-					cohorts.hivNewArtPatients(), IndicatorType.COUNT, null);
-			CohortIndicator inHIV = saveNewDHISCohortIndicator("IN_HIV", "In HIV Program", cohorts.inHIVProgram(),
-					IndicatorType.COUNT, null);
-			List<CohortIndicator> indicators = new ArrayList<CohortIndicator>();
-			PeriodIndicatorReportDefinition report = new PeriodIndicatorReportDefinition();
-			CohortDefinitionDimension above5AgeDisagg = cohorts.createAgeDimension(">=5", DurationUnit.YEARS);
-			CohortDefinitionDimension maleGenderDisagg = cohorts.createGenderDimension("Male");
-			Map<String, Object> mappings = new HashMap<String, Object>();
-			Map<String, String> onlyAgeDimension = new HashMap<String, String>();
-			Map<String, String> onlyGenderDimension = new HashMap<String, String>();
-			Map<String, String> bothGenderAndAgeDimension = new HashMap<String, String>();
-			Map<String, String> bothAgeAndGenderDimension = new HashMap<String, String>();
-
-			mappings.put("startDate", "${startDate}");
-			mappings.put("endDate", "${endDate}");
-			mappings.put("location", "${location}");
-			onlyGenderDimension.put(maleGenderDisagg.getName(), maleGenderDisagg.getName());
-			onlyAgeDimension.put(above5AgeDisagg.getName(), above5AgeDisagg.getName());
-			bothGenderAndAgeDimension.put(maleGenderDisagg.getName(), maleGenderDisagg.getName());
-			bothGenderAndAgeDimension.put(above5AgeDisagg.getName(), above5AgeDisagg.getName());
-			bothAgeAndGenderDimension.put(above5AgeDisagg.getName(), above5AgeDisagg.getName());
-			bothAgeAndGenderDimension.put(maleGenderDisagg.getName(), maleGenderDisagg.getName());
-			// noDimension.put(above5AgeDisagg.getName(), "All");
-			// noDimension.put(maleGenderDisagg.getName(), "All");
-
-			report.addParameter(new Parameter("startDate", "Start Date", Date.class));
-			report.addParameter(new Parameter("endDate", "End Date", Date.class));
-			report.addParameter(new Parameter("location", "Health Center", Location.class));
-			/*
-			 * report.setBaseCohortDefinition(cohorts.
-			 * createParameterizedLocationCohort("At Location"),
-			 * ParameterizableUtil.createParameterMappings(
-			 * "location=${location}"));
-			 */
-			report.setName("ART");
-			report.setDescription("ART Piloting");
-
-			indicators.add(newOnART);
-			indicators.add(currOnART);
-			indicators.add(inHIV);
-			setBasicOpenMRSObjectProps(report);
-			report.setupDataSetDefinition();
-			report.addDimension(above5AgeDisagg.getName(), above5AgeDisagg);
-			report.addDimension(maleGenderDisagg.getName(), maleGenderDisagg);
-			if (StringUtils.isNotBlank(uuid))
-				report.setUuid(uuid);
-
-			if (indicators != null) {
-				for (CohortIndicator ind : indicators) {
-					report.addIndicator(ind.getName(), ind.getDescription(), ind);
-					report.addIndicator(ind.getName() + "_G", ind.getDescription(), ind, onlyGenderDimension);
-					report.addIndicator(ind.getName() + "_A", ind.getDescription(), ind, onlyAgeDimension);
-					report.addIndicator(ind.getName() + "_GA", ind.getDescription(), ind, bothGenderAndAgeDimension);
-					report.addIndicator(ind.getName() + "_AG", ind.getDescription(), ind, bothAgeAndGenderDimension);
-				}
-			}
-
-			Context.getService(ReportDefinitionService.class).saveDefinition(report);
-		}
 	}
 
 	private void createNewLabPeriodReportAndItsDHISConnectorMapping() {
@@ -449,6 +379,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	/**
+	 * TODO refactor/mimic this same approach for the rest of the reports clear
+	 * also including generation of any user's added reports
+	 * 
 	 * @param reportDefinitionUuid
 	 * @param mappings
 	 */

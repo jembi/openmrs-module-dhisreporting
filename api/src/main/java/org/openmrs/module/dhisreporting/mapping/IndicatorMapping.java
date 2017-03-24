@@ -40,6 +40,7 @@ public class IndicatorMapping {
 	 */
 	private String openmrsDenominatorCohortUuid;
 	private String inherentDisaggOrder;
+	private String reportingPeriodType;
 
 	/**
 	 * All blank disaggregation categories or categoryoptioncomboName should
@@ -156,6 +157,14 @@ public class IndicatorMapping {
 
 	public String getInherentDisaggOrder() {
 		return inherentDisaggOrder;
+	}
+
+	public String getReportingPeriodType() {
+		return reportingPeriodType;
+	}
+
+	public void setReportingPeriodType(String reportingPeriodType) {
+		this.reportingPeriodType = reportingPeriodType;
 	}
 
 	public void setInherentDisaggOrder(String inherentDisaggOrder) {
