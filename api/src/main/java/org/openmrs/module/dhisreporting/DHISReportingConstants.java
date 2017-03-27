@@ -104,4 +104,6 @@ public class DHISReportingConstants {
 	public static String MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT = "dhisreporting.mappings.matchCurrentOpenMRSLocationToDHISOrgUnit";
 
 	public static String NEW_ON_ART_PERIOD_MONTHS = "dhisreporting.reporting.newOnARTPeriodInMonths";
+	
+	public static String DATAELEMENT_DISAGG_SEPARATOR = "__";
 }

@@ -18,6 +18,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IndicatorMapping {
 	private String dataelementName;
+	private String dataelementId;
 	private String dataelementCode;
 	private String categoryoptioncomboName;
 	private String categoryoptioncomboCode;
@@ -169,6 +170,14 @@ public class IndicatorMapping {
 
 	public void setInherentDisaggOrder(String inherentDisaggOrder) {
 		this.inherentDisaggOrder = inherentDisaggOrder;
+	}
+
+	public String getDataelementId() {
+		return dataelementId;
+	}
+
+	public void setDataelementId(String dataelementId) {
+		this.dataelementId = dataelementId;
 	}
 
 }

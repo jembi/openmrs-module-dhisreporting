@@ -69,7 +69,8 @@ public interface DHISReportingService extends OpenmrsService {
 	Report runPeriodIndicatorReport(PeriodIndicatorReportDefinition reportDef, Date startDate, Date endDate,
 			Location location);
 
-	Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId);
+	Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId,
+			boolean useTestMapper);
 
 	Object runAndSendReportDataForTheCurrentMonth();
 
@@ -133,4 +134,7 @@ public interface DHISReportingService extends OpenmrsService {
 	void createNewPeriodIndicatorONARTReportAndItsDHISConnectorMapping();
 
 	void pepfarPage(HttpServletRequest request);
+
+	IndicatorMapping getIndicatorMapping(List<IndicatorMapping> indicatorMappings, String mappingFileLocation,
+			String dataelementCode, String categoryoptioncomboName);
 }

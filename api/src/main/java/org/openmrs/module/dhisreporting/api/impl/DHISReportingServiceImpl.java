@@ -483,7 +483,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		if (dimensions != null) {
 			// {oneToFourteenOfAge=oneToFourteenOfAge, Female=Female}
 			for (String dim : dimensions.replace("{", "").replace("}", "").split(", ")) {
-				code += "_" + dim.split("=")[0].toUpperCase();
+				code += DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR + dim.split("=")[0].toUpperCase();
 			}
 
 		}
@@ -566,10 +566,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	@Override
-	// TODO migrating this to DHISConnector module to support scheduling this
-	// call in it
-	// TODO may either be dxf or adx summary
-	public Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId) {
+	public Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId,
+			boolean useTestMapper) {
 		Map<String, DataSet> dataSets = report.getReportData().getDataSets();
 		List<DHISDataValue> dataValues = new ArrayList<DHISDataValue>();
 
@@ -585,7 +583,10 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				String column = columns.get(i).getName();
 
 				dv.setValue(row.getColumnValue(column).toString());
-				dv.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column));
+				// TODO fix this to support current csv mapping
+				dv.setDataElement(
+						useTestMapper ? getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column)
+								: (getDataElementFromIndicatorMappings(column)));
 				dataValues.add(dv);
 			}
 			dataValueSet.setDataValues(dataValues);
@@ -598,25 +599,74 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return null;
 	}
 
+	/*
+	 * TODO currently no dataelement ids in mapping, we could rather use them
+	 * when added, otherwise dhisreporting.config.dxfToAdxSwitch GP must keep
+	 * set to true
+	 */
+	private String getDataElementFromIndicatorMappings(String indicatorCode) {
+		if (StringUtils.isNotBlank(indicatorCode)) {
+			String dataElementCode = indicatorCode.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0
+					? indicatorCode.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR)[0] : indicatorCode;
+			// TODO default remodeling
+			String categoryComboName = indicatorCode.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0
+					? indicatorCode.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR)[1] : "default";
+			IndicatorMapping mapping = getIndicatorMapping(null, null, dataElementCode, categoryComboName);
+
+			if (mapping != null) {
+				return StringUtils.isBlank(mapping.getDataelementId()) ? mapping.getDataelementCode()
+						: mapping.getDataelementId();
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public Object runAndSendReportDataForTheCurrentMonth() {
-		Location defaultLocation = Context.getLocationService().getLocation(Integer.parseInt(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID)));
-
 		Calendar startDate = Calendar.getInstance(Context.getLocale());
 		Date endDate = new Date();
+		Location defaultLocation = Context.getLocationService().getLocation(Integer.parseInt(
+				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID)));
 		PeriodIndicatorReportDefinition labReportDef = (PeriodIndicatorReportDefinition) Context
 				.getService(ReportDefinitionService.class).getDefinitionByUuid(DHISReportingConstants.LAB_REPORT_UUID);
+		Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
+		String dataSetId = getValueFromMappings(DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST");
+		String orgUnitId = getValueFromMappings(DHISMappingType.LOCATION + "_"
+				+ Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_CODE));
+		String period = new SimpleDateFormat("yyyyMM").format(new Date());
 
 		startDate.set(Calendar.DAY_OF_MONTH, 1);
 		if (defaultLocation != null && labReportDef != null) {
-			Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
-			String dataSetId = getValueFromMappings(DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST");
-			String orgUnitId = getValueFromMappings(DHISMappingType.LOCATION + "_" + Context.getAdministrationService()
-					.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_CODE));
-			String period = new SimpleDateFormat("yyyyMM").format(new Date());
+			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId, true);
+		}
+		return null;
+	}
 
-			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId);
+	public Object runAndPushOnARTReportToDHIS() {
+		// TODO fix and invoke respectively
+		String reportUuid = null;
+		String dataSetId = null;
+		String orgUnitId = null;
+		String period = null;
+		Integer locationId = null;
+
+		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, period, locationId);
+	}
+
+	public Object runAndPushReportToDHIS(String reportUuid, String dataSetId, String orgUnitId, String period,
+			Integer locationId) {
+		// TODO pull DHISDataSet object from configuration into DHISConnector
+		// local storage using its id passed into this method
+		Calendar startDate = Calendar.getInstance(Context.getLocale());
+		Date endDate = new Date();
+		Location defaultLocation = Context.getLocationService().getLocation(locationId);
+		PeriodIndicatorReportDefinition labReportDef = (PeriodIndicatorReportDefinition) Context
+				.getService(ReportDefinitionService.class).getDefinitionByUuid(reportUuid);
+		Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
+
+		startDate.set(Calendar.MONTH, 3);// Quarterly period
+		if (defaultLocation != null && labReportDef != null) {
+			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId, false);
 		}
 		return null;
 	}
@@ -971,5 +1021,28 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			}
 		}
 		return filteredMappings;
+	}
+
+	/**
+	 * 
+	 * @param indicatorMappings
+	 * @param mappingFileLocation
+	 * @param dataelementCode
+	 * @param categoryoptioncomboName
+	 * @return
+	 */
+	@Override
+	public IndicatorMapping getIndicatorMapping(List<IndicatorMapping> indicatorMappings, String mappingFileLocation,
+			String dataelementCode, String categoryoptioncomboName) {
+		if (StringUtils.isNotBlank(dataelementCode) && StringUtils.isNotBlank(categoryoptioncomboName)) {
+			List<IndicatorMapping> mappings = indicatorMappings != null ? indicatorMappings
+					: getAllIndicatorMappings(mappingFileLocation);
+			for (IndicatorMapping m : mappings) {
+				if (dataelementCode.equals(m.getDataelementCode())
+						&& categoryoptioncomboName.equals(m.getCategoryoptioncomboName()))
+					return m;
+			}
+		}
+		return null;
 	}
 }
