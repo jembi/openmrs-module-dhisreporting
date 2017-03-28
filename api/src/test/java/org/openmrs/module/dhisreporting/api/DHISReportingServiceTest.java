@@ -33,8 +33,10 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
+import org.openmrs.module.dhisreporting.NumberToWord;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
+import org.openmrs.module.dhisreporting.WordToNumber;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
@@ -264,6 +266,24 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 				mappingFile, true, disaggs, openmrsReportUuid, dataElementPrefixs);
 
 		Assert.assertEquals(16, mappings.size());
+	}
+
+	@Test
+	public void testWordAndNumberConverters() throws Exception {
+		int twenty = 20;
+		int fouteen = 14;
+		int ninety = 90;
+		int onehundredeleven = 111;
+		int zero = 0;
+		int twentyfive = 25;
+
+		Assert.assertEquals(WordToNumber.convert(NumberToWord.convert(twenty)), Long.valueOf(twenty));
+		Assert.assertEquals(WordToNumber.convert(NumberToWord.convert(fouteen)), Long.valueOf(fouteen));
+		Assert.assertEquals(WordToNumber.convert(NumberToWord.convert(ninety)), Long.valueOf(ninety));
+		Assert.assertEquals(WordToNumber.convert(NumberToWord.convert(onehundredeleven)),
+				Long.valueOf(onehundredeleven));
+		Assert.assertEquals(WordToNumber.convert(NumberToWord.convert(zero)), Long.valueOf(zero));
+		Assert.assertEquals(WordToNumber.convert(NumberToWord.convert(twentyfive)), Long.valueOf(twentyfive));
 	}
 
 }

@@ -148,9 +148,9 @@
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>dhisreporting.configuredDHISOrgUnitFosIdMatchingDefaultLocation
+		<property>dhisreporting.configuredDHISOrgUnitUIdMatchingDefaultLocation
 		</property>
-		<defaultValue>JEMBI</defaultValue>
+		<defaultValue>vjFcsoL24z5</defaultValue>
 		<description>Configured organization unit code (the real id is mapped
 			in the dhis-mappings.properties file) or fos id in Rwanda that
 			matches the configured default location id
@@ -197,11 +197,6 @@
 		<description>Set to true only if you have made changes to pepfar-meta-datim.csv mappings file</description>
 	</globalProperty>
 	<globalProperty>
-		<property>dhisreporting.mappings.matchCurrentOpenMRSLocationToDHISOrgUnit</property>
-		<defaultValue></defaultValue>
-		<description>format; (OpenMRSLocationUuiId:DHIS2OrgUnitUId)</description>
-	</globalProperty>
-	<globalProperty>
 		<property>dhisreporting.reporting.newOnARTPeriodInMonths</property>
 		<defaultValue>3</defaultValue>
 		<description>period a patient is marked as being new on ART in months</description>
@@ -233,13 +228,18 @@
 	</globalProperty>
 	<globalProperty>
 		<property>dhisreporting.dataset.onARTUid</property>
-		<defaultValue></defaultValue>
+		<defaultValue>test</defaultValue>
 		<description>on ART dhis dataset uid</description>
 	</globalProperty>
 	<globalProperty>
 		<property>dhisreporting.dataset.onARTPeriodType</property>
-		<defaultValue>Daily</defaultValue>
+		<defaultValue>Quarterly</defaultValue>
 		<description>on ART dhis dataset periodType</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.disableWebReportsDeletion</property>
+		<defaultValue>true</defaultValue>
+		<description>set to false to enable deleting of MER 2.0 reports</description>
 	</globalProperty>
 </module>
 

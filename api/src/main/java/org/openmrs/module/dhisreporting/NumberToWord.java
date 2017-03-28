@@ -11,7 +11,7 @@ public class NumberToWord {
 			" eight", " nine", " ten", " eleven", " twelve", " thirteen", " fourteen", " fifteen", " sixteen",
 			" seventeen", " eighteen", " nineteen" };
 
-	private String convertLessThanOneThousand(int number) {
+	private static String convertLessThanOneThousand(int number) {
 		String current;
 
 		if (number % 100 < 20) {
@@ -29,7 +29,7 @@ public class NumberToWord {
 		return numNames[number] + " hundred" + current;
 	}
 
-	public String convert(int number) {
+	public static String convert(int number) {
 		if (number == 0) {
 			return "zero";
 		}

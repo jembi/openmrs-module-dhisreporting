@@ -135,16 +135,14 @@ public class AgeRange {
 	}
 
 	public String toWordString() {
-		NumberToWord numWorder = new NumberToWord();
-
 		return ObjectUtil
-				.nvlStr(numWorder.convert(minAge)
+				.nvlStr(NumberToWord.convert(minAge)
 						.replaceAll(" ",
 								""),
 						0)
 				+ (maxAge != null
-						? ObjectUtil.decode(WordUtils.capitalize(numWorder.convert(maxAge).replaceAll(" ", "")), "+",
-								"To" + WordUtils.capitalize(numWorder.convert(maxAge).replaceAll(" ", "")))
+						? ObjectUtil.decode(WordUtils.capitalize(NumberToWord.convert(maxAge).replaceAll(" ", "")), "+",
+								"To" + WordUtils.capitalize(NumberToWord.convert(maxAge).replaceAll(" ", "")))
 						: "AndAbove");
 	}
 

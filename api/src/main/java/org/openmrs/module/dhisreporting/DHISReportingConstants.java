@@ -57,7 +57,7 @@ public class DHISReportingConstants {
 
 	public static String DEFAULT_LOCATION_ID = "dhisreporting.defaultLocationId";
 
-	public static String CONFIGURED_ORGUNIT_CODE = "dhisreporting.configuredDHISOrgUnitFosIdMatchingDefaultLocation";
+	public static String CONFIGURED_ORGUNIT_UID = "dhisreporting.configuredDHISOrgUnitUIdMatchingDefaultLocation";
 
 	public static String VIRALLOAD_CONCEPTID = "dhisreporting.concept.viralLoad";
 
@@ -101,9 +101,9 @@ public class DHISReportingConstants {
 
 	public static String MADE_LOCAL_MAPPING_CHANGES = "dhisreporting.mappings.madeChanges";
 
-	public static String MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT = "dhisreporting.mappings.matchCurrentOpenMRSLocationToDHISOrgUnit";
-
 	public static String NEW_ON_ART_PERIOD_MONTHS = "dhisreporting.reporting.newOnARTPeriodInMonths";
-	
+
 	public static String DATAELEMENT_DISAGG_SEPARATOR = "__";
+	
+	public static String DISABLE_WEB_REPORTS_DELETION= "dhisreporting.reporting.disableWebReportsDeletion";
 }

@@ -60,6 +60,8 @@ import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.OpenMRSReportConcepts;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
+import org.openmrs.module.dhisreporting.ReportingPeriodType;
+import org.openmrs.module.dhisreporting.WordToNumber;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
@@ -357,24 +359,30 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		if (onART == null) {
 			Context.getService(DHISReportingService.class)
 					.createNewPeriodIndicatorONARTReportAndItsDHISConnectorMapping();
+			runAndPushOnARTReportToDHIS();
 			if (request != null)
 				request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
 						"You have Successfully Created ON ART Report Definition!");
 		} else {
-			for (CohortIndicatorAndDimensionColumn c : onART.getIndicatorDataSetDefinition().getColumns()) {
-				Mapped<? extends CohortIndicator> cInd = c.getIndicator();
-				Indicator cIndDef = cInd != null && StringUtils.isNotBlank(cInd.getUuidOfMappedOpenmrsObject())
-						? Context.getService(IndicatorService.class)
-								.getDefinitionByUuid(cInd.getUuidOfMappedOpenmrsObject())
-						: null;
+			if ("true".equals(Context.getAdministrationService()
+					.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION))) {
+				runAndPushOnARTReportToDHIS();
+			} else {
+				for (CohortIndicatorAndDimensionColumn c : onART.getIndicatorDataSetDefinition().getColumns()) {
+					Mapped<? extends CohortIndicator> cInd = c.getIndicator();
+					Indicator cIndDef = cInd != null && StringUtils.isNotBlank(cInd.getUuidOfMappedOpenmrsObject())
+							? Context.getService(IndicatorService.class)
+									.getDefinitionByUuid(cInd.getUuidOfMappedOpenmrsObject())
+							: null;
 
-				if (cIndDef != null)
-					Context.getService(IndicatorService.class).purgeDefinition(cIndDef);
+					if (cIndDef != null)
+						Context.getService(IndicatorService.class).purgeDefinition(cIndDef);
+				}
+				rDService.purgeDefinition(onART);
+				if (request != null)
+					request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
+							"You have Deleted ON ART Report Definition!");
 			}
-			rDService.purgeDefinition(onART);
-			if (request != null)
-				request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
-						"You have Deleted ON ART Report Definition!");
 		}
 	}
 
@@ -577,6 +585,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			DataSet ds = dataSets.get("defaultDataSet");
 			List<DataSetColumn> columns = ds.getMetaData().getColumns();
 			DataSetRow row = ds.iterator().next();
+			List<IndicatorMapping> indicatorMappings = getAllIndicatorMappings(null);
 
 			for (int i = 0; i < columns.size(); i++) {
 				DHISDataValue dv = new DHISDataValue();
@@ -586,7 +595,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				// TODO fix this to support current csv mapping
 				dv.setDataElement(
 						useTestMapper ? getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column)
-								: (getDataElementFromIndicatorMappings(column)));
+								: (getDataElementFromIndicatorMappings(indicatorMappings, column)));
 				dataValues.add(dv);
 			}
 			dataValueSet.setDataValues(dataValues);
@@ -604,18 +613,69 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 * when added, otherwise dhisreporting.config.dxfToAdxSwitch GP must keep
 	 * set to true
 	 */
-	private String getDataElementFromIndicatorMappings(String indicatorCode) {
+	private String getDataElementFromIndicatorMappings(List<IndicatorMapping> indicatorMappings, String indicatorCode) {
 		if (StringUtils.isNotBlank(indicatorCode)) {
 			String dataElementCode = indicatorCode.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0
 					? indicatorCode.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR)[0] : indicatorCode;
 			// TODO default remodeling
 			String categoryComboName = indicatorCode.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0
-					? indicatorCode.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR)[1] : "default";
-			IndicatorMapping mapping = getIndicatorMapping(null, null, dataElementCode, categoryComboName);
+					? indicatorCode.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR, 2)[1] : "default";
+			IndicatorMapping mapping = getIndicatorMapping(indicatorMappings, null, dataElementCode,
+					revertDimensionCodeSummaryToDisaggregationName(categoryComboName));
 
 			if (mapping != null) {
 				return StringUtils.isBlank(mapping.getDataelementId()) ? mapping.getDataelementCode()
 						: mapping.getDataelementId();
+			}
+		}
+		return null;
+	}
+
+	private String revertDimensionCodeSummaryToDisaggregationName(String categoryComboName) {
+		if (StringUtils.isNotBlank(categoryComboName)) {
+			if (categoryComboName.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0) {
+				String finalName = "";
+				String[] disaggs = categoryComboName.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR);
+
+				for (int i = 0; i < disaggs.length; i++) {
+					if (i == 0)
+						finalName += revertOneDisaggToItsName(disaggs[i]);
+					else
+						finalName += ", " + revertOneDisaggToItsName(disaggs[i]);
+				}
+				return finalName;
+			} else
+				return revertOneDisaggToItsName(categoryComboName);
+
+		}
+
+		return null;
+	}
+
+	private String revertOneDisaggToItsName(String categoryComboName) {
+		if (categoryComboName.equalsIgnoreCase("Female"))
+			return "Female";
+		else if (categoryComboName.equalsIgnoreCase("Male"))
+			return "Male";
+		else if (categoryComboName.endsWith("OfAge".toUpperCase())) {
+			categoryComboName = categoryComboName.replace("OfAge".toUpperCase(), "");
+
+			try {
+				if (categoryComboName.equalsIgnoreCase("belowOne")) {
+					return "<1";
+				} else if (categoryComboName.endsWith("AndAbove".toUpperCase())) {
+					return Integer
+							.toString(Math.round(
+									WordToNumber.convert(categoryComboName.replace("AndAbove".toUpperCase(), ""))))
+							+ "+";
+				} else if (categoryComboName.indexOf("To".toUpperCase()) > 0) {
+					return Integer
+							.toString(Math.round(WordToNumber.convert(categoryComboName.split("To".toUpperCase())[0])))
+							+ "-" + Integer.toString(
+									Math.round(WordToNumber.convert(categoryComboName.split("To".toUpperCase())[1])));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return null;
@@ -632,7 +692,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
 		String dataSetId = getValueFromMappings(DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST");
 		String orgUnitId = getValueFromMappings(DHISMappingType.LOCATION + "_"
-				+ Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_CODE));
+				+ Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID));
 		String period = new SimpleDateFormat("yyyyMM").format(new Date());
 
 		startDate.set(Calendar.DAY_OF_MONTH, 1);
@@ -644,16 +704,21 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	public Object runAndPushOnARTReportToDHIS() {
 		// TODO fix and invoke respectively
-		String reportUuid = null;
-		String dataSetId = null;
-		String orgUnitId = null;
-		String period = null;
-		Integer locationId = null;
+		String reportUuid = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
+		String dataSetId = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_UID);
+		String orgUnitId = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID);
+		String periodType = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_PERIODTYPE);
+		Integer locationId = Integer.parseInt(
+				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
 
-		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, period, locationId);
+		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, periodType, locationId);
 	}
 
-	public Object runAndPushReportToDHIS(String reportUuid, String dataSetId, String orgUnitId, String period,
+	public Object runAndPushReportToDHIS(String reportUuid, String dataSetId, String orgUnitId, String periodType,
 			Integer locationId) {
 		// TODO pull DHISDataSet object from configuration into DHISConnector
 		// local storage using its id passed into this method
@@ -662,9 +727,28 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		Location defaultLocation = Context.getLocationService().getLocation(locationId);
 		PeriodIndicatorReportDefinition labReportDef = (PeriodIndicatorReportDefinition) Context
 				.getService(ReportDefinitionService.class).getDefinitionByUuid(reportUuid);
+		String period = "";
+
+		// TODO support more period types
+		if (ReportingPeriodType.Quarterly.name().equals(periodType)) {
+			startDate.add(Calendar.MONTH, -3);// Quarterly period
+			period += startDate.get(Calendar.YEAR) + "Q" + (startDate.get(Calendar.MONTH) / 3) + 1;
+		} else if (ReportingPeriodType.Monthly.name().equals(periodType)) {
+			startDate.add(Calendar.MONTH, -1);
+			period += new SimpleDateFormat("yyyyMM").format(startDate.getTime());
+		} else if (ReportingPeriodType.Yearly.name().equals(periodType)) {
+			startDate.add(Calendar.YEAR, -1);
+			period += startDate.get(Calendar.YEAR);
+		} else if (ReportingPeriodType.Weekly.name().equals(periodType)) {
+			startDate.add(Calendar.WEEK_OF_YEAR, -1);
+			period += startDate.get(Calendar.YEAR) + "W" + startDate.get(Calendar.WEEK_OF_YEAR);
+		} else if (ReportingPeriodType.Daily.name().equals(periodType)) {
+			startDate.add(Calendar.DAY_OF_YEAR, -1);
+			period += new SimpleDateFormat("yyyyMMdd").format(startDate.getTime());
+		}
+
 		Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
 
-		startDate.set(Calendar.MONTH, 3);// Quarterly period
 		if (defaultLocation != null && labReportDef != null) {
 			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId, false);
 		}

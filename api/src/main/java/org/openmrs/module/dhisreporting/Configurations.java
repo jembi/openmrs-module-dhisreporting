@@ -2,7 +2,6 @@ package org.openmrs.module.dhisreporting;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
-import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.context.Context;
 
@@ -67,20 +66,6 @@ public class Configurations {
 	public Boolean madeLocalMappingsChanges() {
 		return "true".equals(Context.getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.MADE_LOCAL_MAPPING_CHANGES));
-	}
-
-	public Location getCurrentOpenmrsLocationMatchedWithDHIS2() {
-		String mapping = Context.getAdministrationService()
-				.getGlobalProperty(DHISReportingConstants.MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT);
-
-		return StringUtils.isNotBlank(mapping) && mapping.indexOf(":") > -1
-				? Context.getLocationService().getLocationByUuid(mapping.split(":")[0]) : null;
-	}
-
-	public String getCurrentDHIS2OrgUnitUidMapped() {
-		String mapping = Context.getAdministrationService()
-				.getGlobalProperty(DHISReportingConstants.MATCHOPENMRSLOCATION_TO_DHIS2_ORGUNIT);
-		return StringUtils.isNotBlank(mapping) && mapping.indexOf(":") > -1 ? mapping.split(":")[1] : null;
 	}
 
 	public Integer monthsConsideredNewOnART() {
