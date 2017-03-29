@@ -592,13 +592,20 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			for (int i = 0; i < columns.size(); i++) {
 				DHISDataValue dv = new DHISDataValue();
 				String column = columns.get(i).getName();
+				IndicatorMapping m = getSpecificMappingFromIndicatorMappings(indicatorMappings, column);
 
 				dv.setValue(row.getColumnValue(column).toString());
-				// TODO fix this to support current csv mapping
 				dv.setComment(column);
 				dv.setDataElement(
 						useTestMapper ? getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column)
-								: (getDataElementFromIndicatorMappings(indicatorMappings, column)));
+								: m != null ? (StringUtils.isBlank(m.getDataelementId()) ? m.getDataelementCode()
+										: m.getDataelementId()) : null);
+				dv.setCategoryOptionCombo(
+						useTestMapper ? null
+								: m != null
+										? (StringUtils.isBlank(m.getCategoryoptioncomboUid())
+												? m.getCategoryoptioncomboCode() : m.getCategoryoptioncomboUid())
+										: null);
 				dataValues.add(dv);
 			}
 			dataValueSet.setDataValues(dataValues);
@@ -616,7 +623,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 * when added, otherwise dhisreporting.config.dxfToAdxSwitch GP must keep
 	 * set to true
 	 */
-	private String getDataElementFromIndicatorMappings(List<IndicatorMapping> indicatorMappings, String indicatorCode) {
+	private IndicatorMapping getSpecificMappingFromIndicatorMappings(List<IndicatorMapping> indicatorMappings,
+			String indicatorCode) {
 		if (StringUtils.isNotBlank(indicatorCode)) {
 			String dataElementCode = indicatorCode.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0
 					? indicatorCode.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR)[0] : indicatorCode;
@@ -627,8 +635,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					revertDimensionCodeSummaryToDisaggregationName(categoryComboName));
 
 			if (mapping != null) {
-				return StringUtils.isBlank(mapping.getDataelementId()) ? mapping.getDataelementCode()
-						: mapping.getDataelementId();
+				return mapping;
 			}
 		}
 		return null;
