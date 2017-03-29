@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -633,7 +635,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	private String revertDimensionCodeSummaryToDisaggregationName(String categoryComboName) {
 		if (StringUtils.isNotBlank(categoryComboName)) {
-			if (categoryComboName.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0) {
+			if ("default".equals(categoryComboName))
+				return "default";
+			else if (categoryComboName.indexOf(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR) >= 0) {
 				String finalName = "";
 				String[] disaggs = categoryComboName.split(DHISReportingConstants.DATAELEMENT_DISAGG_SEPARATOR);
 
@@ -652,7 +656,10 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return null;
 	}
 
-	private String revertOneDisaggToItsName(String categoryComboName) {
+	@Override
+	public String revertOneDisaggToItsName(String categoryComboName) {
+		if ("default".equals(categoryComboName))
+			return "default";
 		if (categoryComboName.equalsIgnoreCase("Female"))
 			return "Female";
 		else if (categoryComboName.equalsIgnoreCase("Male"))
@@ -663,6 +670,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			try {
 				if (categoryComboName.equalsIgnoreCase("belowOne")) {
 					return "<1";
+				} else if (categoryComboName.startsWith("below".toUpperCase())) {
+					return "<" + Math.round(WordToNumber.convert(categoryComboName.replace("below".toUpperCase(), "")));
 				} else if (categoryComboName.endsWith("AndAbove".toUpperCase())) {
 					return Integer
 							.toString(Math.round(
@@ -732,7 +741,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		// TODO support more period types
 		if (ReportingPeriodType.Quarterly.name().equals(periodType)) {
 			startDate.add(Calendar.MONTH, -3);// Quarterly period
-			period += startDate.get(Calendar.YEAR) + "Q" + (startDate.get(Calendar.MONTH) / 3) + 1;
+			period += startDate.get(Calendar.YEAR) + "Q" + ((startDate.get(Calendar.MONTH) / 3) + 1);
 		} else if (ReportingPeriodType.Monthly.name().equals(periodType)) {
 			startDate.add(Calendar.MONTH, -1);
 			period += new SimpleDateFormat("yyyyMM").format(startDate.getTime());
@@ -1122,11 +1131,23 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			List<IndicatorMapping> mappings = indicatorMappings != null ? indicatorMappings
 					: getAllIndicatorMappings(mappingFileLocation);
 			for (IndicatorMapping m : mappings) {
-				if (dataelementCode.equals(m.getDataelementCode())
-						&& categoryoptioncomboName.equals(m.getCategoryoptioncomboName()))
+				if (matchDisaggregationNames(categoryoptioncomboName, m.getCategoryoptioncomboName()))
 					return m;
 			}
 		}
 		return null;
+	}
+
+	private boolean matchDisaggregationNames(String n1, String n2) {
+		if (StringUtils.isNotBlank(n1) && StringUtils.isNotBlank(n2)) {
+			String[] n1a = n1.split(", ");
+			String[] n2a = n2.split(", ");
+
+			if (n1.equals(n2) || (n1a.length == n2a.length
+					&& new HashSet<String>(Arrays.asList(n1a)).equals(new HashSet<String>(Arrays.asList(n2a))))) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

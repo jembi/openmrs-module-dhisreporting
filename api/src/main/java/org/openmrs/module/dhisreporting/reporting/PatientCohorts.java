@@ -12,6 +12,8 @@ import org.openmrs.api.PatientSetService.TimeModifier;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.Configurations;
 import org.openmrs.module.dhisreporting.Gender;
+import org.openmrs.module.dhisreporting.NumberToWord;
+import org.openmrs.module.dhisreporting.WordToNumber;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -60,16 +62,47 @@ public class PatientCohorts {
 		AgeCohortDefinition cd = new AgeCohortDefinition();
 
 		if (ageRange != null) {
-			cd.setMinAge(ageRange.getMinAge());
-			cd.setMinAgeUnit(ageRange.getMinAgeUnit());
-			cd.setMaxAge(ageRange.getMaxAge());
-			cd.setMaxAgeUnit(ageRange.getMaxAgeUnit());
-			cd.setName(("zeroToZero".equals(ageRange.toWordString()) ? "belowOne" : ageRange.toWordString()) + "OfAge");
-			cd.setDescription(ageRange.getMinAge() != null && ageRange.getMaxAge() != null
-					? ageRange.getMinAge() + " " + ageRange.getMinAgeUnit() + " to " + ageRange.getMaxAgeUnit() : null);
+
+			try {
+				cd.setMinAge(ageRange.getMinAge());
+				cd.setMinAgeUnit(ageRange.getMinAgeUnit());
+				cd.setMaxAge(ageRange.getMaxAge());
+				cd.setMaxAgeUnit(ageRange.getMaxAgeUnit());
+				cd.setName(getBetteredAgeRangeString(ageRange));
+
+				cd.setDescription(ageRange.getMinAge() != null && ageRange.getMaxAge() != null
+						? ageRange.getMinAge() + " " + ageRange.getMinAgeUnit() + " to " + ageRange.getMaxAgeUnit()
+						: null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		return cd;
+	}
+
+	private String getBetteredAgeRangeString(AgeRange ageRange) throws Exception {
+		String name = "";
+
+		if ("zeroToZero".equals(ageRange.toWordString())) {
+			name += "belowOne";
+		} else {
+			if (ageRange.toWordString().startsWith("zeroTo")) {
+				name += "below" + capitalizeFirstLetter(NumberToWord
+						.convert(Math.round(WordToNumber.convert(ageRange.toWordString().replace("zeroTo", "")) + 1)));
+			} else {
+				name += ageRange.toWordString();
+			}
+
+		}
+
+		name += "OfAge";
+
+		return name;
+	}
+
+	private String capitalizeFirstLetter(String input) {
+		return input.substring(0, 1).toUpperCase() + input.substring(1);
 	}
 
 	private ProgramEnrollmentCohortDefinition inPrograms(String name, List<Program> programs) {

@@ -137,4 +137,6 @@ public interface DHISReportingService extends OpenmrsService {
 
 	IndicatorMapping getIndicatorMapping(List<IndicatorMapping> indicatorMappings, String mappingFileLocation,
 			String dataelementCode, String categoryoptioncomboName);
+
+	String revertOneDisaggToItsName(String categoryComboName);
 }

@@ -40,6 +40,7 @@ import org.openmrs.module.dhisreporting.WordToNumber;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
+import org.openmrs.module.dhisreporting.reporting.PatientCohorts;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DurationUnit;
@@ -286,4 +287,30 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals(WordToNumber.convert(NumberToWord.convert(twentyfive)), Long.valueOf(twentyfive));
 	}
 
+	@Test
+	public void testDisaggregationSerialisationAndDeserialisation() {
+		PatientCohorts cohorts = new PatientCohorts();
+		AgeRange ar1 = new AgeRange("1-4", DurationUnit.YEARS, DurationUnit.YEARS);
+		AgeRange ar2 = new AgeRange("<15", DurationUnit.YEARS, DurationUnit.YEARS);
+		AgeRange ar3 = new AgeRange("<1", DurationUnit.YEARS, DurationUnit.YEARS);
+		AgeRange ar4 = new AgeRange("50+", DurationUnit.YEARS, DurationUnit.YEARS);
+		AgeRange ar5 = new AgeRange("15-19", DurationUnit.YEARS, DurationUnit.YEARS);
+
+		Assert.assertEquals("oneToFourOfAge", cohorts.patientsInAgeRange(ar1).getName());
+		Assert.assertEquals("belowFifteenOfAge", cohorts.patientsInAgeRange(ar2).getName());
+		Assert.assertEquals("belowOneOfAge", cohorts.patientsInAgeRange(ar3).getName());
+		Assert.assertEquals("fiftyAndAboveOfAge", cohorts.patientsInAgeRange(ar4).getName());
+		Assert.assertEquals("fifteenToNineteenOfAge", cohorts.patientsInAgeRange(ar5).getName());
+
+		Assert.assertEquals("1-4", Context.getService(DHISReportingService.class)
+				.revertOneDisaggToItsName("oneToFourOfAge".toUpperCase()));
+		Assert.assertEquals("<15", Context.getService(DHISReportingService.class)
+				.revertOneDisaggToItsName("belowFifteenOfAge".toUpperCase()));
+		Assert.assertEquals("<1",
+				Context.getService(DHISReportingService.class).revertOneDisaggToItsName("belowOneOfAge".toUpperCase()));
+		Assert.assertEquals("50+", Context.getService(DHISReportingService.class)
+				.revertOneDisaggToItsName("fiftyAndAboveOfAge".toUpperCase()));
+		Assert.assertEquals("15-19", Context.getService(DHISReportingService.class)
+				.revertOneDisaggToItsName("fifteenToNineteenOfAge".toUpperCase()));
+	}
 }
