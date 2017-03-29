@@ -595,6 +595,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 				dv.setValue(row.getColumnValue(column).toString());
 				// TODO fix this to support current csv mapping
+				dv.setComment(column);
 				dv.setDataElement(
 						useTestMapper ? getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column)
 								: (getDataElementFromIndicatorMappings(indicatorMappings, column)));
