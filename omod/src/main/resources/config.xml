@@ -228,7 +228,7 @@
 	</globalProperty>
 	<globalProperty>
 		<property>dhisreporting.dataset.onARTUid</property>
-		<defaultValue>test</defaultValue>
+		<defaultValue>K4ahCwZBSy6</defaultValue>
 		<description>on ART dhis dataset uid</description>
 	</globalProperty>
 	<globalProperty>
@@ -240,6 +240,11 @@
 		<property>dhisreporting.reporting.disableWebReportsDeletion</property>
 		<defaultValue>true</defaultValue>
 		<description>set to false to enable deleting of MER 2.0 reports</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.dhis.postSampleMetaFromMapping</property>
+		<defaultValue>true</defaultValue>
+		<description>Auto setting to monitor posting sample metadata from csv mappings</description>
 	</globalProperty>
 </module>
 

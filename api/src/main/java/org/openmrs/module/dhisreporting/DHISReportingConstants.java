@@ -106,4 +106,6 @@ public class DHISReportingConstants {
 	public static String DATAELEMENT_DISAGG_SEPARATOR = "__";
 	
 	public static String DISABLE_WEB_REPORTS_DELETION= "dhisreporting.reporting.disableWebReportsDeletion";
+
+	public static String POST_SAMPLE_DHIS_METADATA = "dhisreporting.dhis.postSampleMetaFromMapping";
 }

@@ -313,4 +313,12 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals("15-19", Context.getService(DHISReportingService.class)
 				.revertOneDisaggToItsName("fifteenToNineteenOfAge".toUpperCase()));
 	}
+
+	@Ignore
+	public void test_postIndicatorMappingDHISMetaData() {
+		String mappingFile = getClass().getClassLoader().getResource(DHISReportingConstants.INDICATOR_MAPPING_FILE_NAME)
+				.getFile();
+
+		Context.getService(DHISReportingService.class).postIndicatorMappingDHISMetaData(mappingFile);
+	}
 }

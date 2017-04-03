@@ -20,6 +20,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
@@ -70,7 +71,7 @@ public interface DHISReportingService extends OpenmrsService {
 			Location location);
 
 	Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId,
-			boolean useTestMapper);
+			boolean useTestMapper, List<IndicatorMapping> indicatorMappings);
 
 	Object runAndSendReportDataForTheCurrentMonth();
 
@@ -139,4 +140,6 @@ public interface DHISReportingService extends OpenmrsService {
 			String dataelementCode, String categoryoptioncomboName);
 
 	String revertOneDisaggToItsName(String categoryComboName);
+
+	JSONObject postIndicatorMappingDHISMetaData(String mappingLocation);
 }

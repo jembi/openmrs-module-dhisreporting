@@ -18,7 +18,11 @@ public class Configurations {
 
 		return conceptId != null ? Context.getConceptService().getConcept(conceptId) : null;
 	}
-
+	
+	/**
+	 * TODO rename this GP to dhisconnector.* instead of dhisreporting.*
+	 * @return
+	 */
 	public Boolean dxfToAdxSwitch() {
 		return "true"
 				.equals(Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DXF_TO_ADX_SWITCH));

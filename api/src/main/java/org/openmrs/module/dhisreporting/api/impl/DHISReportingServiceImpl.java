@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -45,6 +46,7 @@ import org.codehaus.jackson.map.type.TypeFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.OpenmrsMetadata;
@@ -52,6 +54,10 @@ import org.openmrs.api.PatientSetService.TimeModifier;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.dhisconnector.api.DHISConnectorService;
+import org.openmrs.module.dhisconnector.api.model.DHISCategoryCombo;
+import org.openmrs.module.dhisconnector.api.model.DHISCategoryOptionCombo;
+import org.openmrs.module.dhisconnector.api.model.DHISDataElement;
+import org.openmrs.module.dhisconnector.api.model.DHISDataSet;
 import org.openmrs.module.dhisconnector.api.model.DHISDataValue;
 import org.openmrs.module.dhisconnector.api.model.DHISDataValueSet;
 import org.openmrs.module.dhisconnector.api.model.DHISMapping;
@@ -113,6 +119,14 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	private Configurations configs = new Configurations();
 
 	private PatientCohorts cohorts = new PatientCohorts();
+
+	public static final String DATASETS_PATH = "/api/dataSets/";
+
+	private String DATA_ELEMETS_PATH = "/api/dataElements/";
+
+	private String CATEGORY_COMBOS_PATH = "/api/categoryCombos/";
+
+	private String OPTION_CATEGORY_COMBOS_PATH = "/api/categoryOptionCombos/";
 
 	/**
 	 * @param dao
@@ -405,22 +419,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		String reportName = "On ART";
 
 		if (report == null) {
-			List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
-			List<String> dataElementPrefixs = new ArrayList<String>();
-
-			disaggs.add(DisaggregationCategory.AGE);
-			disaggs.add(DisaggregationCategory.DEFAULT);
-			disaggs.add(DisaggregationCategory.GENDER);
-			disaggs.add(DisaggregationCategory.INHERENT);
-			dataElementPrefixs.add("TX_NEW");
-			dataElementPrefixs.add("TX_CURR");
-
-			/*
-			 * First piloting being limited to a few indicators with easy
-			 * disaggregations and existing openmrs Rwanda MoH data
-			 */
-			List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null, true, disaggs, openmrsReportUuid,
-					dataElementPrefixs);
+			List<IndicatorMapping> filteredMappings = filterONARTIndicatorMappings();
 			List<MappedCohortIndicator> indicators = new ArrayList<MappedCohortIndicator>();
 			SqlCohortDefinition activeOnART = cohorts.hivActiveARTPatients();
 			SqlCohortDefinition newOnART = cohorts.hivNewArtPatients();
@@ -486,6 +485,28 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			Context.getService(ReportDefinitionService.class).saveDefinition(report);
 
 		}
+	}
+
+	private List<IndicatorMapping> filterONARTIndicatorMappings() {
+		String openmrsReportUuid = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
+		List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
+		List<String> dataElementPrefixs = new ArrayList<String>();
+
+		disaggs.add(DisaggregationCategory.AGE);
+		disaggs.add(DisaggregationCategory.DEFAULT);
+		disaggs.add(DisaggregationCategory.GENDER);
+		disaggs.add(DisaggregationCategory.INHERENT);
+		dataElementPrefixs.add("TX_NEW");
+		dataElementPrefixs.add("TX_CURR");
+
+		/*
+		 * First piloting being limited to a few indicators with easy
+		 * disaggregations and existing openmrs Rwanda MoH data
+		 */
+		List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null, true, disaggs, openmrsReportUuid,
+				dataElementPrefixs);
+		return filteredMappings;
 	}
 
 	private String convertDimensionMappingsStringToCode(String dimensions) {
@@ -577,7 +598,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	@Override
 	public Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId,
-			boolean useTestMapper) {
+			boolean useTestMapper, List<IndicatorMapping> indicatorMappings) {
 		Map<String, DataSet> dataSets = report.getReportData().getDataSets();
 		List<DHISDataValue> dataValues = new ArrayList<DHISDataValue>();
 
@@ -587,7 +608,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			DataSet ds = dataSets.get("defaultDataSet");
 			List<DataSetColumn> columns = ds.getMetaData().getColumns();
 			DataSetRow row = ds.iterator().next();
-			List<IndicatorMapping> indicatorMappings = getAllIndicatorMappings(null);
+			if (indicatorMappings == null)
+				indicatorMappings = getAllIndicatorMappings(null);
 
 			for (int i = 0; i < columns.size(); i++) {
 				DHISDataValue dv = new DHISDataValue();
@@ -596,16 +618,16 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 				dv.setValue(row.getColumnValue(column).toString());
 				dv.setComment(column);
-				dv.setDataElement(
-						useTestMapper ? getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column)
-								: m != null ? (StringUtils.isBlank(m.getDataelementId()) ? m.getDataelementCode()
-										: m.getDataelementId()) : null);
-				dv.setCategoryOptionCombo(
-						useTestMapper ? null
-								: m != null
-										? (StringUtils.isBlank(m.getCategoryoptioncomboUid())
-												? m.getCategoryoptioncomboCode() : m.getCategoryoptioncomboUid())
-										: null);
+				if (useTestMapper) {
+					dv.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column));
+				} else {
+					if (m != null) {
+						dv.setDataElement(StringUtils.isBlank(m.getDataelementId()) ? m.getDataelementCode()
+								: m.getDataelementId());
+						dv.setCategoryOptionCombo(StringUtils.isBlank(m.getCategoryoptioncomboUid())
+								? m.getCategoryoptioncomboCode() : m.getCategoryoptioncomboUid());
+					}
+				}
 				dataValues.add(dv);
 			}
 			dataValueSet.setDataValues(dataValues);
@@ -714,7 +736,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 		startDate.set(Calendar.DAY_OF_MONTH, 1);
 		if (defaultLocation != null && labReportDef != null) {
-			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId, true);
+			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId, true, null);
 		}
 		return null;
 	}
@@ -731,16 +753,17 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_PERIODTYPE);
 		Integer locationId = Integer.parseInt(
 				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
+		List<IndicatorMapping> indicatorMappings = filterONARTIndicatorMappings();
 
-		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, periodType, locationId);
+		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, periodType, locationId, indicatorMappings);
 	}
 
 	public Object runAndPushReportToDHIS(String reportUuid, String dataSetId, String orgUnitId, String periodType,
-			Integer locationId) {
+			Integer locationId, List<IndicatorMapping> indicatorMappings) {
 		// TODO pull DHISDataSet object from configuration into DHISConnector
 		// local storage using its id passed into this method
 		Calendar startDate = Calendar.getInstance(Context.getLocale());
-		Date endDate = new Date();
+		Calendar endDate = Calendar.getInstance(Context.getLocale());
 		Location defaultLocation = Context.getLocationService().getLocation(locationId);
 		PeriodIndicatorReportDefinition labReportDef = (PeriodIndicatorReportDefinition) Context
 				.getService(ReportDefinitionService.class).getDefinitionByUuid(reportUuid);
@@ -749,25 +772,36 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		// TODO support more period types
 		if (ReportingPeriodType.Quarterly.name().equals(periodType)) {
 			startDate.add(Calendar.MONTH, -3);// Quarterly period
+			endDate.setTime(startDate.getTime());
+			endDate.add(Calendar.MONTH, 3);
 			period += startDate.get(Calendar.YEAR) + "Q" + ((startDate.get(Calendar.MONTH) / 3) + 1);
 		} else if (ReportingPeriodType.Monthly.name().equals(periodType)) {
 			startDate.add(Calendar.MONTH, -1);
+			endDate.setTime(startDate.getTime());
+			endDate.add(Calendar.MONTH, 1);
 			period += new SimpleDateFormat("yyyyMM").format(startDate.getTime());
 		} else if (ReportingPeriodType.Yearly.name().equals(periodType)) {
 			startDate.add(Calendar.YEAR, -1);
+			endDate.setTime(startDate.getTime());
+			endDate.add(Calendar.YEAR, 1);
 			period += startDate.get(Calendar.YEAR);
 		} else if (ReportingPeriodType.Weekly.name().equals(periodType)) {
 			startDate.add(Calendar.WEEK_OF_YEAR, -1);
+			endDate.setTime(startDate.getTime());
+			endDate.add(Calendar.WEEK_OF_YEAR, 1);
 			period += startDate.get(Calendar.YEAR) + "W" + startDate.get(Calendar.WEEK_OF_YEAR);
 		} else if (ReportingPeriodType.Daily.name().equals(periodType)) {
 			startDate.add(Calendar.DAY_OF_YEAR, -1);
+			endDate.setTime(startDate.getTime());
+			endDate.add(Calendar.DAY_OF_YEAR, 1);
 			period += new SimpleDateFormat("yyyyMMdd").format(startDate.getTime());
 		}
 
-		Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
+		Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate.getTime(),
+				defaultLocation);
 
 		if (defaultLocation != null && labReportDef != null) {
-			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId, false);
+			return sendReportDataToDHIS(labReport, dataSetId, period, orgUnitId, false, indicatorMappings);
 		}
 		return null;
 	}
@@ -1092,6 +1126,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	/**
 	 * indicatorMappings is provided to use less memory which would be used to
 	 * re-load the csv mapping file
+	 * 
+	 * filters out all mappings with no data elements ids
 	 */
 	@Override
 	public List<IndicatorMapping> getIndicatorMappings(List<IndicatorMapping> indicatorMappings,
@@ -1110,7 +1146,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					boolean rightDataElements = false;
 
 					for (String pref : dataElementPrefixs) {
-						if (mapping.getDataelementName().startsWith(pref)) {
+						if (mapping.getDataelementName().startsWith(pref)
+								&& StringUtils.isNotBlank(mapping.getDataelementId())) {
 							rightDataElements = true;
 							break;
 						}
@@ -1139,7 +1176,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			List<IndicatorMapping> mappings = indicatorMappings != null ? indicatorMappings
 					: getAllIndicatorMappings(mappingFileLocation);
 			for (IndicatorMapping m : mappings) {
-				if (matchDisaggregationNames(categoryoptioncomboName, m.getCategoryoptioncomboName()))
+				if (dataelementCode.equals(m.getDataelementCode())
+						&& matchDisaggregationNames(categoryoptioncomboName, m.getCategoryoptioncomboName()))
 					return m;
 			}
 		}
@@ -1157,5 +1195,152 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			}
 		}
 		return false;
+	}
+
+	// generates and returns only 11 characters from a uuid
+	private String generateDHISUid() {
+		String uuid = UUID.randomUUID().toString();
+
+		return uuid.substring(uuid.length() - 12, uuid.length() - 1);
+	}
+
+	/**
+	 * TODO rewrite posting metadata compressed resource
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public JSONObject postIndicatorMappingDHISMetaData(String mappingLocation) {
+		List<IndicatorMapping> mappings = getAllIndicatorMappings(mappingLocation);
+		List<DHISCategoryCombo> combos = new ArrayList<DHISCategoryCombo>();
+		List<DHISDataElement> dataElements = new ArrayList<DHISDataElement>();
+		DHISDataSet dataSet = new DHISDataSet();
+		DHISCategoryCombo gender = new DHISCategoryCombo();
+		DHISCategoryCombo age = new DHISCategoryCombo();
+		DHISCategoryCombo genderAge = new DHISCategoryCombo();
+		DHISCategoryCombo others = new DHISCategoryCombo();
+		DHISCategoryCombo def = new DHISCategoryCombo();
+		ObjectMapper mapper = new ObjectMapper();
+		DHISConnectorService service = Context.getService(DHISConnectorService.class);
+		List<String> comboNames = new ArrayList<String>();
+		List<DHISCategoryOptionCombo> optionCombos = new ArrayList<DHISCategoryOptionCombo>();
+		List<String> optionComboIds = new ArrayList<String>();
+		JSONParser parser = new JSONParser();
+
+		gender.setName("GENDER");
+		gender.setCode("GENDER");
+		gender.setId(generateDHISUid());
+		age.setName("AGE");
+		age.setCode("AGE");
+		age.setId(generateDHISUid());
+		genderAge.setName("GENDER_AGE");
+		genderAge.setCode("GENDER_AGE");
+		genderAge.setId(generateDHISUid());
+		def.setName("DEFAULT");
+		def.setCode("DEFAULT");
+		def.setId(generateDHISUid());
+		dataSet.setName("ON ART");
+		dataSet.setCode("ON_ART");
+		dataSet.setId(generateDHISUid());
+		dataSet.setPeriodType(ReportingPeriodType.Quarterly.name());
+
+		for (IndicatorMapping mapping : mappings) {
+			DHISCategoryOptionCombo optionCombo = new DHISCategoryOptionCombo();
+			DHISDataElement dataElement = new DHISDataElement();
+
+			if (StringUtils.isNotBlank(mapping.getCategoryoptioncomboName())) {
+				optionCombo.setCode(mapping.getCategoryoptioncomboCode());
+				optionCombo.setName(mapping.getCategoryoptioncomboName());
+				optionCombo.setId(mapping.getCategoryoptioncomboUid());
+				dataElement.setName(mapping.getDataelementName());
+				dataElement.setCode(mapping.getDataelementCode());
+				dataElement.setId(mapping.getDataelementId());
+				dataElement.setNumberType("INTEGER");
+				dataElement.setType("INTEGER");
+				dataElement.setAggregationType("NONE");
+				dataElement.setDomainType("AGGREGATE");
+
+				if (!comboNames.contains((mapping.getCategoryoptioncomboName()))) {
+					DHISCategoryCombo cc = new DHISCategoryCombo();
+
+					if (DisaggregationCategory.DEFAULT.equals(mapping.getDisaggregationCategory())) {
+						def.getCategoryOptionCombos().add(optionCombo);
+						cc.setId(def.getId());
+						optionCombo.setCategoryCombo(cc);
+						dataElement.setCategoryCombo(def);
+					} else if (DisaggregationCategory.AGE.equals(mapping.getDisaggregationCategory())) {
+						age.getCategoryOptionCombos().add(optionCombo);
+						cc.setId(age.getId());
+						optionCombo.setCategoryCombo(cc);
+						dataElement.setCategoryCombo(age);
+					} else if (DisaggregationCategory.GENDER.equals(mapping.getDisaggregationCategory())) {
+						gender.getCategoryOptionCombos().add(optionCombo);
+						cc.setId(gender.getId());
+						optionCombo.setCategoryCombo(cc);
+						dataElement.setCategoryCombo(gender);
+					} else if (DisaggregationCategory.INHERENT.equals(mapping.getDisaggregationCategory())) {
+						genderAge.getCategoryOptionCombos().add(optionCombo);
+						cc.setId(genderAge.getId());
+						optionCombo.setCategoryCombo(cc);
+						dataElement.setCategoryCombo(genderAge);
+					} else
+						others.getCategoryOptionCombos().add(optionCombo);
+
+					comboNames.add(mapping.getCategoryoptioncomboName());
+					if (!dataElements.contains(dataElements)) {
+						dataElements.add(dataElement);
+					}
+
+					if (!optionComboIds.contains(optionCombo.getId()))
+						optionCombos.add(optionCombo);
+				}
+			}
+		}
+		combos.add(def);
+		combos.add(age);
+		combos.add(gender);
+		combos.add(genderAge);
+
+		dataSet.setDataElements(dataElements);
+
+		try {
+			JSONObject oC = new JSONObject();
+			JSONObject json = new JSONObject();
+			JSONObject c = new JSONObject();
+			JSONObject de = new JSONObject();
+			JSONObject ds = new JSONObject();
+
+			String optionCombosString = mapper.writeValueAsString(optionCombos);
+			String comboString = mapper.writeValueAsString(combos);
+			String dataElementsString = mapper.writeValueAsString(dataElements);
+			String dataSetString = mapper.writeValueAsString(dataSet);
+
+			oC.put("categoryOptionCombos", parser.parse(optionCombosString));
+			c.put("categoryCombos", parser.parse(comboString));
+			de.put("dataElements", parser.parse(dataElementsString));
+			ds.put("dataSets", parser.parse(dataSetString));
+			json.put("categoryOptionCombos", parser.parse(optionCombosString));
+			json.put("categoryCombos", parser.parse(comboString));
+			json.put("dataElements", parser.parse(dataElementsString));
+			json.put("dataSets", parser.parse(dataSetString));
+
+			String optionComboResponseString = service.postDataToDHISEndpoint(OPTION_CATEGORY_COMBOS_PATH,
+					oC.toJSONString());
+			String comboResponseString = service.postDataToDHISEndpoint(CATEGORY_COMBOS_PATH, c.toJSONString());
+			String dataElementsResponseString = service.postDataToDHISEndpoint(DATA_ELEMETS_PATH, de.toJSONString());
+			String datasetsResponseString = service.postDataToDHISEndpoint(DATASETS_PATH, ds.toJSONString());
+
+			System.out.println("\n\n");
+			System.out.println("\n\n" + optionComboResponseString);
+			System.out.println("\n\n" + comboResponseString);
+			System.out.println("\n\n" + dataElementsResponseString);
+			System.out.println("\n\n" + datasetsResponseString);
+			return json;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

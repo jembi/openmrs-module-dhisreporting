@@ -15,6 +15,7 @@ package org.openmrs.module.dhisreporting;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ModuleActivator;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
@@ -54,7 +55,14 @@ public class DHISReportingActivator implements ModuleActivator {
 	public void started() {
 		Context.getService(DHISReportingService.class).transferDHISReportingFilesToDataDirectory();
 		Context.getService(DHISReportingService.class).createCohortQueriesIndicatorsAndReports();
+		GlobalProperty postDHISMetaTrigger = Context.getAdministrationService()
+				.getGlobalPropertyObject(DHISReportingConstants.POST_SAMPLE_DHIS_METADATA);
 
+		/*if (postDHISMetaTrigger != null && postDHISMetaTrigger.getPropertyValue().equals("true")) {
+			Context.getService(DHISReportingService.class).postIndicatorMappingDHISMetaData(null);
+			postDHISMetaTrigger.setPropertyValue("false");
+			Context.getAdministrationService().saveGlobalProperty(postDHISMetaTrigger);
+		}*/
 		log.info("DHIS Reporting Module started");
 	}
 
@@ -70,7 +78,7 @@ public class DHISReportingActivator implements ModuleActivator {
 	 */
 	public void stopped() {
 		log.info("DHIS Reporting Module stopped");
-		//Context.getService(DHISReportingService.class).pepfarPage(null);
+		// Context.getService(DHISReportingService.class).pepfarPage(null);
 	}
 
 }
