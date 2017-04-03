@@ -13,11 +13,16 @@
  */
 package org.openmrs.module.dhisreporting;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.dhisconnector.api.DHISConnectorService;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 
 /**
@@ -58,11 +63,20 @@ public class DHISReportingActivator implements ModuleActivator {
 		GlobalProperty postDHISMetaTrigger = Context.getAdministrationService()
 				.getGlobalPropertyObject(DHISReportingConstants.POST_SAMPLE_DHIS_METADATA);
 
-		/*if (postDHISMetaTrigger != null && postDHISMetaTrigger.getPropertyValue().equals("true")) {
-			Context.getService(DHISReportingService.class).postIndicatorMappingDHISMetaData(null);
-			postDHISMetaTrigger.setPropertyValue("false");
-			Context.getAdministrationService().saveGlobalProperty(postDHISMetaTrigger);
-		}*/
+		if (postDHISMetaTrigger != null && postDHISMetaTrigger.getPropertyValue().equals("true")) {
+			File mappingsFile = new File(getClass().getClassLoader().getResource("metadata.json").getFile());
+			String meta;
+			try {
+				meta = FileUtils.readFileToString(mappingsFile);
+
+				Context.getService(DHISConnectorService.class).postDataToDHISEndpoint("/api/metaData", meta);
+				// Context.getService(DHISReportingService.class).postIndicatorMappingDHISMetaData(null);
+				postDHISMetaTrigger.setPropertyValue("false");
+				Context.getAdministrationService().saveGlobalProperty(postDHISMetaTrigger);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		log.info("DHIS Reporting Module started");
 	}
 
