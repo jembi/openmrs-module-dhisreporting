@@ -17,10 +17,10 @@ ____________________________________
 dataelementName|dataelementCode|dataelementId|categoryoptioncomboName|categoryoptioncomboCode|categoryoptioncomboUid|dataset|disaggregationCategory|activeString|openmrsReportUuid|openmrsNumeratorCohortUuid|openmrsDenominatorCohortUuid|inherentDisaggOrder|reportingPeriodType
 ```
 
-* `disaggregationCategory` is a basic categorisation of the varios possible (e.g. MER 2.0) indicator disaggregations, forexample; `AGE, GENDER, DEFAULT` (the default such as HIV positive status for ON ART report), `inherent` (disaggregations broken down further into others such as gender within a given age range), `CODED` (any other complex patient observational disaggregation) and `OTHER` and `NULL` (any other disaggregations not fiting the above categories).
-* `activeString` (set to either `TRUE/FALSE`) is used to set whether a given indicator should be loaded within the reports setup or generation at OpenMRS level as well as when posting/submitting the data to DHIS.
+* `disaggregationCategory` is a basic categorisation of the varios possible (e.g. MER 2.0) indicator disaggregations, forexample; `AGE`, `GENDER`, `DEFAULT` (the default such as HIV positive status for ON ART report), `inherent` (disaggregations broken down further into others such as gender within a given age range), `CODED` (any other complex patient observational disaggregation) and `OTHER` and `NULL` (any other disaggregations not fiting the above categories).
+* `activeString` (set to either `TRUE`/`FALSE`) is used to set whether a given indicator should be loaded within the reports setup or generation at OpenMRS level as well as when posting/submitting the data to DHIS.
 * `inherentDisaggOrder` is used when `disaggregationCategory` is set to `INHERENT` just to specify the order used such as (Age,Gender), the order must be seperated with comma(,) and the key only supported keywords are `Age,Gender,Coded`.
-* `reportingPeriodType` is a DHIS period type to be used to define starting and ending date when running the OpenMRS report and then used raw while posting data to DHIS, current supported values are; `Quarterly, Monthly, Yearly, Weekly and Daily`.
+* `reportingPeriodType` is a DHIS period type to be used to define starting and ending date when running the OpenMRS report and then used raw while posting data to DHIS, current supported values are; `Quarterly`, `Monthly`, `Yearly`, `Weekly` and `Daily`.
 * The rest of the fiels should be self eplanatory by their names
 * 
 
@@ -44,7 +44,7 @@ TODO
   - [ ] Setup DHIS2 MER 2.0 indicators instance and test with it all default reports
 
 
-## License
+# License
 
 [![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png)](https://creativecommons.org/publicdomain/zero/1.0/)
 [MPL 2.0 w/ HD](http://openmrs.org/license/) © [OpenMRS Inc.](http://www.openmrs.org/)
