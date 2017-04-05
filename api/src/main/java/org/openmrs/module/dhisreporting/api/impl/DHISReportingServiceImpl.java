@@ -217,12 +217,13 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					DHISMappingElement map = new DHISMappingElement();
 					CodedObsCohortDefinition c = (CodedObsCohortDefinition) ind.getCohortDefinition()
 							.getParameterizable();
-					String mappedCode = Integer.toString(c.getQuestion().getConceptId());
-
-					map.setIndicator(code);
-					map.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + mappedCode));
-					mappings.add(map);
-					report.addIndicator(mappedCode, ind.getName(), ind);
+					if (c != null && c.getQuestion() != null) {
+						String mappedCode = Integer.toString(c.getQuestion().getConceptId());
+						map.setIndicator(code);
+						map.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + mappedCode));
+						mappings.add(map);
+						report.addIndicator(mappedCode, ind.getName(), ind);
+					}
 				}
 			}
 			mapping.setName(reportName);
