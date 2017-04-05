@@ -1,4 +1,4 @@
-<img src="https://s3.amazonaws.com/uploads.hipchat.com/20562/3117993/yatUWvRRArvRZkI/omrs-button%20%282%29.png" alt="OpenMRS" align="left"/> <img src="https://s3.amazonaws.com/uploads.hipchat.com/20562/3117993/pmvz9920GZ81cMT/dhis2.png" alt="OpenMRS" align="right"/>
+<img src="https://s3.amazonaws.com/uploads.hipchat.com/20562/3117993/pmvz9920GZ81cMT/dhis2.png" alt="OpenMRS" align="right"/>
 
 ## DHIS OpenMRS Reporting module
 
