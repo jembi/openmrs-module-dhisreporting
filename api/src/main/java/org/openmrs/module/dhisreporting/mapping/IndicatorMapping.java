@@ -27,6 +27,7 @@ public class IndicatorMapping {
 	private DisaggregationCategory disaggregationCategory;
 	private Boolean active;
 	private String activeString;
+
 	/**
 	 * USED and should be mapped through GP/Settings and match what's in the csv
 	 * mapping while
@@ -42,6 +43,11 @@ public class IndicatorMapping {
 	private String openmrsDenominatorCohortUuid;
 	private String inherentDisaggOrder;
 	private String reportingPeriodType;
+
+	/**
+	 * question concept id for the coded disaggregation category
+	 */
+	private Integer codedDisaggQuestion;
 
 	/**
 	 * All blank disaggregation categories or categoryoptioncomboName should
@@ -178,6 +184,14 @@ public class IndicatorMapping {
 
 	public void setDataelementId(String dataelementId) {
 		this.dataelementId = dataelementId;
+	}
+
+	public Integer getCodedDisaggQuestion() {
+		return codedDisaggQuestion;
+	}
+
+	public void setCodedDisaggQuestion(Integer codedDisaggQuestion) {
+		this.codedDisaggQuestion = codedDisaggQuestion;
 	}
 
 }

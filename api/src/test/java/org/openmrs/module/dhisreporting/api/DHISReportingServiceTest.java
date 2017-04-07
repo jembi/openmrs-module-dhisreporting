@@ -37,6 +37,7 @@ import org.openmrs.module.dhisreporting.NumberToWord;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.WordToNumber;
+import org.openmrs.module.dhisreporting.mapping.CodedDisaggregation;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
@@ -321,4 +322,14 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 
 		Context.getService(DHISReportingService.class).postIndicatorMappingDHISMetaData(mappingFile);
 	}
+
+	@Test
+	public void matchCodedQuestionDisaggregation() {
+		Assert.assertNotNull(CodedDisaggregation.matchCodedQuestionDisaggregation(21, "yes"));
+		Assert.assertNotNull(CodedDisaggregation.matchCodedQuestionDisaggregation(21, "no"));
+		Assert.assertNotNull(CodedDisaggregation.matchCodedQuestionDisaggregation(21, "unknown"));
+
+		Assert.assertNull(CodedDisaggregation.matchCodedQuestionDisaggregation(21, "nop"));
+	}
+
 }

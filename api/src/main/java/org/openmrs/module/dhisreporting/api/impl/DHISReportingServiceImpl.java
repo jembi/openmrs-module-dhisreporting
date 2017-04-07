@@ -468,6 +468,11 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					} else if (DisaggregationCategory.INHERENT.equals(mapping.getDisaggregationCategory())) {
 						disaggregations = createInherentDisaggregation(mapping.getCategoryoptioncomboName(),
 								mapping.getInherentDisaggOrder());
+					} else if (DisaggregationCategory.CODED.equals(mapping.getDisaggregationCategory())) {
+						CohortDefinitionDimension cd = cohorts.createCodedQuestionDimension(
+								mapping.getCodedDisaggQuestion(), mapping.getCategoryoptioncomboName());
+						if (cd != null)
+							disaggregations.add(cd);
 					}
 					if (!disaggregations.isEmpty()) {
 						for (CohortDefinitionDimension dim : disaggregations) {
@@ -498,6 +503,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		disaggs.add(DisaggregationCategory.DEFAULT);
 		disaggs.add(DisaggregationCategory.GENDER);
 		disaggs.add(DisaggregationCategory.INHERENT);
+		// TODO only question-answer coded are supported, support the rest
+		disaggs.add(DisaggregationCategory.CODED);
 		dataElementPrefixs.add("TX_NEW");
 		dataElementPrefixs.add("TX_CURR");
 

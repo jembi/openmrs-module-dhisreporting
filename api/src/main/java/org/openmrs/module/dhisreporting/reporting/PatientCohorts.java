@@ -9,11 +9,13 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.PatientSetService.TimeModifier;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.Configurations;
 import org.openmrs.module.dhisreporting.Gender;
 import org.openmrs.module.dhisreporting.NumberToWord;
 import org.openmrs.module.dhisreporting.WordToNumber;
+import org.openmrs.module.dhisreporting.mapping.CodedDisaggregation;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -245,6 +247,24 @@ public class PatientCohorts {
 			ageDimension.addParameter(new Parameter(ageDimension.getName(), ageDimension.getName(), AgeRange.class));
 
 			return ageDimension;
+		}
+		return null;
+	}
+
+	public CohortDefinitionDimension createCodedQuestionDimension(Integer question, String value) {
+		if (question != null && StringUtils.isNotBlank(value)) {
+			Concept q = Context.getConceptService().getConcept(question);
+			Concept a = CodedDisaggregation.matchCodedQuestionDisaggregation(question, value);
+
+			if (q != null && a != null) {
+				CohortDefinitionDimension cd = new CohortDefinitionDimension();
+				CodedObsCohortDefinition qa = createCodedObsCohortDefinition(q, a, SetComparator.IN, TimeModifier.LAST);
+
+				cd.setName(value);
+				cd.addCohortDefinition(qa.getName(), qa, null);
+
+				return cd;
+			}
 		}
 		return null;
 	}

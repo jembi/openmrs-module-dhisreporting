@@ -45,6 +45,11 @@ public class AgeRange {
 	public AgeRange() {
 	}
 
+	/**
+	 * @param ageQuery, valid values are such as; 25+, 20-24, <15, <=30, >45, >=13
+	 * @param minAgeUnit
+	 * @param maxAgeUnit
+	 */
 	public AgeRange(String ageQuery, DurationUnit minAgeUnit, DurationUnit maxAgeUnit) {
 		if (StringUtils.isNotBlank(ageQuery) && minAgeUnit != null && maxAgeUnit != null) {
 			setMinAgeUnit(minAgeUnit);
