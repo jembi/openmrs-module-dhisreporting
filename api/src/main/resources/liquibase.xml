@@ -43,4 +43,49 @@
 			<where>property='dhisreporting.config.dxfToAdxSwitch'</where>
 		</update>
 	</changeSet>
+	<changeSet id="201704111220" author="k-joseph">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="dhisreporting_mapped_indicator_report" />
+			</not>
+		</preConditions>
+		<comment>
+			Create dhisreporting_mapped_indicator_report table
+		</comment>
+		<createTable tableName="dhisreporting_mapped_indicator_report">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="uuid" type="char(38)">
+				<constraints nullable="false" />
+			</column>
+			<column name="dataset_id" type="text">
+				<constraints nullable="false" />
+			</column>
+			<column name="org_unit_id" type="text">
+				<constraints nullable="false" />
+			</column>
+			<column name="period_type" type="text">
+				<constraints nullable="false" />
+			</column>
+			<column name="data_element_prefixes" type="text">
+				<constraints nullable="false" />
+			</column>
+			<column name="disaggregation_categories" type="text">
+				<constraints nullable="false" />
+			</column>
+			<column name="location_id" type="int">
+				<constraints nullable="false" />
+			</column>
+			<column name="report_uuid" type="char(38)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="location_fk"
+			baseTableName="dhisreporting_mapped_indicator_report" baseColumnNames="location_id"
+			referencedTableName="location" referencedColumnNames="location_id" />
+		<addForeignKeyConstraint constraintName="mapped_indicator_report_fk"
+			baseTableName="dhisreporting_mapped_indicator_report" baseColumnNames="report_uuid"
+			referencedTableName="serialized_object" referencedColumnNames="report_uuid" />
+	</changeSet>
 </databaseChangeLog>

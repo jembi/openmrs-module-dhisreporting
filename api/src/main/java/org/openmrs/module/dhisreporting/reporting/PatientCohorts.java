@@ -192,20 +192,25 @@ public class PatientCohorts {
 
 	private CodedObsCohortDefinition createCodedObsCohortDefinition(Concept question, Concept value,
 			SetComparator setComparator, TimeModifier timeModifier) {
-		CodedObsCohortDefinition obsCohortDefinition = new CodedObsCohortDefinition();
-
-		obsCohortDefinition.setQuestion(question);
-		obsCohortDefinition.setOperator(setComparator);
-		obsCohortDefinition.setTimeModifier(timeModifier);
-
-		List<Concept> valueList = new ArrayList<Concept>();
-		if (value != null) {
-			valueList.add(value);
-			obsCohortDefinition.setValueList(valueList);
+		if (question != null && value != null) {
+			CodedObsCohortDefinition obsCohortDefinition = new CodedObsCohortDefinition();
+			if (question.getName() != null && value.getName() != null)
+				obsCohortDefinition.setName(
+						value.getName().getName().replace(" ", "") + question.getName().getName().replace(" ", ""));
+			else
+				obsCohortDefinition.setName("codedCohort" + question.getConceptId() + "_" + value.getConceptId());
+			obsCohortDefinition.setQuestion(question);
+			obsCohortDefinition.setOperator(setComparator);
+			obsCohortDefinition.setTimeModifier(timeModifier);
+			List<Concept> valueList = new ArrayList<Concept>();
+			if (value != null) {
+				valueList.add(value);
+				obsCohortDefinition.setValueList(valueList);
+			}
+			addBasicPeriodIndicatorParameters(obsCohortDefinition);
+			return obsCohortDefinition;
 		}
-		addBasicPeriodIndicatorParameters(obsCohortDefinition);
-
-		return obsCohortDefinition;
+		return null;
 	}
 
 	/**

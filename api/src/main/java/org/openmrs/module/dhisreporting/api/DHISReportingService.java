@@ -25,11 +25,13 @@ import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.dhisreporting.AgeRange;
+import org.openmrs.module.dhisreporting.MappedIndicatorReport;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping;
 import org.openmrs.module.dhisreporting.OpenMRSToDHISMapping.DHISMappingType;
 import org.openmrs.module.dhisreporting.api.impl.DHISReportingServiceImpl;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.IndicatorMappingCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -70,8 +72,8 @@ public interface DHISReportingService extends OpenmrsService {
 	Report runPeriodIndicatorReport(PeriodIndicatorReportDefinition reportDef, Date startDate, Date endDate,
 			Location location);
 
-	Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId,
-			boolean useTestMapper, List<IndicatorMapping> indicatorMappings);
+	Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId, boolean useTestMapper,
+			List<IndicatorMapping> indicatorMappings, IndicatorMappingCategory mappingCategory);
 
 	Object runAndSendReportDataForTheCurrentMonth();
 
@@ -129,10 +131,9 @@ public interface DHISReportingService extends OpenmrsService {
 	 * @return filtered indicatorMappings
 	 */
 	List<IndicatorMapping> getIndicatorMappings(List<IndicatorMapping> mappings, String mappingFileLocation,
-			Boolean active, List<DisaggregationCategory> disaggs, String openmrsReportUuid,
-			List<String> dataElementPrefixs);
+			List<DisaggregationCategory> disaggs, String openmrsReportUuid, List<String> dataElementPrefixs);
 
-	void createNewPeriodIndicatorONARTReportAndItsDHISConnectorMapping();
+	void createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
 
 	void pepfarPage(HttpServletRequest request);
 
@@ -142,4 +143,6 @@ public interface DHISReportingService extends OpenmrsService {
 	String revertOneDisaggToItsName(String categoryComboName);
 
 	JSONObject postIndicatorMappingDHISMetaData(String mappingLocation);
+
+	Object runNewDynamicReportFromIndicatorMappings(MappedIndicatorReport report);
 }

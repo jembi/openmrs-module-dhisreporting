@@ -265,7 +265,7 @@ public class DHISReportingServiceTest extends BaseModuleContextSensitiveTest {
 		dataElementPrefixs.add("TX_CURR");
 
 		List<IndicatorMapping> mappings = Context.getService(DHISReportingService.class).getIndicatorMappings(null,
-				mappingFile, true, disaggs, openmrsReportUuid, dataElementPrefixs);
+				mappingFile, disaggs, openmrsReportUuid, dataElementPrefixs);
 
 		Assert.assertEquals(16, mappings.size());
 	}

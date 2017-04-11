@@ -5,6 +5,7 @@ import javax.annotation.Generated;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * Represents a general OpenMRS to DHIS 2 Indicator/dataelement mapping starting
@@ -47,7 +48,14 @@ public class IndicatorMapping {
 	/**
 	 * question concept id for the coded disaggregation category
 	 */
+	@JsonSerialize(include = Inclusion.NON_NULL)
 	private Integer codedDisaggQuestion;
+
+	private IndicatorMappingCategory category;
+
+	public enum IndicatorMappingCategory {
+		INBUILT, DYNAMIC
+	}
 
 	/**
 	 * All blank disaggregation categories or categoryoptioncomboName should
@@ -192,6 +200,14 @@ public class IndicatorMapping {
 
 	public void setCodedDisaggQuestion(Integer codedDisaggQuestion) {
 		this.codedDisaggQuestion = codedDisaggQuestion;
+	}
+
+	public IndicatorMappingCategory getCategory() {
+		return category;
+	}
+
+	public void setCategory(IndicatorMappingCategory category) {
+		this.category = category;
 	}
 
 }
