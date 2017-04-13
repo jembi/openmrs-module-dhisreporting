@@ -151,7 +151,7 @@ public class IndicatorMapping {
 	}
 
 	public Boolean isActive() {
-		return getActive();
+		return getActive() != null ? getActive() : false;
 	}
 
 	public String getOpenmrsNumeratorCohortUuid() {

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,23 +14,36 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.openmrs.Location;
+import org.openmrs.api.context.Context;
+import org.openmrs.api.db.SerializedObject;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
+import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 
 /**
  * Contains a reference to the OpenMRS period indicator report and its mapped
  * indicators (through filterable properties) which includes the report uuid as
- * well
+ * well.
+ * 
+ * Only used for DYNAMIC {@link IndicatorMapping}
  * 
  * TODO api & ui to manage this object
  * 
  * @author k-joseph
  *
  */
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@Generated("org.jsonschema2pojo")
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "dhisreporting_mapped_indicator_report")
 public class MappedIndicatorReport {
@@ -51,8 +65,9 @@ public class MappedIndicatorReport {
 	@Column(name = "period_type", nullable = false)
 	private String periodType;
 
+	@JsonIgnore
 	@ManyToOne
-	@Column(name = "location_id", nullable = false)
+	@JoinColumn(name = "location_id", nullable = false)
 	private Location location;
 	/**
 	 * comma separated dataElementPrefixes
@@ -66,15 +81,29 @@ public class MappedIndicatorReport {
 	@Column(name = "disaggregation_categories")
 	private String disaggregationCategories;
 
+	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "report_uuid", nullable = false, referencedColumnName = "uuid")
-	private PeriodIndicatorReportDefinition report;
+	@JoinColumn(name = "report_id", nullable = false)
+	private SerializedObject report;
+
+	@Transient
+	private String reportUuid;
+
+	@Transient
+	private Integer locationId;
+
+	public Integer getLocationId() {
+		return getLocation() != null ? getLocation().getLocationId() : locationId;
+	}
+
+	public String getReportUuid() {
+		return getReport() != null ? getReport().getUuid() : reportUuid;
+	}
 
 	public MappedIndicatorReport() {
 	}
 
-	public MappedIndicatorReport(String dataElementPrefixes, String disaggregationCategories,
-			PeriodIndicatorReportDefinition report) {
+	public MappedIndicatorReport(String dataElementPrefixes, String disaggregationCategories, SerializedObject report) {
 		setDataElementPrefixes(dataElementPrefixes);
 		setDisaggregationCategories(disaggregationCategories);
 		setReport(report);
@@ -112,27 +141,38 @@ public class MappedIndicatorReport {
 		this.disaggregationCategories = disaggregationCategories;
 	}
 
-	public PeriodIndicatorReportDefinition getReport() {
+	@JsonIgnore
+	public SerializedObject getReport() {
 		return report;
 	}
 
-	public void setReport(PeriodIndicatorReportDefinition report) {
+	@JsonIgnore
+	public PeriodIndicatorReportDefinition getPeriodIndicatorReport() {
+		return getReport() != null ? (PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class)
+				.getDefinitionByUuid(report.getUuid()) : null;
+	}
+
+	@JsonIgnore
+	public void setReport(SerializedObject report) {
 		this.report = report;
 	}
 
+	@JsonIgnore
 	public List<String> getDataElementPrefixesAsList() {
 		if (StringUtils.isNotBlank(getDataElementPrefixes()))
 			return Arrays.asList(getDataElementPrefixes().replaceAll(" ", "").split(","));
 		return null;
 	}
 
+	@JsonIgnore
 	public List<DisaggregationCategory> getDisaggregationCategoriesAsList() {
 		if (StringUtils.isNotBlank(getDisaggregationCategories())) {
 			List<String> dissaggs = Arrays.asList(getDisaggregationCategories().replaceAll(" ", "").split(","));
 			List<DisaggregationCategory> ds = new ArrayList<DisaggregationCategory>();
 
 			for (String d : dissaggs) {
-				if (StringUtils.isNotBlank(d) && ArrayUtils.contains(DisaggregationCategory.values(), d))
+				if (StringUtils.isNotBlank(d)
+						&& ArrayUtils.contains(DisaggregationCategory.values(), DisaggregationCategory.valueOf(d)))
 					ds.add(DisaggregationCategory.valueOf(d));
 			}
 			return ds;
@@ -164,10 +204,12 @@ public class MappedIndicatorReport {
 		this.periodType = periodType;
 	}
 
+	@JsonIgnore
 	public Location getLocation() {
 		return location;
 	}
 
+	@JsonIgnore
 	public void setLocation(Location location) {
 		this.location = location;
 	}

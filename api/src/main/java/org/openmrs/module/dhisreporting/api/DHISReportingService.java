@@ -145,4 +145,19 @@ public interface DHISReportingService extends OpenmrsService {
 	JSONObject postIndicatorMappingDHISMetaData(String mappingLocation);
 
 	Object runNewDynamicReportFromIndicatorMappings(MappedIndicatorReport report);
+
+	List<MappedIndicatorReport> getAllMappedIndicatorReports();
+
+	MappedIndicatorReport getMappedIndicatorReportByUuid(String uuid);
+
+	MappedIndicatorReport getMappedIndicatorReport(Integer id);
+
+	void deleteMappedIndicatorReport(MappedIndicatorReport mappedIndicatorReport);
+
+	void saveMappedIndicatorReport(MappedIndicatorReport mappedIndicatorReport);
+
+	JSONArray getMappedIndicatorReportExistingMeta();
+
+	void runDynamicReports();
+
 }

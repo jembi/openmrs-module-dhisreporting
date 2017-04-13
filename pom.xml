@@ -34,7 +34,7 @@
 	</modules>
 
 	<properties>
-		<openMRSVersion>1.10.0</openMRSVersion>
+		<openMRSVersion>1.11.5</openMRSVersion>
 		<reportingVersion>0.9.7</reportingVersion>
 		<serializationVersion>0.2.7</serializationVersion>
 		<htmlwidgetsVersion>1.6.4</htmlwidgetsVersion>

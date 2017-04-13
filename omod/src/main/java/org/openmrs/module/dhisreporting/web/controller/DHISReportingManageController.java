@@ -14,6 +14,7 @@
 package org.openmrs.module.dhisreporting.web.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,6 +26,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisconnector.api.DHISConnectorService;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
+import org.openmrs.module.dhisreporting.MappedIndicatorReport;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
@@ -83,5 +85,24 @@ public class DHISReportingManageController {
 	@RequestMapping(value = "/module/dhisreporting/pepfar", method = RequestMethod.POST)
 	public void submitPepfar(ModelMap model, HttpServletRequest request) {
 		Context.getService(DHISReportingService.class).pepfarPage(request);
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/dynamicReports", method = RequestMethod.GET)
+	public void renderDynamicReportsPage(ModelMap model) {
+		List<MappedIndicatorReport> allMappedIndicatorReports = Context.getService(DHISReportingService.class)
+				.getAllMappedIndicatorReports();
+
+		model.addAttribute("mappingsMeta",
+				Context.getService(DHISReportingService.class).getMappedIndicatorReportExistingMeta().toJSONString());
+		try {
+			model.addAttribute("mappedIndicatorReports",
+					new ObjectMapper().writeValueAsString(allMappedIndicatorReports));
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

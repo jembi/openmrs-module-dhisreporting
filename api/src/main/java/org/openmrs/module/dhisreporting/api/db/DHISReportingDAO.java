@@ -13,12 +13,25 @@
  */
 package org.openmrs.module.dhisreporting.api.db;
 
+import java.util.List;
+
+import org.openmrs.module.dhisreporting.MappedIndicatorReport;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 
 /**
  *  Database methods for {@link DHISReportingService}.
  */
 public interface DHISReportingDAO {
+
+	List<MappedIndicatorReport> getAllMappedIndicatorReports();
+
+	MappedIndicatorReport getMappedIndicatorReportByUuid(String uuid);
+
+	MappedIndicatorReport getMappedIndicatorReport(Integer id);
+
+	void deleteMappedIndicatorReport(MappedIndicatorReport mappedIndicatorReport);
+
+	void saveMappedIndicatorReport(MappedIndicatorReport mappedIndicatorReport);
 	
 	/*
 	 * Add DAO methods here

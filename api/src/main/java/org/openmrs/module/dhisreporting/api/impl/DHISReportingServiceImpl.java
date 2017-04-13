@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -387,6 +389,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			if ("true".equals(Context.getAdministrationService()
 					.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION))) {
 				runAndPushOnARTReportToDHIS();
+				if (request != null)
+					request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
+							"You have Successfully Run and posted Reports");
 			} else {
 				for (CohortIndicatorAndDimensionColumn c : onART.getIndicatorDataSetDefinition().getColumns()) {
 					Mapped<? extends CohortIndicator> cInd = c.getIndicator();
@@ -404,18 +409,25 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 							"You have Deleted ON ART Report Definition!");
 			}
 		}
+		runDynamicReports();
+	}
+
+	@Override
+	public void runDynamicReports() {
+		for (MappedIndicatorReport m : getAllMappedIndicatorReports())
+			runNewDynamicReportFromIndicatorMappings(m);
 	}
 
 	@Override
 	public Object runNewDynamicReportFromIndicatorMappings(MappedIndicatorReport report) {
 		if (report != null) {
 			List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null,
-					report.getDisaggregationCategoriesAsList(), report.getReport().getUuid(),
+					report.getDisaggregationCategoriesAsList(), report.getReportUuid(),
 					report.getDataElementPrefixesAsList());
 
 			if (filteredMappings != null && !filteredMappings.isEmpty()) {
-				return runAndPushReportToDHIS(report.getReport().getUuid(), report.getDataSetId(),
-						report.getOrgUnitId(), report.getPeriodType(), report.getReport().getId(), filteredMappings,
+				return runAndPushReportToDHIS(report.getReportUuid(), report.getDataSetId(), report.getOrgUnitId(),
+						report.getPeriodType(), report.getLocationId(), filteredMappings,
 						IndicatorMappingCategory.DYNAMIC);
 			}
 		}
@@ -856,6 +868,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return null;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	public List<OpenMRSToDHISMapping> getAllMappings() {
 		List<OpenMRSToDHISMapping> mappings = new ArrayList<OpenMRSToDHISMapping>();
@@ -1379,5 +1394,93 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override
+	public List<MappedIndicatorReport> getAllMappedIndicatorReports() {
+		return getDao().getAllMappedIndicatorReports();
+	}
+
+	@Override
+	public MappedIndicatorReport getMappedIndicatorReportByUuid(String uuid) {
+		return getDao().getMappedIndicatorReportByUuid(uuid);
+	}
+
+	@Override
+	public MappedIndicatorReport getMappedIndicatorReport(Integer id) {
+		return getDao().getMappedIndicatorReport(id);
+	}
+
+	@Override
+	public void deleteMappedIndicatorReport(MappedIndicatorReport mappedIndicatorReport) {
+		getDao().deleteMappedIndicatorReport(mappedIndicatorReport);
+	}
+
+	@Override
+	public void saveMappedIndicatorReport(MappedIndicatorReport mappedIndicatorReport) {
+		getDao().saveMappedIndicatorReport(mappedIndicatorReport);
+	}
+
+	/**
+	 * TODO do further restrictions and checking here, the reports must exist
+	 * and their indicator codes match the indicatormappings dataelementcodes
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public JSONArray getMappedIndicatorReportExistingMeta() {
+		List<IndicatorMapping> mappings = getAllIndicatorMappings(null);
+		JSONArray meta = new JSONArray();
+		String lastReport = null;
+		JSONObject metaData = new JSONObject();
+		JSONArray disaggCats = new JSONArray();
+		JSONArray dataElementPrefixes = new JSONArray();
+
+		// sort indicatorMappings list by report
+		Collections.sort(mappings, new Comparator<IndicatorMapping>() {
+			@Override
+			public int compare(final IndicatorMapping object1, final IndicatorMapping object2) {
+				return StringUtils.isNotBlank(object1.getOpenmrsReportUuid())
+						&& StringUtils.isNotBlank(object2.getOpenmrsReportUuid())
+								? object1.getOpenmrsReportUuid().compareTo(object2.getOpenmrsReportUuid()) : -1;
+			}
+		});
+
+		for (int i = 0; i < mappings.size(); i++) {
+			IndicatorMapping m = mappings.get(i);
+
+			if (IndicatorMappingCategory.DYNAMIC.equals(m.getCategory())
+					&& StringUtils.isNotBlank(m.getOpenmrsReportUuid()) && m.isActive()
+					&& StringUtils.isNotBlank(m.getDataelementCode())) {
+				if (m.getOpenmrsReportUuid().equals(lastReport)) {
+					setUpMeta(disaggCats, dataElementPrefixes, m);
+				} else {
+					disaggCats = new JSONArray();
+					dataElementPrefixes = new JSONArray();
+
+					setUpMeta(disaggCats, dataElementPrefixes, m);
+				}
+				if (i == mappings.size() - 1 || !mappings.get(i + 1).getOpenmrsReportUuid().equals(lastReport)) {
+					metaData.put("report", m.getOpenmrsReportUuid());
+					metaData.put("disaggCategories", disaggCats);
+					metaData.put("dataElementPrefixes", dataElementPrefixes);
+					meta.add(metaData);
+				}
+
+				lastReport = m.getOpenmrsReportUuid();
+			}
+		}
+
+		return meta;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void setUpMeta(JSONArray disaggCats, JSONArray dataElementPrefixes, IndicatorMapping m) {
+		if (!disaggCats.contains(m.getDisaggregationCategory().name()))
+			disaggCats.add(m.getDisaggregationCategory().name());
+		if (!dataElementPrefixes.contains(m.getDataelementCode())) {
+			dataElementPrefixes.add(m.getDataelementCode().split("_")[0]);
+		}
 	}
 }

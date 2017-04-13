@@ -20,33 +20,36 @@ import org.openmrs.module.Extension;
 import org.openmrs.module.web.extension.AdministrationSectionExt;
 
 /**
- * This class defines the links that will appear on the administration page under the
- * "dhisreporting.title" heading. 
+ * This class defines the links that will appear on the administration page
+ * under the "dhisreporting.title" heading.
  */
 public class AdminList extends AdministrationSectionExt {
-	
+
 	/**
 	 * @see AdministrationSectionExt#getMediaType()
 	 */
 	public Extension.MEDIA_TYPE getMediaType() {
 		return Extension.MEDIA_TYPE.html;
 	}
-	
+
 	/**
 	 * @see AdministrationSectionExt#getTitle()
 	 */
 	public String getTitle() {
 		return "dhisreporting.title";
 	}
-	
+
 	/**
 	 * @see AdministrationSectionExt#getLinks()
 	 */
 	public Map<String, String> getLinks() {
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+
 		map.put("/module/dhisreporting/manage.form", "dhisreporting.manage");
 		map.put("/module/dhisreporting/pepfar.form", "PEPFAR MER 2.0 Indicator Reports");
+		map.put("/module/dhisreporting/dynamicReports.form", "Dynamic Period Indicator Reports");
+
 		return map;
 	}
-	
+
 }

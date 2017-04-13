@@ -77,15 +77,15 @@
 			<column name="location_id" type="int">
 				<constraints nullable="false" />
 			</column>
-			<column name="report_uuid" type="char(38)">
+			<column name="report_id" type="int">
 				<constraints nullable="false" />
 			</column>
 		</createTable>
 		<addForeignKeyConstraint constraintName="location_fk"
 			baseTableName="dhisreporting_mapped_indicator_report" baseColumnNames="location_id"
 			referencedTableName="location" referencedColumnNames="location_id" />
-		<addForeignKeyConstraint constraintName="mapped_indicator_report_fk"
-			baseTableName="dhisreporting_mapped_indicator_report" baseColumnNames="report_uuid"
-			referencedTableName="serialized_object" referencedColumnNames="report_uuid" />
+		<addForeignKeyConstraint constraintName="serialized_report_fk"
+			baseTableName="dhisreporting_mapped_indicator_report" baseColumnNames="report_id"
+			referencedTableName="serialized_object" referencedColumnNames="serialized_object_id" />
 	</changeSet>
 </databaseChangeLog>
