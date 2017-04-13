@@ -3,9 +3,9 @@
 
 <%@ include file="template/localHeader.jsp"%>
 
-<p>Hello ${user.systemId}!</p>
-
+<h3>Export Mapping</h3>
 <form method="post">
-	<input type="submit" value="Test Sending monthly HMIS data with Lab report" disabled>
+	<input type="submit" value="Export">
 </form>
+
 <%@ include file="/WEB-INF/template/footer.jsp"%>

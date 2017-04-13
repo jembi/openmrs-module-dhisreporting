@@ -13,11 +13,18 @@
  */
 package org.openmrs.module.dhisreporting.web.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonGenerationException;
@@ -26,6 +33,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisconnector.api.DHISConnectorService;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
+import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.MappedIndicatorReport;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.web.WebConstants;
@@ -33,12 +41,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * The main controller.
  */
 @Controller
 public class DHISReportingManageController {
+	public static final String DHISCONNECTOR_TEMP_FOLDER = File.separator + "dhisconnector" + File.separator + "temp";
 
 	protected final Log log = LogFactory.getLog(getClass());
 
@@ -104,5 +115,75 @@ public class DHISReportingManageController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/exportMapping", method = RequestMethod.GET)
+	public void exportMappingRenderer(ModelMap model) {
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/exportMapping", method = RequestMethod.POST)
+	public void exportMapping(ModelMap model, HttpServletRequest request, HttpServletResponse response) {
+		try {
+			exportFile(response, DHISReportingConstants.INDICATOR_MAPPING_FILE);
+		} catch (FileNotFoundException e) {
+			request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "No Mapping is available for export!!!");
+			e.printStackTrace();
+		} catch (IOException e) {
+			request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
+					"Something went wrong, check server logs!!!");
+			e.printStackTrace();
+		}
+	}
+
+	private void exportFile(HttpServletResponse response, File downloadFile) throws FileNotFoundException, IOException {
+		if (downloadFile != null && downloadFile.exists()) {
+			FileInputStream inputStream = new FileInputStream(downloadFile);
+			String mimeType = "application/octet-stream";
+
+			System.out.println("MIME type: " + mimeType);
+			response.setContentType(mimeType);
+			response.setContentLength((int) downloadFile.length());
+
+			String headerKey = "Content-Disposition";
+			String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
+
+			response.setHeader(headerKey, headerValue);
+
+			OutputStream outStream = response.getOutputStream();
+			byte[] buffer = new byte[4096];
+			int bytesRead = -1;
+
+			while ((bytesRead = inputStream.read(buffer)) != -1) {
+				outStream.write(buffer, 0, bytesRead);
+			}
+			inputStream.close();
+			outStream.close();
+		}
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/importMapping", method = RequestMethod.GET)
+	public void importMappingRenderer(ModelMap model) {
+	}
+
+	@RequestMapping(value = "/module/dhisreporting/importMapping", method = RequestMethod.POST)
+	public void importMapping(ModelMap model, HttpServletRequest request,
+			@RequestParam(value = "mapping", required = false) MultipartFile mapping) {
+		importMapping(mapping, request);
+	}
+
+	private void importMapping(MultipartFile mapping, HttpServletRequest request) {
+		try {
+			OutputStream out = new FileOutputStream(DHISReportingConstants.INDICATOR_MAPPING_FILE);
+
+			IOUtils.copy(mapping.getInputStream(), out);
+			request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
+					"You have Successfully imported mapping file!");
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
+					"Importing mapping file failed: !" + e.getMessage());
+		}
+
 	}
 }

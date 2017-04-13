@@ -3,7 +3,7 @@
 
 <%@ include file="template/localHeader.jsp"%>
 
-Mapping Dynamic Period indicator reports
+<h3>Mapping Dynamic Period indicator reports</h3>
 <p>${mappingsMeta}</p>
 <p>${mappedIndicatorReports}</p>
 

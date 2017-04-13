@@ -45,9 +45,10 @@ public class AdminList extends AdministrationSectionExt {
 	public Map<String, String> getLinks() {
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
-		map.put("/module/dhisreporting/manage.form", "dhisreporting.manage");
 		map.put("/module/dhisreporting/pepfar.form", "PEPFAR MER 2.0 Indicator Reports");
 		map.put("/module/dhisreporting/dynamicReports.form", "Dynamic Period Indicator Reports");
+		map.put("/module/dhisreporting/exportMapping.form", "Export Mapping");
+		map.put("/module/dhisreporting/importMapping.form", "Import Mapping");
 
 		return map;
 	}

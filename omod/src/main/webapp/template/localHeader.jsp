@@ -5,12 +5,6 @@
 				code="admin.title.short" /></a></li>
 
 	<li
-		<c:if test='<%= request.getRequestURI().contains("/manage") %>'>class="active"</c:if>>
-		<a
-		href="${pageContext.request.contextPath}/module/dhisreporting/manage.form"><spring:message
-				code="dhisreporting.manage" /></a>
-	</li>
-	<li
 		<c:if test='<%= request.getRequestURI().contains("/pepfar") %>'>class="active"</c:if>>
 		<a
 		href="${pageContext.request.contextPath}/module/dhisreporting/pepfar.form">PEPFAR MER 2.0 Indicator Reports</a>
@@ -21,7 +15,16 @@
 		<a
 		href="${pageContext.request.contextPath}/module/dhisreporting/dynamicReports.form">Dynamic Period Indicator Reports</a>
 	</li>
-	
+	<li
+		<c:if test='<%= request.getRequestURI().contains("/exportMapping") %>'>class="active"</c:if>>
+		<a
+		href="${pageContext.request.contextPath}/module/dhisreporting/exportMapping.form">Export Mapping</a>
+	</li>
+	<li
+		<c:if test='<%= request.getRequestURI().contains("/importMapping") %>'>class="active"</c:if>>
+		<a
+		href="${pageContext.request.contextPath}/module/dhisreporting/importMapping.form">Import Mapping</a>
+	</li>
 	<!-- Add further links here -->
 </ul>
 <h2>
