@@ -381,14 +381,14 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 		if (onART == null) {
 			createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
-			runAndPushOnARTReportToDHIS();
+			runAndPostOnARTReportToDHIS();
 			if (request != null)
 				request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
 						"You have Successfully Created ON ART Report Definition!");
 		} else {
 			if ("true".equals(Context.getAdministrationService()
 					.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION))) {
-				runAndPushOnARTReportToDHIS();
+				runAndPostOnARTReportToDHIS();
 				if (request != null)
 					request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
 							"You have Successfully Run and posted Reports");
@@ -409,17 +409,17 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 							"You have Deleted ON ART Report Definition!");
 			}
 		}
-		runDynamicReports();
+		runAndPostDynamicReports();
 	}
 
 	@Override
-	public void runDynamicReports() {
+	public void runAndPostDynamicReports() {
 		for (MappedIndicatorReport m : getAllMappedIndicatorReports())
-			runNewDynamicReportFromIndicatorMappings(m);
+			runAndPostNewDynamicReportFromIndicatorMappings(m);
 	}
 
 	@Override
-	public Object runNewDynamicReportFromIndicatorMappings(MappedIndicatorReport report) {
+	public Object runAndPostNewDynamicReportFromIndicatorMappings(MappedIndicatorReport report) {
 		if (report != null) {
 			List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null,
 					report.getDisaggregationCategoriesAsList(), report.getReportUuid(),
@@ -789,7 +789,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return null;
 	}
 
-	public Object runAndPushOnARTReportToDHIS() {
+	@Override
+	public Object runAndPostOnARTReportToDHIS() {
 		// TODO fix and invoke respectively
 		String reportUuid = Context.getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
@@ -1100,6 +1101,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 *            item number based on size to end at just as when paging
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	public List<MerIndicator> getMerIndicators(String merIndicatorsFileLocation, Integer startingFrom,
 			Integer endindAt) {
@@ -1145,7 +1147,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 * @return
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	public List<IndicatorMapping> getAllIndicatorMappings(String mappingFileLocation) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();

@@ -144,7 +144,7 @@ public interface DHISReportingService extends OpenmrsService {
 
 	JSONObject postIndicatorMappingDHISMetaData(String mappingLocation);
 
-	Object runNewDynamicReportFromIndicatorMappings(MappedIndicatorReport report);
+	Object runAndPostNewDynamicReportFromIndicatorMappings(MappedIndicatorReport report);
 
 	List<MappedIndicatorReport> getAllMappedIndicatorReports();
 
@@ -158,6 +158,8 @@ public interface DHISReportingService extends OpenmrsService {
 
 	JSONArray getMappedIndicatorReportExistingMeta();
 
-	void runDynamicReports();
+	void runAndPostDynamicReports();
+
+	Object runAndPostOnARTReportToDHIS();
 
 }

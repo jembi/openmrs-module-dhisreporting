@@ -88,4 +88,52 @@
 			baseTableName="dhisreporting_mapped_indicator_report" baseColumnNames="report_id"
 			referencedTableName="serialized_object" referencedColumnNames="serialized_object_id" />
 	</changeSet>
+	<changeSet id="190420171608" author="k-joseph">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM
+				scheduler_task_config WHERE schedulable_class =
+				'org.openmrs.module.dhisreporting.scheduler.RunOnARTReportTask';
+			</sqlCheck>
+		</preConditions>
+		<comment>Run ON ART PEPFAR MER 2.0 Report every after a quarter</comment>
+		<insert tableName="scheduler_task_config">
+			<column name="name" value="Run ON ART PEPFAR MER 2.0 Report" />
+			<column name="schedulable_class"
+				value="org.openmrs.module.dhisreporting.scheduler.RunOnARTReportTask" />
+			<column name="description"
+				value="Scheduled task for Running quarterly ON ART PEPFAR MER 2.0 Report" />
+			<column name="start_time" value="2017-01-01 12:00:00" />
+			<column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+			<column name="repeat_interval" value="7776000" />
+			<column name="start_on_startup" value="1" />
+			<column name="started" value="1" />
+			<column name="created_by" value="1" />
+			<column name="date_created" value="2017-04-19 16:09:00" />
+			<column name="uuid" value="b9c23a8e-2502-11e7-93ae-92361f002671" />
+		</insert>
+	</changeSet>
+	<changeSet id="190420171613" author="k-joseph">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM
+				scheduler_task_config WHERE schedulable_class =
+				'org.openmrs.module.dhisreporting.scheduler.RunDynamicReportsTask';
+			</sqlCheck>
+		</preConditions>
+		<comment>Run dynamic Reports every day</comment>
+		<insert tableName="scheduler_task_config">
+			<column name="name" value="Run Dynamic Reports everyday" />
+			<column name="schedulable_class"
+				value="org.openmrs.module.dhisreporting.scheduler.RunDynamicReportsTask" />
+			<column name="description"
+				value="Scheduled task for Running Dynamic Reports daily" />
+			<column name="start_time" value="2017-04-19 13:00:00" />
+			<column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+			<column name="repeat_interval" value="86400" />
+			<column name="start_on_startup" value="1" />
+			<column name="started" value="1" />
+			<column name="created_by" value="1" />
+			<column name="date_created" value="2017-04-19 16:17:00" />
+			<column name="uuid" value="b9c23840-2502-11e7-93ae-92361f002671" />
+		</insert>
+	</changeSet>
 </databaseChangeLog>
