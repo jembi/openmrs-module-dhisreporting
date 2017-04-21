@@ -39,6 +39,8 @@ public class DHISReportingConstants {
 
 	public static String PREGNANCYTEST_CONCEPTID = "dhisreporting.pregnancyTestConceptId";
 
+	public static String PCR_CONCEPTID = "dhisreporting.hiv.PCR";
+
 	public static String HEMOGLOBIN_CONCEPTID = "dhisreporting.hemoglobinConceptId";
 
 	public static String FULLBLOODCOUNT_CONCEPTID = "dhisreporting.fullBloodCountConceptId";
@@ -68,6 +70,10 @@ public class DHISReportingConstants {
 	public static String HIV_PROGRAMID = "dhisreporting.program.HIV";
 
 	public static String TB_PROGRAMID = "dhisreporting.program.TB";
+
+	public static String PMTCT_PROGRAMID = "dhisreporting.program.PMTCT";
+
+	public static String PREGNANTPATIENT_CONCEPTID = "dhisreporting.patients.pregnant";
 
 	public static String HIVSTATUS_CONCEPTID = "dhisreporting.concept.hivStatus";
 
@@ -104,8 +110,10 @@ public class DHISReportingConstants {
 	public static String NEW_ON_ART_PERIOD_MONTHS = "dhisreporting.reporting.newOnARTPeriodInMonths";
 
 	public static String DATAELEMENT_DISAGG_SEPARATOR = "__";
-	
-	public static String DISABLE_WEB_REPORTS_DELETION= "dhisreporting.reporting.disableWebReportsDeletion";
+
+	public static String DISABLE_WEB_REPORTS_DELETION = "dhisreporting.reporting.disableWebReportsDeletion";
 
 	public static String POST_SAMPLE_DHIS_METADATA = "dhisreporting.dhis.postSampleMetaFromMapping";
+
+	public static String AGEQUERY_INFANT = "dhisreporting.ageQuery.infant";
 }

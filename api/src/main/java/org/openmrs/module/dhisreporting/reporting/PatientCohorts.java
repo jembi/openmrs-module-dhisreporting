@@ -3,6 +3,7 @@ package org.openmrs.module.dhisreporting.reporting;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
@@ -12,13 +13,16 @@ import org.openmrs.api.PatientSetService.TimeModifier;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.dhisreporting.AgeRange;
 import org.openmrs.module.dhisreporting.Configurations;
+import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.Gender;
 import org.openmrs.module.dhisreporting.NumberToWord;
 import org.openmrs.module.dhisreporting.WordToNumber;
+import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.mapping.CodedDisaggregation;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.ProgramEnrollmentCohortDefinition;
@@ -26,6 +30,7 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.evaluation.parameter.ParameterizableUtil;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 
 public class PatientCohorts {
@@ -35,15 +40,15 @@ public class PatientCohorts {
 		GenderCohortDefinition cd = new GenderCohortDefinition();
 
 		if (gender.equals(Gender.FEMALE)) {
-			cd.setName("femaleGender");
+			cd.setName("Female");
 			cd.setDescription("Patients whose gender is F");
 			cd.setFemaleIncluded(true);
 		} else if (gender.equals(Gender.MALE)) {
-			cd.setName("maleGender");
+			cd.setName("Male");
 			cd.setDescription("Patients whose gender is M");
 			cd.setMaleIncluded(true);
 		} else {
-			cd.setName("unknownGender");
+			cd.setName("Unknown");
 			cd.setDescription("Patients whose gender is not known");
 			cd.setUnknownGenderIncluded(true);
 		}
@@ -132,6 +137,13 @@ public class PatientCohorts {
 		return inPrograms("in TB Program", programs);
 	}
 
+	public ProgramEnrollmentCohortDefinition inPMTCTProgram() {
+		List<Program> programs = new ArrayList<Program>();
+
+		programs.add(config.getPMTCTProgram());
+		return inPrograms("in PMTCT Program", programs);
+	}
+
 	/**
 	 * An Active patient according to Rwanda is one enrolled within the HIV
 	 * program and is not exited from care as well as taking ARV or HIV
@@ -192,22 +204,27 @@ public class PatientCohorts {
 
 	private CodedObsCohortDefinition createCodedObsCohortDefinition(Concept question, Concept value,
 			SetComparator setComparator, TimeModifier timeModifier) {
-		if (question != null && value != null) {
+		if (question != null) {
 			CodedObsCohortDefinition obsCohortDefinition = new CodedObsCohortDefinition();
-			if (question.getName() != null && value.getName() != null)
+			List<Concept> valueList = new ArrayList<Concept>();
+
+			// TODO is using onOrBefore equal to making use of endDate!!!
+			addBasicPeriodIndicatorParameters(obsCohortDefinition);
+			if (question.getName() != null && value != null && value.getName() != null)
 				obsCohortDefinition.setName(
 						value.getName().getName().replace(" ", "") + question.getName().getName().replace(" ", ""));
 			else
-				obsCohortDefinition.setName("codedCohort" + question.getConceptId() + "_" + value.getConceptId());
+				obsCohortDefinition.setName(
+						"codedCohort#" + question.getConceptId() + (value != null ? "_" + value.getConceptId() : ""));
 			obsCohortDefinition.setQuestion(question);
 			obsCohortDefinition.setOperator(setComparator);
 			obsCohortDefinition.setTimeModifier(timeModifier);
-			List<Concept> valueList = new ArrayList<Concept>();
+
 			if (value != null) {
 				valueList.add(value);
 				obsCohortDefinition.setValueList(valueList);
 			}
-			addBasicPeriodIndicatorParameters(obsCohortDefinition);
+
 			return obsCohortDefinition;
 		}
 		return null;
@@ -266,11 +283,60 @@ public class PatientCohorts {
 				CodedObsCohortDefinition qa = createCodedObsCohortDefinition(q, a, SetComparator.IN, TimeModifier.LAST);
 
 				cd.setName(value);
-				cd.addCohortDefinition(qa.getName(), qa, null);
+				cd.addCohortDefinition(qa.getName(), qa, startAndEndDatesMappings());
 
 				return cd;
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * pregnant is basically enrollment in PMTCT
+	 * 
+	 * @return
+	 */
+	public CompositionCohortDefinition inPMTCTHIVPostivePatients() {
+		CompositionCohortDefinition c = new CompositionCohortDefinition();
+
+		c.addSearch("inPMTCT", inPMTCTProgram(), startAndEndDatesMappings());
+		// enrollment in PMTCT means HIV+
+		c.addSearch("hivPositive", hivPositivePatients(), startAndEndDatesMappings());
+
+		return c;
+	}
+
+	public CodedObsCohortDefinition pregnantPatients() {
+		String pregConceptId = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.PREGNANTPATIENT_CONCEPTID);
+
+		if (StringUtils.isNotBlank(pregConceptId))
+			return createCodedObsCohortDefinition(config.getPregnantPatientConcept(), null, SetComparator.IN,
+					TimeModifier.LAST);
+		return null;
+	}
+
+	public CompositionCohortDefinition infantsWhoHadPCRTestInNMonths(Integer numberOfMonths) {
+		CompositionCohortDefinition c = new CompositionCohortDefinition();
+		String infantAgeQuery = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.AGEQUERY_INFANT);
+		AgeRange infant = Context.getService(DHISReportingService.class).convertAgeQueryToAgeRangeObject(infantAgeQuery,
+				DurationUnit.YEARS, DurationUnit.YEARS);
+		AgeCohortDefinition infants = patientsInAgeRange(infant);
+
+		//TODO within first n months
+		CodedObsCohortDefinition withPCRTest = createCodedObsCohortDefinition(
+				config.getPCRConcept(), null, SetComparator.IN, TimeModifier.LAST);
+
+		
+		c.addSearch("infants", infants, startAndEndDatesMappings());
+		c.addSearch("pcrTest", withPCRTest, startAndEndDatesMappings());
+
+		return c;
+	}
+
+	public Map<String, Object> startAndEndDatesMappings() {
+		return ParameterizableUtil.createParameterMappings(
+				"startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate}");
 	}
 }

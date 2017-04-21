@@ -246,5 +246,25 @@
 		<defaultValue>true</defaultValue>
 		<description>Auto setting to monitor posting sample metadata from csv mappings</description>
 	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.program.PMTCT</property>
+		<defaultValue>1</defaultValue>
+		<description>PMTCT Program Id</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.patients.pregnant</property>
+		<defaultValue></defaultValue>
+		<description>Set to PATIENT PREGNANT concept id (1755) when the implementation uses it</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.hiv.PCR</property>
+		<defaultValue>1553</defaultValue>
+		<description>Concept id for a virologic HIV (PCR) test</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.ageQuery.infant</property>
+		<defaultValue>&lt;=1</defaultValue>
+		<description>age query (e.g; 25+, 20-24, &lt;15, &lt;=30, &gt;45, &gt;=13) for an infant</description>
+	</globalProperty>
 </module>
 

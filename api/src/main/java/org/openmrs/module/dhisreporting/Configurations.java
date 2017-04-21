@@ -51,6 +51,14 @@ public class Configurations {
 	public Concept getHIVPositiveAnswer() {
 		return getConceptByGpCode(DHISReportingConstants.POSITIVE_CONCEPTID);
 	}
+	
+	public Concept getPregnantPatientConcept() {
+		return getConceptByGpCode(DHISReportingConstants.PREGNANTPATIENT_CONCEPTID);
+	}
+	
+	public Concept getPCRConcept() {
+		return getConceptByGpCode(DHISReportingConstants.PCR_CONCEPTID);
+	}
 
 	public Program getHIVProgram() {
 		return inProgram(DHISReportingConstants.HIV_PROGRAMID);
@@ -58,6 +66,10 @@ public class Configurations {
 
 	public Program getTBProgram() {
 		return inProgram(DHISReportingConstants.TB_PROGRAMID);
+	}
+	
+	public Program getPMTCTProgram() {
+		return inProgram(DHISReportingConstants.PMTCT_PROGRAMID);
 	}
 
 	private Program inProgram(String programGpCode) {
