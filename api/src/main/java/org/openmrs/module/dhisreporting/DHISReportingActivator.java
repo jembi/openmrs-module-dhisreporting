@@ -62,6 +62,8 @@ public class DHISReportingActivator implements ModuleActivator {
 		Context.getService(DHISReportingService.class).createCohortQueriesIndicatorsAndReports();
 		GlobalProperty postDHISMetaTrigger = Context.getAdministrationService()
 				.getGlobalPropertyObject(DHISReportingConstants.POST_SAMPLE_DHIS_METADATA);
+		GlobalProperty infantAgeQuery = Context.getAdministrationService()
+				.getGlobalPropertyObject(DHISReportingConstants.AGEQUERY_INFANT);
 
 		if (postDHISMetaTrigger != null && postDHISMetaTrigger.getPropertyValue().equals("true")) {
 			File mappingsFile = new File(getClass().getClassLoader().getResource("metadata.json").getFile());
@@ -77,6 +79,12 @@ public class DHISReportingActivator implements ModuleActivator {
 				e.printStackTrace();
 			}
 		}
+		if (infantAgeQuery == null) {
+			infantAgeQuery = new GlobalProperty(DHISReportingConstants.AGEQUERY_INFANT, "<1",
+					"age query (e.g; 25+, 20-24, <15, <=30, >45, >=13) for an infant");
+			Context.getAdministrationService().saveGlobalProperty(infantAgeQuery);
+		}
+
 		log.info("DHIS Reporting Module started");
 	}
 

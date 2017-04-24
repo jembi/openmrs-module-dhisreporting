@@ -69,7 +69,7 @@ public class PatientCohorts {
 		AgeCohortDefinition cd = new AgeCohortDefinition();
 
 		if (ageRange != null) {
-
+			addBasicPeriodIndicatorParameters(cd);
 			try {
 				cd.setMinAge(ageRange.getMinAge());
 				cd.setMinAgeUnit(ageRange.getMinAgeUnit());
@@ -283,7 +283,7 @@ public class PatientCohorts {
 				CodedObsCohortDefinition qa = createCodedObsCohortDefinition(q, a, SetComparator.IN, TimeModifier.LAST);
 
 				cd.setName(value);
-				cd.addCohortDefinition(qa.getName(), qa, startAndEndDatesMappings());
+				cd.addCohortDefinition(qa.getName(), qa, defaultParameterMappings());
 
 				return cd;
 			}
@@ -299,9 +299,11 @@ public class PatientCohorts {
 	public CompositionCohortDefinition inPMTCTHIVPostivePatients() {
 		CompositionCohortDefinition c = new CompositionCohortDefinition();
 
-		c.addSearch("inPMTCT", inPMTCTProgram(), startAndEndDatesMappings());
+		addBasicPeriodIndicatorParameters(c);
+		c.addSearch("inPMTCT", inPMTCTProgram(), defaultParameterMappings());
 		// enrollment in PMTCT means HIV+
-		c.addSearch("hivPositive", hivPositivePatients(), startAndEndDatesMappings());
+		c.addSearch("hivPositive", hivPositivePatients(), defaultParameterMappings());
+		c.setCompositionString("inPMTCT and hivPositive");
 
 		return c;
 	}
@@ -310,9 +312,13 @@ public class PatientCohorts {
 		String pregConceptId = Context.getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.PREGNANTPATIENT_CONCEPTID);
 
-		if (StringUtils.isNotBlank(pregConceptId))
-			return createCodedObsCohortDefinition(config.getPregnantPatientConcept(), null, SetComparator.IN,
-					TimeModifier.LAST);
+		if (StringUtils.isNotBlank(pregConceptId)) {
+			CodedObsCohortDefinition preg = createCodedObsCohortDefinition(config.getPregnantPatientConcept(), null,
+					SetComparator.IN, TimeModifier.LAST);
+
+			addBasicPeriodIndicatorParameters(preg);
+			return preg;
+		}
 		return null;
 	}
 
@@ -324,19 +330,40 @@ public class PatientCohorts {
 				DurationUnit.YEARS, DurationUnit.YEARS);
 		AgeCohortDefinition infants = patientsInAgeRange(infant);
 
-		//TODO within first n months
-		CodedObsCohortDefinition withPCRTest = createCodedObsCohortDefinition(
-				config.getPCRConcept(), null, SetComparator.IN, TimeModifier.LAST);
+		// TODO within first n months
+		CodedObsCohortDefinition withPCRTest = createCodedObsCohortDefinition(config.getPCRConcept(), null,
+				SetComparator.IN, TimeModifier.LAST);
+		SqlCohortDefinition withPCRTestInNMonths = donePCRTestInFirstNMonths(numberOfMonths);
 
-		
-		c.addSearch("infants", infants, startAndEndDatesMappings());
-		c.addSearch("pcrTest", withPCRTest, startAndEndDatesMappings());
+		addBasicPeriodIndicatorParameters(c);
+		c.addSearch("infants", infants, defaultParameterMappings());
+		c.addSearch("pcrTest", withPCRTest, defaultParameterMappings());
+		c.addSearch("pcrTestInFirst12Months", withPCRTestInNMonths, defaultParameterMappings());
+		c.setCompositionString("infants and pcrTest and pcrTestInFirst12Months");
 
 		return c;
 	}
 
-	public Map<String, Object> startAndEndDatesMappings() {
-		return ParameterizableUtil.createParameterMappings(
-				"startDate=${startDate},endDate=${endDate},onOrAfter=${startDate},onOrBefore=${endDate}");
+	/**
+	 * @TODO infant's first n months not last n months
+	 * @param numberOfMonths
+	 * @return
+	 */
+	private SqlCohortDefinition donePCRTestInFirstNMonths(Integer numberOfMonths) {
+		SqlCohortDefinition sc = new SqlCohortDefinition();
+		String sql = "select distinct o.person_id as patient_id from obs o where o.concept_id = "
+				+ config.getPCRConcept().getConceptId() + " and o.obs_datetime >= (CURRENT_DATE() - INTERVAL "
+				+ numberOfMonths + " MONTH)";
+
+		sc.setName("donePCRTestIn" + numberOfMonths);
+		addBasicPeriodIndicatorParameters(sc);
+		sc.setQuery(sql);
+
+		return sc;
+	}
+
+	public Map<String, Object> defaultParameterMappings() {
+		return ParameterizableUtil
+				.createParameterMappings("startDate=${startDate},endDate=${endDate},location=${location}");
 	}
 }

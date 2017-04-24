@@ -269,6 +269,11 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
 
 		}
+		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS)) == null) {
+			createNewPeriodIndicatorHIVStatusReportFromInBuiltIndicatorMappings();
+
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -379,6 +384,10 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		ReportDefinitionService rDService = Context.getService(ReportDefinitionService.class);
 		PeriodIndicatorReportDefinition onART = (PeriodIndicatorReportDefinition) rDService.getDefinitionByUuid(
 				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART));
+		PeriodIndicatorReportDefinition hivStatus = (PeriodIndicatorReportDefinition) rDService.getDefinitionByUuid(
+				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS));
+		String disableWebReports = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION);
 
 		if (onART == null) {
 			createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
@@ -387,8 +396,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
 						"You have Successfully Created ON ART Report Definition!");
 		} else {
-			if ("true".equals(Context.getAdministrationService()
-					.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION))) {
+			if ("true".equals(disableWebReports)) {
 				runAndPostOnARTReportToDHIS();
 				if (request != null)
 					request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
@@ -409,6 +417,15 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
 							"You have Deleted ON ART Report Definition!");
 			}
+		}
+		if (hivStatus == null) {
+			createNewPeriodIndicatorHIVStatusReportFromInBuiltIndicatorMappings();
+			runAndPostHIVStatusReportToDHIS();
+		} else {
+			if ("true".equals(disableWebReports))
+				runAndPostHIVStatusReportToDHIS();
+			else
+				rDService.purgeDefinition(hivStatus);
 		}
 		runAndPostDynamicReports();
 	}
@@ -484,7 +501,6 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 			createReportDimensions(report, indicators);
 			Context.getService(ReportDefinitionService.class).saveDefinition(report);
-
 		}
 	}
 
@@ -655,46 +671,47 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	@Override
 	public Object sendReportDataToDHIS(Report report, String dataSetId, String period, String orgUnitId,
 			boolean useTestMapper, List<IndicatorMapping> indicatorMappings, IndicatorMappingCategory mappingCategory) {
-		Map<String, DataSet> dataSets = report.getReportData().getDataSets();
-		List<DHISDataValue> dataValues = new ArrayList<DHISDataValue>();
+		if (report != null && report.getReportData() != null) {
+			Map<String, DataSet> dataSets = report.getReportData().getDataSets();
+			List<DHISDataValue> dataValues = new ArrayList<DHISDataValue>();
+			if (dataSets != null && dataSets.size() > 0 && StringUtils.isNotBlank(period)
+					&& StringUtils.isNotBlank(orgUnitId)) {
+				DHISDataValueSet dataValueSet = new DHISDataValueSet();
+				DataSet ds = dataSets.get("defaultDataSet");
+				List<DataSetColumn> columns = ds.getMetaData().getColumns();
+				DataSetRow row = ds.iterator().next();
+				if (indicatorMappings == null)
+					indicatorMappings = getAllIndicatorMappings(null);
 
-		if (dataSets != null && dataSets.size() > 0 && StringUtils.isNotBlank(period)
-				&& StringUtils.isNotBlank(orgUnitId)) {
-			DHISDataValueSet dataValueSet = new DHISDataValueSet();
-			DataSet ds = dataSets.get("defaultDataSet");
-			List<DataSetColumn> columns = ds.getMetaData().getColumns();
-			DataSetRow row = ds.iterator().next();
-			if (indicatorMappings == null)
-				indicatorMappings = getAllIndicatorMappings(null);
+				for (int i = 0; i < columns.size(); i++) {
+					DHISDataValue dv = new DHISDataValue();
+					String column = columns.get(i).getName();
+					IndicatorMapping m = getSpecificMappingFromIndicatorMappings(indicatorMappings, column);
 
-			for (int i = 0; i < columns.size(); i++) {
-				DHISDataValue dv = new DHISDataValue();
-				String column = columns.get(i).getName();
-				IndicatorMapping m = getSpecificMappingFromIndicatorMappings(indicatorMappings, column);
-
-				dv.setValue(row.getColumnValue(column).toString());
-				dv.setComment(column);
-				if (useTestMapper) {
-					dv.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column));
-				} else {
-					if (m != null && m.getCategory() != null && m.getCategory().equals(mappingCategory)) {
-						dv.setDataElement(StringUtils.isBlank(m.getDataelementId()) ? m.getDataelementCode()
-								: m.getDataelementId());
-						dv.setCategoryOptionCombo(StringUtils.isBlank(m.getCategoryoptioncomboUid())
-								? m.getCategoryoptioncomboCode() : m.getCategoryoptioncomboUid());
-					} else
-						dv = null;
+					dv.setValue(row.getColumnValue(column).toString());
+					dv.setComment(column);
+					if (useTestMapper) {
+						dv.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column));
+					} else {
+						if (m != null && m.getCategory() != null && m.getCategory().equals(mappingCategory)) {
+							dv.setDataElement(StringUtils.isBlank(m.getDataelementId()) ? m.getDataelementCode()
+									: m.getDataelementId());
+							dv.setCategoryOptionCombo(StringUtils.isBlank(m.getCategoryoptioncomboUid())
+									? m.getCategoryoptioncomboCode() : m.getCategoryoptioncomboUid());
+						} else
+							dv = null;
+					}
+					if (dv != null)
+						dataValues.add(dv);
 				}
-				if (dv != null)
-					dataValues.add(dv);
-			}
-			dataValueSet.setDataValues(dataValues);
-			dataValueSet.setOrgUnit(orgUnitId);
-			dataValueSet.setPeriod(period);
-			dataValueSet.setDataSet(dataSetId);
+				dataValueSet.setDataValues(dataValues);
+				dataValueSet.setOrgUnit(orgUnitId);
+				dataValueSet.setPeriod(period);
+				dataValueSet.setDataSet(dataSetId);
 
-			if (!dataValueSet.getDataValues().isEmpty())
-				return Context.getService(DHISConnectorService.class).postDataValueSet(dataValueSet);
+				if (!dataValueSet.getDataValues().isEmpty())
+					return Context.getService(DHISConnectorService.class).postDataValueSet(dataValueSet);
+			}
 		}
 		return null;
 	}
@@ -814,6 +831,23 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		Integer locationId = Integer.parseInt(
 				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
 		List<IndicatorMapping> indicatorMappings = filterONARTIndicatorMappings();
+
+		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, periodType, locationId, indicatorMappings,
+				IndicatorMappingCategory.INBUILT);
+	}
+
+	public Object runAndPostHIVStatusReportToDHIS() {
+		String reportUuid = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS);
+		String dataSetId = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_UID);
+		String orgUnitId = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID);
+		String periodType = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_PERIODTYPE);
+		Integer locationId = Integer.parseInt(
+				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
+		List<IndicatorMapping> indicatorMappings = filterHIVStatusIndicatorMappings();
 
 		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, periodType, locationId, indicatorMappings,
 				IndicatorMappingCategory.INBUILT);
@@ -1527,13 +1561,16 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 								mapping.getOpenmrsNumeratorCohortUuid());
 						// denominator is meant to be all pregnant patients but
 						// seems not tracked in Rwanda EMR
-						if (preg != null)
-							indicator.setDenominator(preg, cohorts.startAndEndDatesMappings());
+						if (preg != null) {
+							indicator.setType(IndicatorType.FRACTION);
+							indicator.setDenominator(preg, cohorts.defaultParameterMappings());
+						}
 					} else if (mapping.getDataelementCode().startsWith("PMTCT_EID")) {
 						indicator = saveNewDHISCohortIndicator(mapping.getDataelementCode(),
 								mapping.getDataelementName(), pctTestInFirst12Months, IndicatorType.COUNT,
 								mapping.getOpenmrsNumeratorCohortUuid());
-						indicator.setDenominator(inPMTCTPositive, cohorts.startAndEndDatesMappings());
+						indicator.setType(IndicatorType.FRACTION);
+						indicator.setDenominator(inPMTCTPositive, cohorts.defaultParameterMappings());
 					}
 					if (indicator != null && openmrsReportUuid.equals(mapping.getOpenmrsReportUuid())) {
 						mIndicator = new MappedCohortIndicator(indicator, mapping);

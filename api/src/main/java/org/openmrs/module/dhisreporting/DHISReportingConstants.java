@@ -94,6 +94,9 @@ public class DHISReportingConstants {
 
 	public static String REPORT_UUID_OTHER = "dhisreporting.reporting.othersUuid";
 
+	/**
+	 * TODO maybe rename to be used for the rest of the reports
+	 */
 	public static String DHIS_DATASET_ONART_UID = "dhisreporting.dataset.onARTUid";
 
 	public static String DHIS_DATASET_ONART_PERIODTYPE = "dhisreporting.dataset.onARTPeriodType";

@@ -261,10 +261,5 @@
 		<defaultValue>1553</defaultValue>
 		<description>Concept id for a virologic HIV (PCR) test</description>
 	</globalProperty>
-	<globalProperty>
-		<property>dhisreporting.ageQuery.infant</property>
-		<defaultValue>&lt;=1</defaultValue>
-		<description>age query (e.g; 25+, 20-24, &lt;15, &lt;=30, &gt;45, &gt;=13) for an infant</description>
-	</globalProperty>
 </module>
 
