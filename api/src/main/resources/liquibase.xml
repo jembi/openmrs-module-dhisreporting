@@ -92,16 +92,16 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM
 				scheduler_task_config WHERE schedulable_class =
-				'org.openmrs.module.dhisreporting.scheduler.RunOnARTReportTask';
+				'org.openmrs.module.dhisreporting.scheduler.RunInBuiltReportsTask';
 			</sqlCheck>
 		</preConditions>
-		<comment>Run ON ART PEPFAR MER 2.0 Report every after a quarter</comment>
+		<comment>Run in built PEPFAR MER 2.0 Reports every after a quarter</comment>
 		<insert tableName="scheduler_task_config">
 			<column name="name" value="Run ON ART PEPFAR MER 2.0 Report" />
 			<column name="schedulable_class"
-				value="org.openmrs.module.dhisreporting.scheduler.RunOnARTReportTask" />
+				value="org.openmrs.module.dhisreporting.scheduler.RunInBuiltReportsTask" />
 			<column name="description"
-				value="Scheduled task for Running quarterly ON ART PEPFAR MER 2.0 Report" />
+				value="Scheduled task for Running quarterly in built PEPFAR MER 2.0 Reports" />
 			<column name="start_time" value="2017-01-01 12:00:00" />
 			<column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
 			<column name="repeat_interval" value="7776000" />

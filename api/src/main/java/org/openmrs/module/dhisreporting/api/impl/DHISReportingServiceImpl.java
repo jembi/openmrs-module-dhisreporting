@@ -836,6 +836,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				IndicatorMappingCategory.INBUILT);
 	}
 
+	@Override
 	public Object runAndPostHIVStatusReportToDHIS() {
 		String reportUuid = Context.getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS);

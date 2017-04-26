@@ -162,4 +162,6 @@ public interface DHISReportingService extends OpenmrsService {
 
 	Object runAndPostOnARTReportToDHIS();
 
+	Object runAndPostHIVStatusReportToDHIS();
+
 }
