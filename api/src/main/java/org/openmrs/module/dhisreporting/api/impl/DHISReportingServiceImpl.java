@@ -540,7 +540,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				} else if (DisaggregationCategory.CODED.equals(mapping.getDisaggregationCategory())) {
 					if (mapping.getCodedDisaggQuestion() != null) {
 						CohortDefinitionDimension cd = cohorts.createCodedQuestionDimension(
-								mapping.getCodedDisaggQuestion(), mapping.getCategoryoptioncomboName());
+								mapping.getCodedDisaggQuestion(), mapping.getCategoryoptioncomboName(),
+								mapping.getCodedDisaggAnswer());
 						if (cd != null)
 							disaggregations.add(cd);
 					}

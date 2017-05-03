@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.PatientSetService.TimeModifier;
@@ -23,6 +24,7 @@ import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.EncounterCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.ProgramEnrollmentCohortDefinition;
@@ -273,16 +275,18 @@ public class PatientCohorts {
 		return null;
 	}
 
-	public CohortDefinitionDimension createCodedQuestionDimension(Integer question, String value) {
-		if (question != null && StringUtils.isNotBlank(value)) {
+	public CohortDefinitionDimension createCodedQuestionDimension(Integer question, String stringValue,
+			Integer answer) {
+		if (question != null) {
 			Concept q = Context.getConceptService().getConcept(question);
-			Concept a = CodedDisaggregation.matchCodedQuestionDisaggregation(question, value);
+			Concept a = answer != null ? Context.getConceptService().getConcept(answer)
+					: CodedDisaggregation.matchCodedQuestionDisaggregation(question, stringValue);
 
 			if (q != null && a != null) {
 				CohortDefinitionDimension cd = new CohortDefinitionDimension();
 				CodedObsCohortDefinition qa = createCodedObsCohortDefinition(q, a, SetComparator.IN, TimeModifier.LAST);
 
-				cd.setName(value);
+				cd.setName(stringValue);
 				cd.addCohortDefinition(qa.getName(), qa, defaultParameterMappings());
 
 				return cd;
@@ -317,6 +321,7 @@ public class PatientCohorts {
 					SetComparator.IN, TimeModifier.LAST);
 
 			addBasicPeriodIndicatorParameters(preg);
+
 			return preg;
 		}
 		return null;
@@ -365,5 +370,30 @@ public class PatientCohorts {
 	public Map<String, Object> defaultParameterMappings() {
 		return ParameterizableUtil
 				.createParameterMappings("startDate=${startDate},endDate=${endDate},location=${location}");
+	}
+
+	public EncounterCohortDefinition createEncounterCohortDefinition(String name, EncounterType encounterType) {
+		List<EncounterType> encounters = new ArrayList<EncounterType>();
+		EncounterCohortDefinition encounter = new EncounterCohortDefinition();
+
+		encounters.add(encounterType);
+		encounter.setName(name);
+		encounter.setEncounterTypeList(encounters);
+		addBasicPeriodIndicatorParameters(encounter);
+
+		return encounter;
+	}
+
+	public EncounterCohortDefinition inANC() {
+		EncounterType ancEncType = Context.getAdministrationService()
+				.getGlobalProperty(
+						DHISReportingConstants.ANC_ENCOUNTERTYPE_ID) != null
+								? Context.getEncounterService()
+										.getEncounterType(Integer.parseInt(Context.getAdministrationService()
+												.getGlobalProperty(DHISReportingConstants.ANC_ENCOUNTERTYPE_ID)))
+								: null;
+		if (ancEncType != null)
+			return createEncounterCohortDefinition("inANC", ancEncType);
+		return null;
 	}
 }

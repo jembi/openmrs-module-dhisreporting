@@ -51,6 +51,9 @@ public class IndicatorMapping {
 	@JsonSerialize(include = Inclusion.NON_NULL)
 	private Integer codedDisaggQuestion;
 
+	@JsonSerialize(include = Inclusion.NON_NULL)
+	private Integer codedDisaggAnswer;
+
 	private IndicatorMappingCategory category;
 
 	public enum IndicatorMappingCategory {
@@ -200,6 +203,14 @@ public class IndicatorMapping {
 
 	public void setCodedDisaggQuestion(Integer codedDisaggQuestion) {
 		this.codedDisaggQuestion = codedDisaggQuestion;
+	}
+
+	public Integer getCodedDisaggAnswer() {
+		return codedDisaggAnswer;
+	}
+
+	public void setCodedDisaggAnswer(Integer codedDisaggAnswer) {
+		this.codedDisaggAnswer = codedDisaggAnswer;
 	}
 
 	public IndicatorMappingCategory getCategory() {

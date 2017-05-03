@@ -119,4 +119,6 @@ public class DHISReportingConstants {
 	public static String POST_SAMPLE_DHIS_METADATA = "dhisreporting.dhis.postSampleMetaFromMapping";
 
 	public static String AGEQUERY_INFANT = "dhisreporting.ageQuery.infant";
+	
+	public static String ANC_ENCOUNTERTYPE_ID = "pmtct.encounterType.anc";
 }

@@ -22,9 +22,22 @@ dataelementName|dataelementCode|dataelementId|categoryoptioncomboName|categoryop
 * `inherentDisaggOrder` is used when `disaggregationCategory` is set to `INHERENT` just to specify the order used such as (Age,Gender), the order must be seperated with comma(,) and the key only supported keywords are `Age,Gender,Coded`.
 * `reportingPeriodType` is a DHIS period type to be used to define starting and ending date when running the OpenMRS report and then used raw while posting data to DHIS, current supported values are; `Quarterly`, `Monthly`, `Yearly`, `Weekly` and `Daily`.
 * `codedDisaggQuestion` is the concept id of the question being answered by the value(concept name) set for `categoryoptioncomboName`
+* `codedDisaggAnswer` is the concept id if any that answers `codedDisaggQuestion` instead of concept name
 * `category` is the category for a given indicatpr mapping, currently supports either `INBUILT` or `DYNAMIC`, for `DYNAMIC` the period report indicator codes must match the `dataelementCode`__DisaggregationName format e.g; `TX_CURR_N_DSD_Age_Sex__ONETOFOUROFAGE__FEMALE`, `TX_CURR_N_TA_Age_Sex_TARGET__FIFTEENANDABOVEOFAGE__FEMALE`, `TX_CURR_N_TA_NARRATIVE`, it is recommended that each mapping entry have a unique `dataelementCode`
 * The rest of the fields should be self eplanatory by their names
 
+> Generating mappings from DHIS metadata
+
+* You can export a CSV version of an SQLView of the Postgress SQL below;
+```
+select coalesce(de.name, '') as dataelementName, coalesce(de.code, '') as dataelementCode, coalesce(de.uid, '') as dataelementId, coalesce(coc.name, '') as categoryoptioncomboName, coalesce(coc.code, '') as categoryoptioncomboCode, coalesce(coc.uid, '') as categoryoptioncomboUid, coalesce(ds.uid, '') as dataset, '' as disaggregationCategory, 'FALSE' as activeString, '' as openmrsReportUuid, '' as openmrsNumeratorCohortUuid, '' as openmrsDenominatorCohortUuid, '' as inherentDisaggOrder, 'Quarterly' as reportingPeriodType, '' as codedDisaggQuestion, '' as codedDisaggAnswer, 'INBUILT' as category
+from categoryoptioncombo coc
+inner join categorycombos_optioncombos ccoc on ccoc.categoryoptioncomboid = coc.categoryoptioncomboid
+inner join dataelement de on de.categorycomboid = ccoc.categorycomboid
+inner join dataset ds on ds.categorycomboid = ccoc.categorycomboid
+order by dataset, dataelementId
+```
+* Fill in the remaining details and make any corrections
 
 # Module Status
 
