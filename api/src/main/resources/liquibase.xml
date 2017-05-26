@@ -109,7 +109,7 @@
 			<column name="started" value="1" />
 			<column name="created_by" value="1" />
 			<column name="date_created" value="2017-04-19 16:09:00" />
-			<column name="uuid" value="b9c23a8e-2502-11e7-93ae-92361f002671" />
+			<column name="uuid" value="b9c23a8e-2502-11e7-93ae-92361f003333" />
 		</insert>
 	</changeSet>
 	<changeSet id="190420171613" author="k-joseph">
@@ -133,7 +133,22 @@
 			<column name="started" value="1" />
 			<column name="created_by" value="1" />
 			<column name="date_created" value="2017-04-19 16:17:00" />
-			<column name="uuid" value="b9c23840-2502-11e7-93ae-92361f002671" />
+			<column name="uuid" value="b9c23840-2502-11e7-93ae-92361f002222" />
 		</insert>
+	</changeSet>
+	<changeSet id="2017May251743" author="k-joseph">
+		<preConditions>
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM scheduler_task_config WHERE schedulable_class =
+					'org.openmrs.module.dhisreporting.scheduler.RunOnARTReportTask';
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>Deleting RunOnARTReportTask</comment>
+		<sql>
+			DELETE FROM scheduler_task_config WHERE schedulable_class =
+			'org.openmrs.module.dhisreporting.scheduler.RunOnARTReportTask';
+		</sql>
 	</changeSet>
 </databaseChangeLog>

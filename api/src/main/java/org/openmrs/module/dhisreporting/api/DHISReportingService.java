@@ -92,10 +92,9 @@ public interface DHISReportingService extends OpenmrsService {
 	/**
 	 * @should rightly handle an ageQuery and create an ageRange object from it
 	 * @param ageQuery
-	 * @param ageUnit
 	 * @return
 	 * @see DHISReportingServiceImpl#convertAgeQueryToAgeRangeObject(String,
-	 *      DurationUnit)
+	 *      DurationUnit, DurationUnit)
 	 */
 	AgeRange convertAgeQueryToAgeRangeObject(String ageQuery, DurationUnit minAgeUnit, DurationUnit maxAgeUnit);
 
@@ -109,8 +108,6 @@ public interface DHISReportingService extends OpenmrsService {
 	/**
 	 * @should Parse JSONArray From FileSystem into List of MerIndicator objects
 	 * @param merIndicatorsFileLocation
-	 * @param startingIndex
-	 * @param endindIndex
 	 * @return
 	 */
 	List<MerIndicator> getMerIndicators(String merIndicatorsFileLocation, Integer startingFrom, Integer endingAt);
@@ -124,7 +121,6 @@ public interface DHISReportingService extends OpenmrsService {
 	 *         dhis data elements
 	 * @param mappings
 	 * @param mappingFileLocation
-	 * @param active
 	 * @param disaggs
 	 * @param openmrsReportUuid
 	 * @param dataElementPrefixs

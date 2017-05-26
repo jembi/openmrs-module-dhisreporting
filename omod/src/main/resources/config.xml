@@ -261,5 +261,10 @@
 		<defaultValue>1553</defaultValue>
 		<description>Concept id for a virologic HIV (PCR) test</description>
 	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.reporting.ancUuid</property>
+		<defaultValue>f538d57f-fb90-4941-82f5-2fbb769d1deb</defaultValue>
+		<description>OpenMRS ANC report unique identifier</description>
+	</globalProperty>
 </module>
 

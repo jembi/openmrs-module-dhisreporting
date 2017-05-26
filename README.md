@@ -24,6 +24,7 @@ dataelementName|dataelementCode|dataelementId|categoryoptioncomboName|categoryop
 * `codedDisaggQuestion` is the concept id of the question being answered by the value(concept name) set for `categoryoptioncomboName`
 * `codedDisaggAnswer` is the concept id if any that answers `codedDisaggQuestion` instead of concept name
 * `category` is the category for a given indicatpr mapping, currently supports either `INBUILT` or `DYNAMIC`, for `DYNAMIC` the period report indicator codes must match the `dataelementCode`__DisaggregationName format e.g; `TX_CURR_N_DSD_Age_Sex__ONETOFOUROFAGE__FEMALE`, `TX_CURR_N_TA_Age_Sex_TARGET__FIFTEENANDABOVEOFAGE__FEMALE`, `TX_CURR_N_TA_NARRATIVE`, it is recommended that each mapping entry have a unique `dataelementCode`
+* `baseCohort` is a categorisation of the cohort; currently can be; `ANC, ONART, HIVSTATUS, PREVENTION, OTHERS`, its a way for the `INBUILT` indicators to be assigned at-least a 'base' cohort definition 
 * The rest of the fields should be self eplanatory by their names
 
 > Generating mappings from DHIS metadata
@@ -37,7 +38,21 @@ inner join dataelement de on de.categorycomboid = ccoc.categorycomboid
 inner join dataset ds on ds.categorycomboid = ccoc.categorycomboid
 order by dataset, dataelementId
 ```
-* Fill in the remaining details and make any corrections
+* Fill in the remaining details and make any corrections/editions such as excluding some datasets et-cetera
+* Here is a sample RHMIS ANC mappings output generator
+
+```
+select coalesce(de.name, '') as dataelementName, coalesce(de.code, '') as dataelementCode, coalesce(de.uid, '') as dataelementId, coalesce(coc.name, '') as categoryoptioncomboName, coalesce(coc.code, '') as categoryoptioncomboCode, coalesce(coc.uid, '') as categoryoptioncomboUid, coalesce(ds.uid, '') as dataset, '' as disaggregationCategory, 'FALSE' as activeString, '' as openmrsReportUuid, '' as openmrsNumeratorCohortUuid, '' as openmrsDenominatorCohortUuid, '' as inherentDisaggOrder, 'Monthly' as reportingPeriodType, '' as codedDisaggQuestion, '' as codedDisaggAnswer, 'INBUILT' as category
+from dataelement de
+inner join categorycombo cc on cc.categorycomboid = de.categorycomboid
+inner join dataset ds on cc.categorycomboid = ds.categorycomboid
+inner join categorycombos_optioncombos ccoc on cc.categorycomboid = ccoc.categorycomboid
+inner join categoryoptioncombo coc on ccoc.categoryoptioncomboid = coc.categoryoptioncomboid
+inner join dataelementgroupmembers degm on de.dataelementid = degm.dataelementid
+inner join dataelementgroup deg on degm.dataelementgroupid = deg.dataelementgroupid
+where ds.uid = 'ygTEbJWQhqf' and deg.uid = 'AlzCrr1AvUe'
+order by dataset, dataelementId
+```
 
 # Module Status
 
@@ -59,5 +74,5 @@ TODO
 
 # License
 
-[![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png)](https://creativecommons.org/publicdomain/zero/1.0/)
+[![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png)](http://jembi.org)
 [MPL 2.0 w/ HD](http://openmrs.org/license/) © [OpenMRS Inc.](http://www.openmrs.org/)

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.openmrs.module.reporting.cohort.definition.BaseCohortDefinition;
 
 /**
  * Represents a general OpenMRS to DHIS 2 Indicator/dataelement mapping starting
@@ -54,10 +55,16 @@ public class IndicatorMapping {
 	@JsonSerialize(include = Inclusion.NON_NULL)
 	private Integer codedDisaggAnswer;
 
+	private BaseCohort baseCohort;
+
 	private IndicatorMappingCategory category;
 
 	public enum IndicatorMappingCategory {
 		INBUILT, DYNAMIC
+	}
+
+	public enum BaseCohort {
+		ANC, ONART, HIVSTATUS, PREVENTION, OTHERS
 	}
 
 	/**
@@ -219,6 +226,14 @@ public class IndicatorMapping {
 
 	public void setCategory(IndicatorMappingCategory category) {
 		this.category = category;
+	}
+
+	public BaseCohort getBaseCohort() {
+		return baseCohort;
+	}
+
+	public void setBaseCohort(BaseCohort baseCohort) {
+		this.baseCohort = baseCohort;
 	}
 
 }

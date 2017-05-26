@@ -35,6 +35,7 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.ParameterizableUtil;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 
+//TODO review SQL JOINS in here
 public class PatientCohorts {
 	private Configurations config = new Configurations();
 
@@ -204,7 +205,7 @@ public class PatientCohorts {
 				SetComparator.IN, TimeModifier.LAST);
 	}
 
-	private CodedObsCohortDefinition createCodedObsCohortDefinition(Concept question, Concept value,
+	public CodedObsCohortDefinition createCodedObsCohortDefinition(Concept question, Concept value,
 			SetComparator setComparator, TimeModifier timeModifier) {
 		if (question != null) {
 			CodedObsCohortDefinition obsCohortDefinition = new CodedObsCohortDefinition();
@@ -233,8 +234,7 @@ public class PatientCohorts {
 	}
 
 	/**
-	 * 
-	 * @param genders
+	 *
 	 * @return
 	 */
 	public CohortDefinitionDimension createGenderDimension(String gender) {
@@ -387,10 +387,10 @@ public class PatientCohorts {
 	public EncounterCohortDefinition inANC() {
 		EncounterType ancEncType = Context.getAdministrationService()
 				.getGlobalProperty(
-						DHISReportingConstants.ANC_ENCOUNTERTYPE_ID) != null
+						DHISReportingConstants.ANC_REPORT_UUID) != null
 								? Context.getEncounterService()
 										.getEncounterType(Integer.parseInt(Context.getAdministrationService()
-												.getGlobalProperty(DHISReportingConstants.ANC_ENCOUNTERTYPE_ID)))
+												.getGlobalProperty(DHISReportingConstants.ANC_REPORT_UUID)))
 								: null;
 		if (ancEncType != null)
 			return createEncounterCohortDefinition("inANC", ancEncType);

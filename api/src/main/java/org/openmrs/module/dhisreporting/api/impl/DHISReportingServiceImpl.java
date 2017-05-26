@@ -75,7 +75,9 @@ import org.openmrs.module.dhisreporting.ReportingPeriodType;
 import org.openmrs.module.dhisreporting.WordToNumber;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.api.db.DHISReportingDAO;
+import org.openmrs.module.dhisreporting.mapping.CodedDisaggregation;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
+import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.BaseCohort;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.IndicatorMappingCategory;
 import org.openmrs.module.dhisreporting.mer.MerIndicator;
@@ -88,6 +90,7 @@ import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinitio
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DurationUnit;
+import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -149,10 +152,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	/**
-	 * 
+	 *
 	 * @param concept
-	 * @param location
-	 * @param startDate
 	 * @param
 	 * @return cohort, cohort.size() returns evaluated number of patients
 	 *         returned
@@ -376,7 +377,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	/**
 	 * TODO add all reports as they get supported
-	 * 
+	 *
 	 * @param request
 	 */
 	@Override
@@ -455,9 +456,6 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	/**
 	 * TODO refactor/mimic this same approach for the rest of the reports clear
 	 * also including generation of any user's added reports
-	 * 
-	 * @param reportDefinitionUuid
-	 * @param mappings
 	 */
 	@Override
 	public void createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings() {
@@ -1111,7 +1109,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	/**
-	 * 
+	 *
 	 * @param ageQuery,
 	 *            examples include;15-19, 20-24, 25-49, >=50, <1
 	 * @return
@@ -1141,7 +1139,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 * Acts as the runtime MER indicators database;<br />
 	 * Should be Invoked when adding, editing, deleting or doing any mer
 	 * indicators manipulations
-	 * 
+	 *
 	 * @param startingFrom,
 	 *            item number based on size to start from just as when paging
 	 * @param endindAt,
@@ -1172,6 +1170,11 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return merIndicators;
 	}
 
+	/**
+	 * TODO is the indicator code the best unique property,
+	 * this method would return the first found indicator with the reqeusted code incase,
+	 * probably dataelement id is better being used
+	 */
 	@Override
 	public MerIndicator getMerIndicator(String code) {
 		if (StringUtils.isNotBlank(code)) {
@@ -1188,7 +1191,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	/**
 	 * Reads mappings from pepfar-meta-datim csv file, parses them to jackson to
 	 * map them to IndicatorMapping list
-	 * 
+	 *
 	 * @param mappingFileLocation,
 	 *            excell mappings file
 	 * @return
@@ -1228,7 +1231,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	/**
 	 * indicatorMappings is provided to use less memory which would be used to
 	 * re-load the csv mapping file
-	 * 
+	 *
 	 * filters out all mappings with no data elements ids
 	 */
 	@Override
@@ -1263,7 +1266,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	/**
-	 * 
+	 *
 	 * @param indicatorMappings
 	 * @param mappingFileLocation
 	 * @param dataelementCode
@@ -1307,7 +1310,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	/**
 	 * TODO rewrite posting metadata compressed resource
-	 * 
+	 *
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -1473,7 +1476,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	/**
 	 * TODO do further restrictions and checking here, the reports must exist
 	 * and their indicator codes match the indicatormappings dataelementcodes
-	 * 
+	 *
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -1601,9 +1604,83 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return filteredMappings;
 	}
 
+	public void createNewPeriodIndicatorANCReportFromInBuiltIndicatorMappings() {
+		String openmrsReportUuid = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.ANC_REPORT_UUID);
+		// creating cohort indicators
+		PeriodIndicatorReportDefinition report = (PeriodIndicatorReportDefinition) Context
+				.getService(ReportDefinitionService.class).getDefinitionByUuid(openmrsReportUuid);
+		String reportName = "RHMIS ANC";
+		String reportDescription = "RHMIS ANC report";
+
+		if (report == null) {
+			report = initPeriodIndicatorReport(openmrsReportUuid, reportName, reportDescription);
+
+			List<IndicatorMapping> filteredMappings = filterANCIndicatorMappings();
+			List<MappedCohortIndicator> indicators = new ArrayList<MappedCohortIndicator>();
+
+			for (IndicatorMapping mapping : filteredMappings) {
+				CohortIndicator indicator = null;
+				MappedCohortIndicator mIndicator = null;
+
+				if (mapping.getCategory() != null && mapping.getCategory().equals(IndicatorMappingCategory.INBUILT)) {
+					if (mapping.getDataelementCode().startsWith("ANC")) {
+						CohortDefinition baseCohortDefinition = mapping.getBaseCohort().equals(BaseCohort.ANC)
+								? cohorts.inANC() : null;
+						CompositionCohortDefinition cd = new CompositionCohortDefinition();
+						String cdQuery = "";
+
+						if (baseCohortDefinition != null) {
+							cd.addSearch("inANC", baseCohortDefinition, cohorts.defaultParameterMappings());
+							cdQuery += "inANC";
+						}
+						if (mapping.getCodedDisaggQuestion() != null) {
+							CohortDefinition cd1 = cohorts.createCodedObsCohortDefinition(
+									Context.getConceptService().getConcept(mapping.getCodedDisaggQuestion()),
+									mapping.getCodedDisaggAnswer() != null
+											? Context.getConceptService().getConcept(mapping.getCodedDisaggAnswer())
+											: CodedDisaggregation.matchCodedQuestionDisaggregation(
+													mapping.getCodedDisaggQuestion(),
+													mapping.getCategoryoptioncomboName()),
+									SetComparator.IN, TimeModifier.LAST);
+							cd.addSearch(cd1.getName(), cd1, cohorts.defaultParameterMappings());
+							cdQuery += StringUtils.isBlank(cdQuery) ? cd1.getName() : " and " + cd1.getName();
+						}
+
+						cd.setCompositionString(cdQuery);
+						indicator = saveNewDHISCohortIndicator(mapping.getDataelementCode(),
+								mapping.getDataelementName(), cd, IndicatorType.COUNT,
+								mapping.getOpenmrsNumeratorCohortUuid());
+						//TODO proceed
+					}
+					if (indicator != null && openmrsReportUuid.equals(mapping.getOpenmrsReportUuid())) {
+						mIndicator = new MappedCohortIndicator(indicator, mapping);
+						indicators.add(mIndicator);
+					}
+				}
+			}
+			createReportDimensions(report, indicators);
+			Context.getService(ReportDefinitionService.class).saveDefinition(report);
+		}
+	}
+
+	private List<IndicatorMapping> filterANCIndicatorMappings() {
+		String ancReportUuid = Context.getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.ANC_REPORT_UUID);
+		List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
+		List<String> dataElementPrefixs = new ArrayList<String>();
+
+		addSupportedDisaggregations(disaggs);
+		dataElementPrefixs.add("ANC");
+
+		List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null, disaggs, ancReportUuid,
+				dataElementPrefixs);
+		return filteredMappings;
+	}
+
 	/**
 	 * TODO only question-answer coded are supported, support the rest
-	 * 
+	 *
 	 * @param disaggs
 	 */
 	private void addSupportedDisaggregations(List<DisaggregationCategory> disaggs) {

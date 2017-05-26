@@ -1,7 +1,9 @@
 package org.openmrs.module.dhisreporting;
 
 import java.io.File;
+import java.util.UUID;
 
+import org.hibernate.id.GUIDGenerator;
 import org.openmrs.util.OpenmrsUtil;
 
 public class DHISReportingConstants {
@@ -94,6 +96,8 @@ public class DHISReportingConstants {
 
 	public static String REPORT_UUID_OTHER = "dhisreporting.reporting.othersUuid";
 
+	public static String REPORT_UUID_ANC = "dhisreporting.reporting.ancUuid";
+
 	/**
 	 * TODO maybe rename to be used for the rest of the reports
 	 */
@@ -119,6 +123,7 @@ public class DHISReportingConstants {
 	public static String POST_SAMPLE_DHIS_METADATA = "dhisreporting.dhis.postSampleMetaFromMapping";
 
 	public static String AGEQUERY_INFANT = "dhisreporting.ageQuery.infant";
-	
-	public static String ANC_ENCOUNTERTYPE_ID = "pmtct.encounterType.anc";
+
+	public static String ANC_REPORT_UUID = "pmtct.encounterType.anc";
+
 }
