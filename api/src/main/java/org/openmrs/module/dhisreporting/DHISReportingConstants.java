@@ -1,10 +1,8 @@
 package org.openmrs.module.dhisreporting;
 
-import java.io.File;
-import java.util.UUID;
-
-import org.hibernate.id.GUIDGenerator;
 import org.openmrs.util.OpenmrsUtil;
+
+import java.io.File;
 
 public class DHISReportingConstants {
 
@@ -103,7 +101,9 @@ public class DHISReportingConstants {
 	 */
 	public static String DHIS_DATASET_ONART_UID = "dhisreporting.dataset.onARTUid";
 
-	public static String DHIS_DATASET_ONART_PERIODTYPE = "dhisreporting.dataset.onARTPeriodType";
+	public static String DHIS_DATASET_QUARTERY_PERIODTYPE = "dhisreporting.dataset.onARTPeriodType";
+
+	public static String DHIS_DATASET_MONTHLY_PERIODTYPE = "dhisreporting.dataset.monthlyPeriodType";
 
 	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
 
@@ -124,6 +124,8 @@ public class DHISReportingConstants {
 
 	public static String AGEQUERY_INFANT = "dhisreporting.ageQuery.infant";
 
-	public static String ANC_REPORT_UUID = "pmtct.encounterType.anc";
+	public static String ENCOUNTERTYPE_ANC_REPORT_UUID = "pmtct.encounterType.anc";
+
+	public static String DISABLE_BASE_COHORTS = "dhisreporting.baseCohort.disable";
 
 }

@@ -1,10 +1,5 @@
 package org.openmrs.module.dhisreporting.reporting;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
@@ -12,28 +7,20 @@ import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.PatientSetService.TimeModifier;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.dhisreporting.AgeRange;
-import org.openmrs.module.dhisreporting.Configurations;
-import org.openmrs.module.dhisreporting.DHISReportingConstants;
-import org.openmrs.module.dhisreporting.Gender;
-import org.openmrs.module.dhisreporting.NumberToWord;
-import org.openmrs.module.dhisreporting.WordToNumber;
+import org.openmrs.module.dhisreporting.*;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
 import org.openmrs.module.dhisreporting.mapping.CodedDisaggregation;
-import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.EncounterCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.ProgramEnrollmentCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.*;
 import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.evaluation.parameter.ParameterizableUtil;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 //TODO review SQL JOINS in here
 public class PatientCohorts {
@@ -213,12 +200,7 @@ public class PatientCohorts {
 
 			// TODO is using onOrBefore equal to making use of endDate!!!
 			addBasicPeriodIndicatorParameters(obsCohortDefinition);
-			if (question.getName() != null && value != null && value.getName() != null)
-				obsCohortDefinition.setName(
-						value.getName().getName().replace(" ", "") + question.getName().getName().replace(" ", ""));
-			else
-				obsCohortDefinition.setName(
-						"codedCohort#" + question.getConceptId() + (value != null ? "_" + value.getConceptId() : ""));
+			obsCohortDefinition.setName(question.getConceptId() + (value != null ? "" + value.getConceptId() : ""));
 			obsCohortDefinition.setQuestion(question);
 			obsCohortDefinition.setOperator(setComparator);
 			obsCohortDefinition.setTimeModifier(timeModifier);
@@ -286,7 +268,7 @@ public class PatientCohorts {
 				CohortDefinitionDimension cd = new CohortDefinitionDimension();
 				CodedObsCohortDefinition qa = createCodedObsCohortDefinition(q, a, SetComparator.IN, TimeModifier.LAST);
 
-				cd.setName(stringValue);
+				cd.setName(qa.getName());
 				cd.addCohortDefinition(qa.getName(), qa, defaultParameterMappings());
 
 				return cd;
@@ -387,10 +369,10 @@ public class PatientCohorts {
 	public EncounterCohortDefinition inANC() {
 		EncounterType ancEncType = Context.getAdministrationService()
 				.getGlobalProperty(
-						DHISReportingConstants.ANC_REPORT_UUID) != null
+						DHISReportingConstants.ENCOUNTERTYPE_ANC_REPORT_UUID) != null
 								? Context.getEncounterService()
 										.getEncounterType(Integer.parseInt(Context.getAdministrationService()
-												.getGlobalProperty(DHISReportingConstants.ANC_REPORT_UUID)))
+												.getGlobalProperty(DHISReportingConstants.ENCOUNTERTYPE_ANC_REPORT_UUID)))
 								: null;
 		if (ancEncType != null)
 			return createEncounterCohortDefinition("inANC", ancEncType);

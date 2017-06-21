@@ -148,8 +148,7 @@
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>dhisreporting.configuredDHISOrgUnitUIdMatchingDefaultLocation
-		</property>
+		<property>dhisreporting.configuredDHISOrgUnitUIdMatchingDefaultLocation</property>
 		<defaultValue>vjFcsoL24z5</defaultValue>
 		<description>Configured organization unit code (the real id is mapped
 			in the dhis-mappings.properties file) or fos id in Rwanda that
@@ -265,6 +264,16 @@
 		<property>dhisreporting.reporting.ancUuid</property>
 		<defaultValue>f538d57f-fb90-4941-82f5-2fbb769d1deb</defaultValue>
 		<description>OpenMRS ANC report unique identifier</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.baseCohort.disable</property>
+		<defaultValue>false</defaultValue>
+		<description>Set to true to disable use of base cohorts set in the mappings</description>
+	</globalProperty>
+	<globalProperty>
+	<property>dhisreporting.dataset.monthlyPeriodType</property>
+		<defaultValue>Monthly</defaultValue>
+		<description>DHIS2 monthly period type</description>
 	</globalProperty>
 </module>
 

@@ -13,17 +13,6 @@
  */
 package org.openmrs.module.dhisreporting.web.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +32,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main controller.
@@ -91,11 +86,12 @@ public class DHISReportingManageController {
 
 	@RequestMapping(value = "/module/dhisreporting/pepfar", method = RequestMethod.GET)
 	public void pepfar(ModelMap model) {
+		model.addAttribute("response", new ArrayList<String>());
 	}
 
 	@RequestMapping(value = "/module/dhisreporting/pepfar", method = RequestMethod.POST)
 	public void submitPepfar(ModelMap model, HttpServletRequest request) {
-		Context.getService(DHISReportingService.class).pepfarPage(request);
+		model.addAttribute("response", Context.getService(DHISReportingService.class).pepfarPage(request));
 	}
 
 	@RequestMapping(value = "/module/dhisreporting/dynamicReports", method = RequestMethod.GET)

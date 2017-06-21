@@ -24,7 +24,7 @@ dataelementName|dataelementCode|dataelementId|categoryoptioncomboName|categoryop
 * `codedDisaggQuestion` is the concept id of the question being answered by the value(concept name) set for `categoryoptioncomboName`
 * `codedDisaggAnswer` is the concept id if any that answers `codedDisaggQuestion` instead of concept name
 * `category` is the category for a given indicatpr mapping, currently supports either `INBUILT` or `DYNAMIC`, for `DYNAMIC` the period report indicator codes must match the `dataelementCode`__DisaggregationName format e.g; `TX_CURR_N_DSD_Age_Sex__ONETOFOUROFAGE__FEMALE`, `TX_CURR_N_TA_Age_Sex_TARGET__FIFTEENANDABOVEOFAGE__FEMALE`, `TX_CURR_N_TA_NARRATIVE`, it is recommended that each mapping entry have a unique `dataelementCode`
-* `baseCohort` is a categorisation of the cohort; currently can be; `ANC, ONART, HIVSTATUS, PREVENTION, OTHERS`, its a way for the `INBUILT` indicators to be assigned at-least a 'base' cohort definition 
+* `baseCohort` is a categorisation of the cohort; currently can be; `ANC, ONART, HIVSTATUS, PREVENTION, OTHERS`, its a way for the `INBUILT` indicators to be assigned at-least one ('base') cohort definition 
 * The rest of the fields should be self eplanatory by their names
 
 > Generating mappings from DHIS metadata

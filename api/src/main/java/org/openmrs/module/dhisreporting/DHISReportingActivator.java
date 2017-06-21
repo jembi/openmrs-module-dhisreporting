@@ -13,9 +13,6 @@
  */
 package org.openmrs.module.dhisreporting;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +21,9 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.ModuleActivator;
 import org.openmrs.module.dhisconnector.api.DHISConnectorService;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * This class contains the logic that is run every time this module is either
@@ -100,7 +100,7 @@ public class DHISReportingActivator implements ModuleActivator {
 	 */
 	public void stopped() {
 		log.info("DHIS Reporting Module stopped");
-		// Context.getService(DHISReportingService.class).pepfarPage(null);
+		Context.getService(DHISReportingService.class).deleteAllDHISReportingReports();
 	}
 
 }

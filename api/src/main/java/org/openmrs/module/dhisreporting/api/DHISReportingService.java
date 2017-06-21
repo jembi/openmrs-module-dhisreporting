@@ -13,12 +13,6 @@
  */
 package org.openmrs.module.dhisreporting.api;
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.openmrs.Concept;
@@ -41,6 +35,11 @@ import org.openmrs.module.reporting.indicator.CohortIndicator.IndicatorType;
 import org.openmrs.module.reporting.report.Report;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.util.Date;
+import java.util.List;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean
@@ -131,7 +130,7 @@ public interface DHISReportingService extends OpenmrsService {
 
 	void createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
 
-	void pepfarPage(HttpServletRequest request);
+	List<String> pepfarPage(HttpServletRequest request);
 
 	IndicatorMapping getIndicatorMapping(List<IndicatorMapping> indicatorMappings, String mappingFileLocation,
 			String dataelementCode, String categoryoptioncomboName);
@@ -154,10 +153,13 @@ public interface DHISReportingService extends OpenmrsService {
 
 	JSONArray getMappedIndicatorReportExistingMeta();
 
-	void runAndPostDynamicReports();
+	List<Object> runAndPostDynamicReports();
 
 	Object runAndPostOnARTReportToDHIS();
 
 	Object runAndPostHIVStatusReportToDHIS();
 
+	public void deleteAllDHISReportingReports();
+
+	public Object runAndPostANCReportToDHIS();
 }
