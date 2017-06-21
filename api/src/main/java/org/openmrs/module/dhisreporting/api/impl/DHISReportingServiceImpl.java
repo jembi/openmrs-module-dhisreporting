@@ -371,7 +371,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART));
 		PeriodIndicatorReportDefinition hivStatus = (PeriodIndicatorReportDefinition) rDService.getDefinitionByUuid(
 				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS));
-		String disableWebReports = Context.getAdministrationService()
+		String disableWebReportsDeletion = Context.getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION);
 		PeriodIndicatorReportDefinition anc = (PeriodIndicatorReportDefinition) rDService.getDefinitionByUuid(
 				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC));
@@ -388,51 +388,43 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		String dhisMonthlyPeriodType = Context.getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_MONTHLY_PERIODTYPE);
 
-		if (onART == null) {
-			createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
-			onARTResp = runAndPostOnARTReportToDHIS();
+		if ("false".equals(disableWebReportsDeletion)) {
+			deletePeriodIndicatorReport(onART);
+			deletePeriodIndicatorReport(hivStatus);
+			deletePeriodIndicatorReport(anc);
+			if (request != null)
+				request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
+						"You have Successfully Deleted DHISReporting Reports");
+		} else {
+			if (onART == null) {
+				createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
+				onARTResp = runAndPostOnARTReportToDHIS();
+			} else {
+				onARTResp = runAndPostOnARTReportToDHIS();
+			}
+			if (hivStatus == null) {
+				createNewPeriodIndicatorHIVStatusReportFromInBuiltIndicatorMappings();
+				hivStatusResp = runAndPostHIVStatusReportToDHIS();
+			} else {
+				hivStatusResp = runAndPostHIVStatusReportToDHIS();
+			}
+			if (anc == null) {
+				createNewPeriodIndicatorANCReportFromInBuiltIndicatorMappings();
+				ancResp = runAndPostANCReportToDHIS();
+			} else {
+				ancResp = runAndPostANCReportToDHIS();
+			}
+			response.add(getPostSummary(onARTResp));
+			response.add(getPostSummary(hivStatusResp));
+			response.add(getPostSummary(ancResp));
+			for (Object o : runAndPostDynamicReports()) {
+				response.add(getPostSummary(o));
+			}
+
 			if (request != null)
 				request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
-						"You have Successfully Created ON ART Report Definition!");
-		} else {
-			if ("true".equals(disableWebReports)) {
-				onARTResp = runAndPostOnARTReportToDHIS();
-				if (request != null)
-					request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
-							"You have Successfully Run and posted Reports");
-			} else {
-				deletePeriodIndicatorReport(onART);
-				if (request != null)
-					request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
-							"You have Deleted ON ART Report Definition!");
-			}
+						"You have Successfully Run and posted/logged DHISReporting Reports");
 		}
-		if (hivStatus == null) {
-			createNewPeriodIndicatorHIVStatusReportFromInBuiltIndicatorMappings();
-			hivStatusResp = runAndPostHIVStatusReportToDHIS();
-		} else {
-			if ("true".equals(disableWebReports))
-				hivStatusResp = runAndPostHIVStatusReportToDHIS();
-			else
-				rDService.purgeDefinition(hivStatus);
-		}
-		if (anc == null) {
-			createNewPeriodIndicatorANCReportFromInBuiltIndicatorMappings();
-			ancResp = runAndPostANCReportToDHIS();
-		} else {
-			if ("true".equals(disableWebReports))
-				ancResp = runAndPostANCReportToDHIS();
-			else
-				rDService.purgeDefinition(anc);
-		}
-        response.add(getPostSummary(onARTResp));
-        response.add(getPostSummary(hivStatusResp));
-        response.add(getPostSummary(ancResp));
-
-		for(Object o : runAndPostDynamicReports()) {
-			response.add(getPostSummary(o));
-		}
-
 		return response;
 	}
 

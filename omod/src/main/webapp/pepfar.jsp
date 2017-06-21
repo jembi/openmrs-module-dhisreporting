@@ -11,7 +11,7 @@
 </style>
 
 <form method="post">
-	<input type="submit" value="Generate & Post or Delete All Pepfar reports">
+	<input type="submit" value="Generate & Post or Delete All DHISReporting reports">
 </form>
 
 <br />
