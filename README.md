@@ -73,6 +73,9 @@ TODO
   - [ ] Create inbuilt support for all the four default reports
   
 
+# References
+ - [First presentation](http://rebrand.ly/drPresentation)
+
 # License
 
 [![CC0](https://licensebuttons.net/p/zero/1.0/88x31.png)](http://jembi.org)
