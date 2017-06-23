@@ -126,7 +126,7 @@ public interface DHISReportingService extends OpenmrsService {
 	 * @return filtered indicatorMappings
 	 */
 	List<IndicatorMapping> getIndicatorMappings(List<IndicatorMapping> mappings, String mappingFileLocation,
-			List<DisaggregationCategory> disaggs, String openmrsReportUuid, List<String> dataElementPrefixs);
+			List<DisaggregationCategory> disaggs, String openmrsReportUuid, List<String> dataElementPrefixs, String dataset);
 
 	void createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
 

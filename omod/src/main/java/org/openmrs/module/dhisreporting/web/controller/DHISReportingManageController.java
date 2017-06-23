@@ -14,17 +14,25 @@
 package org.openmrs.module.dhisreporting.web.controller;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.Location;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.SerializedObject;
 import org.openmrs.module.dhisconnector.api.DHISConnectorService;
 import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.MappedIndicatorReport;
+import org.openmrs.module.dhisreporting.ReportingPeriodType;
 import org.openmrs.module.dhisreporting.api.DHISReportingService;
+import org.openmrs.module.reporting.definition.service.SerializedDefinitionService;
+import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -37,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -99,20 +108,47 @@ public class DHISReportingManageController {
 		List<MappedIndicatorReport> allMappedIndicatorReports = Context.getService(DHISReportingService.class)
 				.getAllMappedIndicatorReports();
 
-		model.addAttribute("mappingsMeta",
-				Context.getService(DHISReportingService.class).getMappedIndicatorReportExistingMeta().toJSONString());
-		try {
-			model.addAttribute("mappedIndicatorReports",
-					new ObjectMapper().writeValueAsString(allMappedIndicatorReports));
-		} catch (JsonGenerationException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		basicAttributes(model, allMappedIndicatorReports);
 	}
 
+	@RequestMapping(value = "/module/dhisreporting/dynamicReports", method = RequestMethod.POST)
+	public void postDynamicReportsPage(ModelMap model, HttpServletRequest request) {
+		SerializedObject report = Context.getService(SerializedDefinitionService.class).getSerializedDefinitionByUuid(request.getParameter("mappingReport"));
+		Location location = Context.getLocationService().getLocationByUuid(request.getParameter("mappingLocation"));
+		MappedIndicatorReport m = new MappedIndicatorReport(request.getParameter("mappingPrefixes"), request.getParameter("mappingCategories"), report,
+				location, request.getParameter("mappingPeriodType"), request.getParameter("mappingOrgUnit"), request.getParameter("mappingDataset"));
+		String response = "";
+
+		if(request.getParameterValues("mappingIds") != null) {
+			for (String s : request.getParameterValues("mappingIds")) {
+				if (StringUtils.isNotBlank(s))
+					Context.getService(DHISReportingService.class).deleteMappedIndicatorReport(Context.getService(DHISReportingService.class).getMappedIndicatorReport(Integer.parseInt(s)));
+			}
+			response += "Successfully Deleted selected MappedIndicator reports";
+		}
+
+		if(m.getReport() != null) {
+			Context.getService(DHISReportingService.class).saveMappedIndicatorReport(m);
+			response += StringUtils.isBlank(response) ? "" : " & ";
+			response += "Successfully Saved MappedIndicator report";
+		}
+
+		List<MappedIndicatorReport> allMappedIndicatorReports = Context.getService(DHISReportingService.class)
+				.getAllMappedIndicatorReports();
+
+		basicAttributes(model, allMappedIndicatorReports);
+
+		if(StringUtils.isNotBlank(response))
+			request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, response);
+	}
+
+	private void basicAttributes(ModelMap model, List<MappedIndicatorReport> allMappedIndicatorReports) {
+		model.addAttribute("periodTypes", getNames(ReportingPeriodType.class));
+		model.addAttribute("locations", Context.getLocationService().getAllLocations(false));
+		model.addAttribute("reports", getAllPeriodIndicatorReports());
+		model.addAttribute("mappedIndicatorReports", allMappedIndicatorReports);
+		model.addAttribute("orgUnit", Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID));
+	}
 	@RequestMapping(value = "/module/dhisreporting/exportMapping", method = RequestMethod.GET)
 	public void exportMappingRenderer(ModelMap model) {
 	}
@@ -169,17 +205,36 @@ public class DHISReportingManageController {
 
 	private void importMapping(MultipartFile mapping, HttpServletRequest request) {
 		try {
-			OutputStream out = new FileOutputStream(DHISReportingConstants.INDICATOR_MAPPING_FILE);
+			if(mapping != null && mapping.getSize() > 0 && mapping.getOriginalFilename().endsWith(".csv")) {
+				OutputStream out = new FileOutputStream(DHISReportingConstants.INDICATOR_MAPPING_FILE);
 
-			IOUtils.copy(mapping.getInputStream(), out);
-			request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
-					"You have Successfully imported mapping file!");
-			out.close();
+				IOUtils.copy(mapping.getInputStream(), out);
+				request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
+						"You have Successfully imported mapping file!");
+				out.close();
+			} else
+				request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Please select a CSV mapping file");
 		} catch (IOException e) {
 			e.printStackTrace();
 			request.getSession().setAttribute(WebConstants.OPENMRS_ERROR_ATTR,
 					"Importing mapping file failed: !" + e.getMessage());
 		}
 
+	}
+
+	public String[] getNames(Class<? extends Enum<?>> e) {
+		return Arrays.toString(e.getEnumConstants()).replaceAll("^.|.$", "").split(", ");
+	}
+
+	public List<SerializedObject> getAllPeriodIndicatorReports() {
+		List<SerializedObject> reports = new ArrayList<SerializedObject>();
+		List<ReportDefinition> defs = Context.getService(ReportDefinitionService.class).getAllDefinitions(false);
+
+		for(ReportDefinition def : defs) {
+			if(def instanceof PeriodIndicatorReportDefinition) {
+                reports.add(Context.getService(SerializedDefinitionService.class).getSerializedDefinitionByUuid(def.getUuid()));
+			}
+		}
+		return reports;
 	}
 }

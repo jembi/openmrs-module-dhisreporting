@@ -1,21 +1,5 @@
 package org.openmrs.module.dhisreporting;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.Generated;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -26,8 +10,15 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.db.SerializedObject;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping;
 import org.openmrs.module.dhisreporting.mapping.IndicatorMapping.DisaggregationCategory;
-import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
+
+import javax.annotation.Generated;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Contains a reference to the OpenMRS period indicator report and its mapped
@@ -109,6 +100,17 @@ public class MappedIndicatorReport {
 		setReport(report);
 	}
 
+	public MappedIndicatorReport(String dataElementPrefixes, String disaggregationCategories, SerializedObject report,
+								 Location location, String periodType, String orgUnitId, String dataSetId) {
+		setDataElementPrefixes(dataElementPrefixes);
+		setDisaggregationCategories(disaggregationCategories);
+		setReport(report);
+		setLocation(location);
+		setPeriodType(periodType);
+		setOrgUnitId(orgUnitId);
+		setDataSetId(dataSetId);
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -147,8 +149,8 @@ public class MappedIndicatorReport {
 	}
 
 	@JsonIgnore
-	public PeriodIndicatorReportDefinition getPeriodIndicatorReport() {
-		return getReport() != null ? (PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class)
+	public ReportDefinition getPeriodIndicatorReport() {
+		return getReport() != null ? Context.getService(ReportDefinitionService.class)
 				.getDefinitionByUuid(report.getUuid()) : null;
 	}
 
@@ -198,6 +200,10 @@ public class MappedIndicatorReport {
 
 	public String getPeriodType() {
 		return periodType;
+	}
+
+	private String[] getNames(Class<? extends Enum<?>> e) {
+		return Arrays.toString(e.getEnumConstants()).replaceAll("^.|.$", "").split(", ");
 	}
 
 	public void setPeriodType(String periodType) {

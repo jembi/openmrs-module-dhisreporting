@@ -496,7 +496,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		if (report != null) {
 			List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null,
 					report.getDisaggregationCategoriesAsList(), report.getReportUuid(),
-					report.getDataElementPrefixesAsList());
+					report.getDataElementPrefixesAsList(), report.getDataSetId());
 
 			if (filteredMappings != null && !filteredMappings.isEmpty()) {
 				return runAndPushReportToDHIS(report.getReportUuid(), report.getDataSetId(), report.getOrgUnitId(),
@@ -630,7 +630,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		 * disaggregations and existing openmrs Rwanda MoH data
 		 */
 		List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null, disaggs, openmrsReportUuid,
-				dataElementPrefixs);
+				dataElementPrefixs, null);
 		return filteredMappings;
 	}
 
@@ -746,7 +746,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					if (useTestMapper) {
 						dv.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column));
 					} else {
-						if (m != null && m.getCategory() != null && m.getCategory().equals(mappingCategory)) {
+						if (m != null && m.getCategory() != null && m.getCategory().equals(mappingCategory) && dataSetId.equals(m.getDataset())) {
 							dv.setDataElement(StringUtils.isBlank(m.getDataelementId()) ? m.getDataelementCode()
 									: m.getDataelementId());
 							dv.setCategoryOptionCombo(StringUtils.isBlank(m.getCategoryoptioncomboUid())
@@ -1309,7 +1309,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	@Override
 	public List<IndicatorMapping> getIndicatorMappings(List<IndicatorMapping> indicatorMappings,
 			String mappingFileLocation, List<DisaggregationCategory> disaggs, String openmrsReportUuid,
-			List<String> dataElementPrefixs) {
+			List<String> dataElementPrefixs, String dataset) {
 		List<IndicatorMapping> filteredMappings = new ArrayList<IndicatorMapping>();
 
 		if (disaggs != null && StringUtils.isNotBlank(openmrsReportUuid) && dataElementPrefixs != null) {
@@ -1322,9 +1322,14 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 					boolean rightDataElements = false;
 
 					for (String pref : dataElementPrefixs) {
-						if (mapping.getDataelementName().startsWith(pref)
+						if (mapping.getDataelementCode().startsWith(pref)
 								&& StringUtils.isNotBlank(mapping.getDataelementId())) {
-							rightDataElements = true;
+
+							if(StringUtils.isNotBlank(dataset)) {
+								if (dataset.equals(mapping.getDataset()))
+									rightDataElements = true;
+							} else
+								rightDataElements = true;
 							break;
 						}
 					}
@@ -1672,7 +1677,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		dataElementPrefixs.add("PMTCT_EID");
 
 		List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null, disaggs, openmrsReportUuid,
-				dataElementPrefixs);
+				dataElementPrefixs, null);
 		return filteredMappings;
 	}
 
@@ -1762,7 +1767,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		dataElementPrefixs.add("ANC");
 
 		List<IndicatorMapping> filteredMappings = getIndicatorMappings(null, null, disaggs, ancReportUuid,
-				dataElementPrefixs);
+				dataElementPrefixs, null);
 		return filteredMappings;
 	}
 

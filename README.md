@@ -63,14 +63,15 @@ Implemented
   - [x] Create OpenMRS to DHIS2 mapping design
   - [x] Support Inherent, age and gender dimension/disaggregation categorisations
   - [x] Write ON ART report and support sample test indicators whose DHIS metadata can be created (add sample test metadata to prove the concept)
+  - [x] Write background tasks to run reports and post data depending on the reporting periods set in the mapping
+  - [x] Setup DHIS2 MER 2.0 indicators instance and test with it all default reports; [here](http://146.185.151.152:8080)
 
 TODO
+  > In progress
   - [ ] Support UI indicator mapping managment (edit, create new, delete) export/import etc
-  - [ ] Write background tasks to run reports and post data depending on the reporting periods set in the mapping
   - [ ] Report setup must always be triggered whenever changes are made to the mapping
-  - [ ] Create inbuit support for all the four default reports
-  - [ ] Setup DHIS2 MER 2.0 indicators instance and test with it all default reports
-
+  - [ ] Create inbuilt support for all the four default reports
+  
 
 # License
 
