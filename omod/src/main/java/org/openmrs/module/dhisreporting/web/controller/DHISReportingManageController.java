@@ -17,14 +17,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.SerializedObject;
 import org.openmrs.module.dhisconnector.api.DHISConnectorService;
-import org.openmrs.module.dhisconnector.api.model.DHISImportSummary;
 import org.openmrs.module.dhisreporting.DHISReportingConstants;
 import org.openmrs.module.dhisreporting.MappedIndicatorReport;
 import org.openmrs.module.dhisreporting.ReportingPeriodType;
@@ -57,28 +56,6 @@ public class DHISReportingManageController {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
-	@RequestMapping(value = "/module/dhisreporting/manage", method = RequestMethod.GET)
-	public void manage(ModelMap model) {
-		model.addAttribute("user", Context.getAuthenticatedUser());
-	}
-
-	@RequestMapping(value = "/module/dhisreporting/manage", method = RequestMethod.POST)
-	public void postManage(ModelMap model, HttpServletRequest request) {
-		DHISImportSummary feedback = (DHISImportSummary) Context.getService(DHISReportingService.class)
-				.runAndSendReportDataForTheCurrentMonth();
-
-		try {
-			request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
-					new ObjectMapper().writeValueAsString(feedback));
-		} catch (JsonGenerationException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@RequestMapping(value = "/module/dhisreporting/mappings", method = RequestMethod.GET)
 	public void mappings(ModelMap model) {
 		model.addAttribute("mappings", Context.getService(DHISReportingService.class).getAllMappings());
@@ -108,7 +85,7 @@ public class DHISReportingManageController {
 		List<MappedIndicatorReport> allMappedIndicatorReports = Context.getService(DHISReportingService.class)
 				.getAllMappedIndicatorReports();
 
-		basicAttributes(model, allMappedIndicatorReports);
+		basicMappedReportAttributes(model, allMappedIndicatorReports);
 	}
 
 	@RequestMapping(value = "/module/dhisreporting/dynamicReports", method = RequestMethod.POST)
@@ -136,13 +113,13 @@ public class DHISReportingManageController {
 		List<MappedIndicatorReport> allMappedIndicatorReports = Context.getService(DHISReportingService.class)
 				.getAllMappedIndicatorReports();
 
-		basicAttributes(model, allMappedIndicatorReports);
+		basicMappedReportAttributes(model, allMappedIndicatorReports);
 
 		if(StringUtils.isNotBlank(response))
 			request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, response);
 	}
 
-	private void basicAttributes(ModelMap model, List<MappedIndicatorReport> allMappedIndicatorReports) {
+	private void basicMappedReportAttributes(ModelMap model, List<MappedIndicatorReport> allMappedIndicatorReports) {
 		model.addAttribute("periodTypes", getNames(ReportingPeriodType.class));
 		model.addAttribute("locations", Context.getLocationService().getAllLocations(false));
 		model.addAttribute("reports", getAllPeriodIndicatorReports());
@@ -236,5 +213,33 @@ public class DHISReportingManageController {
 			}
 		}
 		return reports;
+	}
+
+
+	@RequestMapping(value = "/module/dhisreporting/configurations", method = RequestMethod.GET)
+	public void configurations(ModelMap model) {
+		model.addAttribute("configurations", Context.getService(DHISReportingService.class).getDHISReportingConfigurations());
+	}
+
+
+	@RequestMapping(value = "/module/dhisreporting/configurations", method = RequestMethod.POST)
+	public void saveConfigurations(ModelMap model, HttpServletRequest request) {
+		JSONArray configs = Context.getService(DHISReportingService.class).getDHISReportingConfigurations();
+
+		for(int i = 0; i < configs.size(); i++) {
+			JSONObject config = (JSONObject) configs.get(i);
+			String property = (String) config.get("property");
+			String value = request.getParameter(property);
+
+			if(StringUtils.isNotBlank(property) && !((String) config.get("value")).equals(value)) {
+				GlobalProperty gp = Context.getAdministrationService().getGlobalPropertyObject(property);
+
+				if(gp != null)
+					gp.setPropertyValue(value);
+			}
+		}
+		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR,
+				"You have Successfully saved configurations.");
+		model.addAttribute("configurations", Context.getService(DHISReportingService.class).getDHISReportingConfigurations());
 	}
 }

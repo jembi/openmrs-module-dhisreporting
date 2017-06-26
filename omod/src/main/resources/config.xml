@@ -231,7 +231,7 @@
 		<description>on ART dhis dataset uid</description>
 	</globalProperty>
 	<globalProperty>
-		<property>dhisreporting.dataset.onARTPeriodType</property>
+		<property>dhisreporting.dataset.onQuarteryPeriodType</property>
 		<defaultValue>Quarterly</defaultValue>
 		<description>on ART dhis dataset periodType</description>
 	</globalProperty>
@@ -274,6 +274,16 @@
 	<property>dhisreporting.dataset.monthlyPeriodType</property>
 		<defaultValue>Monthly</defaultValue>
 		<description>DHIS2 monthly period type</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.dataset.hivStatusUid</property>
+		<defaultValue>J0ahCwZBSy8</defaultValue>
+		<description>HIV Status report matching DHIS2 dataset uid</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.dataset.rhmisANCUid</property>
+		<defaultValue>ygTEbJWQhqf</defaultValue>
+		<description>RHIS ANC report matching DHIS2 dataset uid</description>
 	</globalProperty>
 </module>
 

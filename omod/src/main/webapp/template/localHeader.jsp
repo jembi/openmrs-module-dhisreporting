@@ -5,25 +5,29 @@
 				code="admin.title.short" /></a></li>
 
 	<li
+			<c:if test='<%= request.getRequestURI().contains("/configurations") %>'>class="active"</c:if>>
+		<a
+				href="${pageContext.request.contextPath}/module/dhisreporting/configurations.form">Configurations</a>
+	</li>
+	<li
+			<c:if test='<%= request.getRequestURI().contains("/dynamicReports") %>'>class="active"</c:if>>
+		<a
+				href="${pageContext.request.contextPath}/module/dhisreporting/dynamicReports.form">Dynamic Period Indicator Reports</a>
+	</li>
+	<li
+			<c:if test='<%= request.getRequestURI().contains("/exportMapping") %>'>class="active"</c:if>>
+		<a
+				href="${pageContext.request.contextPath}/module/dhisreporting/exportMapping.form">Export Mapping</a>
+	</li>
+	<li
+			<c:if test='<%= request.getRequestURI().contains("/importMapping") %>'>class="active"</c:if>>
+		<a
+				href="${pageContext.request.contextPath}/module/dhisreporting/importMapping.form">Import Mapping</a>
+	</li>
+	<li
 		<c:if test='<%= request.getRequestURI().contains("/pepfar") %>'>class="active"</c:if>>
 		<a
 		href="${pageContext.request.contextPath}/module/dhisreporting/pepfar.form">PEPFAR MER 2.0 Indicator Reports</a>
-	</li>
-	
-	<li
-		<c:if test='<%= request.getRequestURI().contains("/dynamicReports") %>'>class="active"</c:if>>
-		<a
-		href="${pageContext.request.contextPath}/module/dhisreporting/dynamicReports.form">Dynamic Period Indicator Reports</a>
-	</li>
-	<li
-		<c:if test='<%= request.getRequestURI().contains("/exportMapping") %>'>class="active"</c:if>>
-		<a
-		href="${pageContext.request.contextPath}/module/dhisreporting/exportMapping.form">Export Mapping</a>
-	</li>
-	<li
-		<c:if test='<%= request.getRequestURI().contains("/importMapping") %>'>class="active"</c:if>>
-		<a
-		href="${pageContext.request.contextPath}/module/dhisreporting/importMapping.form">Import Mapping</a>
 	</li>
 	<!-- Add further links here -->
 </ul>

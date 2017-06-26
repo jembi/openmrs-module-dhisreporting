@@ -13,11 +13,11 @@
  */
 package org.openmrs.module.dhisreporting.extension.html;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.openmrs.module.Extension;
 import org.openmrs.module.web.extension.AdministrationSectionExt;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * This class defines the links that will appear on the administration page
@@ -45,10 +45,11 @@ public class AdminList extends AdministrationSectionExt {
 	public Map<String, String> getLinks() {
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
-		map.put("/module/dhisreporting/pepfar.form", "PEPFAR MER 2.0 Indicator Reports");
+		map.put("/module/dhisreporting/configurations.form", "Configurations");
 		map.put("/module/dhisreporting/dynamicReports.form", "Dynamic Period Indicator Reports");
 		map.put("/module/dhisreporting/exportMapping.form", "Export Mapping");
 		map.put("/module/dhisreporting/importMapping.form", "Import Mapping");
+		map.put("/module/dhisreporting/pepfar.form", "PEPFAR MER 2.0 Indicator Reports");
 
 		return map;
 	}

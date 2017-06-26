@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This service exposes module's core functionality. It is a Spring managed bean
@@ -162,4 +163,8 @@ public interface DHISReportingService extends OpenmrsService {
 	public void deleteAllDHISReportingReports();
 
 	public Object runAndPostANCReportToDHIS();
+
+	public JSONArray getDHISReportingConfigurations();
+
+	public Map<String, Object> getFieldNamesAndValues(final Object obj, boolean publicOnly) throws IllegalArgumentException, IllegalAccessException;
 }

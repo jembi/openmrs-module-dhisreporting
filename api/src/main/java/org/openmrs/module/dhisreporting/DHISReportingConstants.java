@@ -6,6 +6,32 @@ import java.io.File;
 
 public class DHISReportingConstants {
 
+	/**
+	 * TODO maybe rename to be used for the rest of the reports
+	 */
+	public static String DHIS_DATASET_ONART_UID = "dhisreporting.dataset.onARTUid";
+
+	public static String DHIS_DATASET_HIVSTATUS_UID = "dhisreporting.dataset.hivStatusUid";
+
+	public static String DHIS_DATASET_RHMISANC_UID = "dhisreporting.dataset.rhmisANCUid";
+
+	public static String DHIS_DATASET_QUARTERY_PERIODTYPE = "dhisreporting.dataset.onQuarteryPeriodType";
+
+	public static String DHIS_DATASET_MONTHLY_PERIODTYPE = "dhisreporting.dataset.monthlyPeriodType";
+
+	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
+
+	public static String AGEQUERY_INFANT = "dhisreporting.ageQuery.infant";
+
+	public static String ENCOUNTERTYPE_ANC_REPORT_UUID = "pmtct.encounterType.anc";
+
+	public static String DISABLE_BASE_COHORTS = "dhisreporting.baseCohort.disable";
+
+	public static String DISABLE_WEB_REPORTS_DELETION = "dhisreporting.reporting.disableWebReportsDeletion";
+
+	public static String POST_SAMPLE_DHIS_METADATA = "dhisreporting.dhis.postSampleMetaFromMapping";
+
+
 	private static final String DHISREPORTING_DIRECTORY_NAME = "DHISReporting";
 
 	public static final File DHISREPORTING_DIRECTORY = OpenmrsUtil
@@ -96,17 +122,6 @@ public class DHISReportingConstants {
 
 	public static String REPORT_UUID_ANC = "dhisreporting.reporting.ancUuid";
 
-	/**
-	 * TODO maybe rename to be used for the rest of the reports
-	 */
-	public static String DHIS_DATASET_ONART_UID = "dhisreporting.dataset.onARTUid";
-
-	public static String DHIS_DATASET_QUARTERY_PERIODTYPE = "dhisreporting.dataset.onARTPeriodType";
-
-	public static String DHIS_DATASET_MONTHLY_PERIODTYPE = "dhisreporting.dataset.monthlyPeriodType";
-
-	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
-
 	public static String INDICATOR_MAPPING_FILE_NAME = "pepfar-meta-datim.csv";
 
 	public static File INDICATOR_MAPPING_FILE = new File(
@@ -117,15 +132,5 @@ public class DHISReportingConstants {
 	public static String NEW_ON_ART_PERIOD_MONTHS = "dhisreporting.reporting.newOnARTPeriodInMonths";
 
 	public static String DATAELEMENT_DISAGG_SEPARATOR = "__";
-
-	public static String DISABLE_WEB_REPORTS_DELETION = "dhisreporting.reporting.disableWebReportsDeletion";
-
-	public static String POST_SAMPLE_DHIS_METADATA = "dhisreporting.dhis.postSampleMetaFromMapping";
-
-	public static String AGEQUERY_INFANT = "dhisreporting.ageQuery.infant";
-
-	public static String ENCOUNTERTYPE_ANC_REPORT_UUID = "pmtct.encounterType.anc";
-
-	public static String DISABLE_BASE_COHORTS = "dhisreporting.baseCohort.disable";
 
 }

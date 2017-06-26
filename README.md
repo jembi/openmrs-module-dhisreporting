@@ -71,6 +71,8 @@ TODO
   - [ ] Support UI indicator mapping managment (edit, create new, delete) export/import etc
   - [ ] Report setup must always be triggered whenever changes are made to the mapping
   - [ ] Create inbuilt support for all the four default reports
+  - [ ] Rename Dynamic mapping category to rather something more meaningful such as Custom indicator mapping instead
+  - [ ] Translate all hard-coded UI messages
   
 
 # References

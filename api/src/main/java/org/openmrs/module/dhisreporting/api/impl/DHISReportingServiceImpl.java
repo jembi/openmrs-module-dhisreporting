@@ -28,6 +28,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.openmrs.Concept;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.OpenmrsMetadata;
 import org.openmrs.api.PatientSetService.TimeModifier;
@@ -80,8 +81,12 @@ import org.openmrs.web.WebConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static org.openmrs.api.context.Context.getAdministrationService;
 
 /**
  * It is a default implementation of {@link DHISReportingService}.
@@ -244,17 +249,17 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		 * .getDefinitionByUuid(DHISReportingConstants.LAB_REPORT_UUID) == null)
 		 * { createNewLabPeriodReportAndItsDHISConnectorMapping(); }
 		 */
-		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(Context.getAdministrationService()
+		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART)) == null) {
 			createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings();
 
 		}
-		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(Context.getAdministrationService()
+		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS)) == null) {
 			createNewPeriodIndicatorHIVStatusReportFromInBuiltIndicatorMappings();
 
 		}
-		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(Context.getAdministrationService()
+		if (Context.getService(ReportDefinitionService.class).getDefinitionByUuid(getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC)) == null) {
 			createNewPeriodIndicatorANCReportFromInBuiltIndicatorMappings();
 
@@ -331,7 +336,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 		createNewDHISPeriodReportAndItsDHISConnectorMappingOrUseExisting("HMIS Lab Request",
 				"HMIS Auto-generated Lab Request", indicators,
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.LAB_REPORT_UUID),
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.LAB_REPORT_UUID),
 				DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST", "Monthly");
 	}
 
@@ -368,24 +373,22 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	public List<String> pepfarPage(HttpServletRequest request) {
 		ReportDefinitionService rDService = Context.getService(ReportDefinitionService.class);
 		PeriodIndicatorReportDefinition onART = (PeriodIndicatorReportDefinition) rDService.getDefinitionByUuid(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART));
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART));
 		PeriodIndicatorReportDefinition hivStatus = (PeriodIndicatorReportDefinition) rDService.getDefinitionByUuid(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS));
-		String disableWebReportsDeletion = Context.getAdministrationService()
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS));
+		String disableWebReportsDeletion = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION);
 		PeriodIndicatorReportDefinition anc = (PeriodIndicatorReportDefinition) rDService.getDefinitionByUuid(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC));
-		String dataSetId = Context.getAdministrationService()
-				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_UID);
-		String orgUnitId = Context.getAdministrationService()
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC));
+		String orgUnitId = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID);
 		Integer locationId = Integer.parseInt(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
 		Object ancResp = null;
 		Object onARTResp = null;
 		Object hivStatusResp = null;
 		List<String> response = new ArrayList<String>();
-		String dhisMonthlyPeriodType = Context.getAdministrationService()
+		String dhisMonthlyPeriodType = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_MONTHLY_PERIODTYPE);
 
 		if ("false".equals(disableWebReportsDeletion)) {
@@ -449,20 +452,20 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	@Override
 	public void deleteAllDHISReportingReports() {
-		String disableWebReports = Context.getAdministrationService()
+		String disableWebReports = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DISABLE_WEB_REPORTS_DELETION);
 
 		if("false".equals(disableWebReports)) {
 			deletePeriodIndicatorReport((PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class).getDefinitionByUuid(
-					Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART)));
+					getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART)));
 			deletePeriodIndicatorReport((PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class).getDefinitionByUuid(
-					Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_PREVENTION)));
+					getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_PREVENTION)));
 			deletePeriodIndicatorReport((PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class).getDefinitionByUuid(
-					Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS)));
+					getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS)));
 			deletePeriodIndicatorReport((PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class).getDefinitionByUuid(
-					Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_OTHER)));
+					getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_OTHER)));
 			deletePeriodIndicatorReport((PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class).getDefinitionByUuid(
-					Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC)));
+					getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC)));
 		}
 	}
 
@@ -513,7 +516,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	 */
 	@Override
 	public void createNewPeriodIndicatorONARTReportFromInBuiltIndicatorMappings() {
-		String openmrsReportUuid = Context.getAdministrationService()
+		String openmrsReportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
 		// creating cohort indicators
 		PeriodIndicatorReportDefinition report = (PeriodIndicatorReportDefinition) Context
@@ -616,7 +619,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	private List<IndicatorMapping> filterONARTIndicatorMappings() {
-		String openmrsReportUuid = Context.getAdministrationService()
+		String openmrsReportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
 		List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
 		List<String> dataElementPrefixs = new ArrayList<String>();
@@ -747,6 +750,8 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 						dv.setDataElement(getValueFromMappings(DHISMappingType.CONCEPTDATAELEMENT + "_" + column));
 					} else {
 						if (m != null && m.getCategory() != null && m.getCategory().equals(mappingCategory) && dataSetId.equals(m.getDataset())) {
+							if(StringUtils.isNotBlank(dataSetId))
+								dataSetId = m.getDataset();
 							dv.setDataElement(StringUtils.isBlank(m.getDataelementId()) ? m.getDataelementCode()
 									: m.getDataelementId());
 							dv.setCategoryOptionCombo(StringUtils.isBlank(m.getCategoryoptioncomboUid())
@@ -854,13 +859,13 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		Calendar startDate = Calendar.getInstance(Context.getLocale());
 		Date endDate = new Date();
 		Location defaultLocation = Context.getLocationService().getLocation(Integer.parseInt(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID)));
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID)));
 		PeriodIndicatorReportDefinition labReportDef = (PeriodIndicatorReportDefinition) Context
 				.getService(ReportDefinitionService.class).getDefinitionByUuid(DHISReportingConstants.LAB_REPORT_UUID);
 		Report labReport = runPeriodIndicatorReport(labReportDef, startDate.getTime(), endDate, defaultLocation);
 		String dataSetId = getValueFromMappings(DHISMappingType.DATASET + "_" + "HMIS_LAB_REQUEST");
 		String orgUnitId = getValueFromMappings(DHISMappingType.LOCATION + "_"
-				+ Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID));
+				+ getAdministrationService().getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID));
 		String period = new SimpleDateFormat("yyyyMM").format(new Date());
 
 		startDate.set(Calendar.DAY_OF_MONTH, 1);
@@ -873,16 +878,16 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	@Override
 	public Object runAndPostOnARTReportToDHIS() {
 		// TODO fix and invoke respectively
-		String reportUuid = Context.getAdministrationService()
+		String reportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ONART);
-		String dataSetId = Context.getAdministrationService()
+		String dataSetId = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_UID);
-		String orgUnitId = Context.getAdministrationService()
+		String orgUnitId = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID);
-		String periodType = Context.getAdministrationService()
+		String periodType = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_QUARTERY_PERIODTYPE);
 		Integer locationId = Integer.parseInt(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
 		List<IndicatorMapping> indicatorMappings = filterONARTIndicatorMappings();
 
 		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, periodType, locationId, indicatorMappings,
@@ -891,16 +896,16 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 
 	@Override
 	public Object runAndPostHIVStatusReportToDHIS() {
-		String reportUuid = Context.getAdministrationService()
+		String reportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS);
-		String dataSetId = Context.getAdministrationService()
-				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_UID);
-		String orgUnitId = Context.getAdministrationService()
+		String dataSetId = getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_HIVSTATUS_UID);
+		String orgUnitId = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID);
-		String periodType = Context.getAdministrationService()
+		String periodType = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_QUARTERY_PERIODTYPE);
 		Integer locationId = Integer.parseInt(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
 		List<IndicatorMapping> indicatorMappings = filterHIVStatusIndicatorMappings();
 
 		return runAndPushReportToDHIS(reportUuid, dataSetId, orgUnitId, periodType, locationId, indicatorMappings,
@@ -910,17 +915,17 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	@Override
 	public Object runAndPostANCReportToDHIS() {
 		PeriodIndicatorReportDefinition anc = (PeriodIndicatorReportDefinition) Context.getService(ReportDefinitionService.class).getDefinitionByUuid(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC));
-		String dataSetId = Context.getAdministrationService()
-				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_ONART_UID);
-		String orgUnitId = Context.getAdministrationService()
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC));
+		String dataSetId = getAdministrationService()
+				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_RHMISANC_UID);
+		String orgUnitId = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.CONFIGURED_ORGUNIT_UID);
 		Integer locationId = Integer.parseInt(
-				Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
-		String dhisMonthlyPeriodType = Context.getAdministrationService()
+				getAdministrationService().getGlobalProperty(DHISReportingConstants.DEFAULT_LOCATION_ID));
+		String dhisMonthlyPeriodType = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.DHIS_DATASET_MONTHLY_PERIODTYPE);
 
-		return runAndPushReportToDHIS(Context.getAdministrationService()
+		return runAndPushReportToDHIS(getAdministrationService()
 						.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC), dataSetId, orgUnitId, dhisMonthlyPeriodType, locationId, filterANCIndicatorMappings(),
 				IndicatorMappingCategory.INBUILT);
 	}
@@ -1614,7 +1619,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	public void createNewPeriodIndicatorHIVStatusReportFromInBuiltIndicatorMappings() {
-		String openmrsReportUuid = Context.getAdministrationService()
+		String openmrsReportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS);
 		// creating cohort indicators
 		PeriodIndicatorReportDefinition report = (PeriodIndicatorReportDefinition) Context
@@ -1667,7 +1672,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	private List<IndicatorMapping> filterHIVStatusIndicatorMappings() {
-		String openmrsReportUuid = Context.getAdministrationService()
+		String openmrsReportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_HIVSTATUS);
 		List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
 		List<String> dataElementPrefixs = new ArrayList<String>();
@@ -1682,7 +1687,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	public void createNewPeriodIndicatorANCReportFromInBuiltIndicatorMappings() {
-		String openmrsReportUuid = Context.getAdministrationService()
+		String openmrsReportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC);
 		// creating cohort indicators
 		PeriodIndicatorReportDefinition report = (PeriodIndicatorReportDefinition) Context
@@ -1728,7 +1733,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		CohortIndicator indicator;
 		CompositionCohortDefinition cd = new CompositionCohortDefinition();
 		String cdQuery = "";
-		String disableBaseCohorts = Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.DISABLE_BASE_COHORTS);
+		String disableBaseCohorts = getAdministrationService().getGlobalProperty(DHISReportingConstants.DISABLE_BASE_COHORTS);
 		CohortDefinition cd1 = null;
 
 		if (baseCohortDefinition != null) {
@@ -1758,7 +1763,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 	}
 
 	private List<IndicatorMapping> filterANCIndicatorMappings() {
-		String ancReportUuid = Context.getAdministrationService()
+		String ancReportUuid = getAdministrationService()
 				.getGlobalProperty(DHISReportingConstants.REPORT_UUID_ANC);
 		List<DisaggregationCategory> disaggs = new ArrayList<DisaggregationCategory>();
 		List<String> dataElementPrefixs = new ArrayList<String>();
@@ -1783,5 +1788,57 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		disaggs.add(DisaggregationCategory.INHERENT);
 		disaggs.add(DisaggregationCategory.CODED);
 		disaggs.add(DisaggregationCategory.NULL);
+	}
+
+	@Override
+	public Map<String, Object> getFieldNamesAndValues(Object obj, boolean publicOnly)
+			throws IllegalArgumentException, IllegalAccessException {
+		Class<? extends Object> c = obj.getClass();
+		Map<String, Object> map = new HashMap<String, Object>();
+		Field[] fields = c.getDeclaredFields();
+		for (int i = 0; i < fields.length; i++) {
+			String name = fields[i].getName();
+			if (publicOnly) {
+				if(Modifier.isPublic(fields[i].getModifiers())) {
+					Object value = fields[i].get(obj);
+					map.put(name, value);
+				}
+			}
+			else {
+				fields[i].setAccessible(true);
+				Object value = fields[i].get(obj);
+				map.put(name, value);
+			}
+		}
+		return map;
+	}
+
+	@Override
+	public JSONArray getDHISReportingConfigurations() {
+		JSONArray ja = new JSONArray();
+
+		try {
+			Iterator it = getFieldNamesAndValues(new DHISReportingConstants(), true).entrySet().iterator();
+			while (it.hasNext()) {
+				Object o = ((Map.Entry) it.next()).getValue();
+
+				if(o instanceof String) {
+					String gpProp = (String) o;
+					JSONObject j = new JSONObject();
+					GlobalProperty gp = Context.getAdministrationService().getGlobalPropertyObject(gpProp);
+
+					if(gp != null) {
+						j.put("property", gpProp);
+						j.put("value", StringUtils.isNotBlank(gp.getPropertyValue()) ? gp.getPropertyValue() : "");
+						j.put("uuid", gp.getUuid());
+						j.put("description", gp.getDescription());
+						ja.add(j);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ja;
 	}
 }
