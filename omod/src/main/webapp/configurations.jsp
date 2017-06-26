@@ -17,7 +17,7 @@
                 <tr class="evenRow">
                     <td>${config.property}</td>
                     <td>${config.description}</td>
-                    <td><input type="text" value="${config.value}" name="${config.property}"></td>
+                    <td><input type="text" value="${config.value}" name="${config.property}" size="35"></td>
                 </tr>
             </c:forEach>
         </tbody>
