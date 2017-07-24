@@ -4,6 +4,10 @@ import org.openmrs.util.OpenmrsUtil;
 
 import java.io.File;
 
+/**
+ * Used by java reflection to generate configurations.jsp settings besides as simple constants
+ * Don't refactor un-used constants out
+ */
 public class DHISReportingConstants {
 
 	/**
@@ -139,4 +143,5 @@ public class DHISReportingConstants {
 
 	public static String PERIODTYPE_MONTHLY_DAY = "dhisreporting.periodType.monthlyDay";
 
+	public static String DATA_AND_LOGS_STORAGE_PERIOD = "dhisreporting.config.dataAndLogsStoragePeriod";
 }
