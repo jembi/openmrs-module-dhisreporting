@@ -285,5 +285,20 @@
 		<defaultValue>ygTEbJWQhqf</defaultValue>
 		<description>RHIS ANC report matching DHIS2 dataset uid</description>
 	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.periodType.dailyHour</property>
+		<defaultValue>12:00</defaultValue>
+		<description>24 hour Time (exact hour:minutes format) to execute period type indicators defaults to mid-day</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.periodType.weeklyDay</property>
+		<defaultValue>2</defaultValue>
+		<description>Day of the week to execute weekly indicators, defaults to monday</description>
+	</globalProperty>
+	<globalProperty>
+		<property>dhisreporting.periodType.monthlyDay</property>
+		<defaultValue>1</defaultValue>
+		<description>Day of the month to execute monthly indicators, defaults to 1st</description>
+	</globalProperty>
 </module>
 

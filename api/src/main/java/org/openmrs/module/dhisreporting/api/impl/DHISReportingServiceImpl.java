@@ -930,6 +930,14 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 				IndicatorMappingCategory.INBUILT);
 	}
 
+	/*
+	 * timeString should be of format 12:00 in 24 hour time format
+	 */
+	private void setDailyTime(Calendar cal, String timeString) {
+		cal.set(Calendar.HOUR, Integer.parseInt(timeString.split(":")[0]));
+		cal.set(Calendar.MINUTE, Integer.parseInt(timeString.split(":")[1]));
+	}
+
 	public Object runAndPushReportToDHIS(String reportUuid, String dataSetId, String orgUnitId, String periodType,
 			Integer locationId, List<IndicatorMapping> indicatorMappings, IndicatorMappingCategory mappingCategory) {
 		// TODO pull DHISDataSet object from configuration into DHISConnector
@@ -940,6 +948,9 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		PeriodIndicatorReportDefinition labReportDef = (PeriodIndicatorReportDefinition) Context
 				.getService(ReportDefinitionService.class).getDefinitionByUuid(reportUuid);
 		String period = "";
+		String gpDailyHour = Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.PERIODTYPE_DAILY_HOUR);
+		String gpWeeklyDay = Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.PERIODTYPE_WEEKLY_DAY);
+		String gpMonthlyDay = Context.getAdministrationService().getGlobalProperty(DHISReportingConstants.PERIODTYPE_MONTHLY_DAY);
 
 		// TODO support more period types
 		if (ReportingPeriodType.Quarterly.name().equals(periodType)) {
@@ -949,6 +960,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			period += startDate.get(Calendar.YEAR) + "Q" + ((startDate.get(Calendar.MONTH) / 3) + 1);
 		} else if (ReportingPeriodType.Monthly.name().equals(periodType)) {
 			startDate.add(Calendar.MONTH, -1);
+			startDate.set(Calendar.DAY_OF_MONTH, Integer.parseInt(gpMonthlyDay));
 			endDate.setTime(startDate.getTime());
 			endDate.add(Calendar.MONTH, 1);
 			period += new SimpleDateFormat("yyyyMM").format(startDate.getTime());
@@ -959,11 +971,13 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 			period += startDate.get(Calendar.YEAR);
 		} else if (ReportingPeriodType.Weekly.name().equals(periodType)) {
 			startDate.add(Calendar.WEEK_OF_YEAR, -1);
+			startDate.set(Calendar.DAY_OF_WEEK, Integer.parseInt(gpWeeklyDay));
 			endDate.setTime(startDate.getTime());
 			endDate.add(Calendar.WEEK_OF_YEAR, 1);
 			period += startDate.get(Calendar.YEAR) + "W" + startDate.get(Calendar.WEEK_OF_YEAR);
 		} else if (ReportingPeriodType.Daily.name().equals(periodType)) {
 			startDate.add(Calendar.DAY_OF_YEAR, -1);
+			setDailyTime(startDate, gpDailyHour);
 			endDate.setTime(startDate.getTime());
 			endDate.add(Calendar.DAY_OF_YEAR, 1);
 			period += new SimpleDateFormat("yyyyMMdd").format(startDate.getTime());

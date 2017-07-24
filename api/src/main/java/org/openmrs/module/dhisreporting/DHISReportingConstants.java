@@ -133,4 +133,10 @@ public class DHISReportingConstants {
 
 	public static String DATAELEMENT_DISAGG_SEPARATOR = "__";
 
+	public static String PERIODTYPE_DAILY_HOUR = "dhisreporting.periodType.dailyHour";
+
+	public static String PERIODTYPE_WEEKLY_DAY = "dhisreporting.periodType.weeklyDay";
+
+	public static String PERIODTYPE_MONTHLY_DAY = "dhisreporting.periodType.monthlyDay";
+
 }
