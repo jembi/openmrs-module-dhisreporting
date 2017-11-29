@@ -1827,6 +1827,7 @@ public class DHISReportingServiceImpl extends BaseOpenmrsService implements DHIS
 		return map;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public JSONArray getDHISReportingConfigurations() {
 		JSONArray ja = new JSONArray();

@@ -23,7 +23,7 @@ public class DHISReportingConstants {
 
 	public static String DHIS_DATASET_MONTHLY_PERIODTYPE = "dhisreporting.dataset.monthlyPeriodType";
 
-	public static String DXF_TO_ADX_SWITCH = "dhisreporting.config.dxfToAdxSwitch";
+	public static String DXF_TO_ADX_SWITCH = "dhisconnector.config.dxfToAdxSwitch";
 
 	public static String AGEQUERY_INFANT = "dhisreporting.ageQuery.infant";
 
